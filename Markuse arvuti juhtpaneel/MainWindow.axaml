@@ -1,0 +1,238 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="929" d:DesignHeight="681"
+        x:Class="Markuse_arvuti_juhtpaneel.MainWindow"
+        Title="Markuse arvuti juhtpaneel"
+        Width="929" Height="681">
+  <Grid Name="ErtGrid" SizeChanged="Grid_SizeChanged">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="120"></RowDefinition>
+      <RowDefinition/>
+    </Grid.RowDefinitions>
+    <StackPanel>
+      <Image DoubleTapped="Image_DoubleTapped" Margin="0,10,0,0" Name="Logo" Height="64" Width="64"/>
+      <TextBlock Name="TopLabel" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" FontSize="23" Margin="0,10,0,0" Text="markuse arvuti juhtpaneel">
+      </TextBlock>
+    </StackPanel>
+    <TabControl Grid.Row="1" FontSize="12">
+<!--Avaleht-->
+      <TabItem Header="Avaleht">
+        <StackPanel>
+          <Label>Integratsioonimenüü</Label>
+          <WrapPanel Classes="Left">
+            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" IsEnabled="False">Loo kuvatõmmis ja salvesta nim.</Button>
+            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" IsEnabled="False">Loo kuvatõmmis ja salvesta</Button>
+            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="FindFlash">Markuse mälupulk</Button>
+            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="QuickNotes">Kiirmärkmik</Button>
+            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="RestartMas">Taaskäivita Markuse asjad</Button>
+          </WrapPanel>
+          <Label>Windowsi tarvikud</Label>
+          <WrapPanel Classes="Left">
+            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartTaskMgr">Tegumihaldur</Button>
+            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartCmd">Käsuviip</Button>
+            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartDevmgmt">Seadmehaldur</Button>
+            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartRegedit">Registrite redigeerija</Button>
+            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartCompmgmt">Arvuti haldamine</Button>
+          </WrapPanel>
+          <WrapPanel Orientation="Vertical" HorizontalAlignment="Left">
+            <Label Classes="H1">Info</Label>
+            <TextBlock Name="InfoTextBlock" Width="500" TextAlignment="Start" HorizontalAlignment="Left" TextWrapping="Wrap">Siin kuvatakse teave, kui liigutate kursori teatud nupu peale.</TextBlock>
+          </WrapPanel>
+        </StackPanel>
+      </TabItem>
+<!--MarkuStation-->
+      <TabItem Header="MarkuStation" Loaded="MarkuStationTabLoad">
+        <StackPanel>
+          <Label Classes="H1">MarkuStation</Label>
+          <Label>Mängud</Label>
+          <ListBox Height="150" Margin="0,0,0,10" Name="GameList" DoubleTapped="MsGameEdit">
+            <ListBoxItem>Dummy A</ListBoxItem>
+            <ListBoxItem>Dummy B</ListBoxItem>
+            <ListBoxItem>Dummy C</ListBoxItem>
+            <ListBoxItem>Dummy D</ListBoxItem>
+          </ListBox>
+          <StackPanel Orientation="Horizontal">
+            <StackPanel>
+              <Label>Lisa</Label>
+              <StackPanel Orientation="Horizontal">
+                <Label>Mängu nimi</Label>
+                <TextBox Name="GameNameBox" Width="200" Margin="15,0,0,0"></TextBox>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Height="30">
+                <Label>Asukoht</Label>
+                <TextBox Name="LocationBox" Width="200" Margin="15,0,0,0"></TextBox>
+                <Button Height="30" Margin="10,0" FontSize="14" Click="BrowseButtonAsync">...</Button>
+              </StackPanel>
+              <Button Click="AddButton">Lisa</Button>
+            </StackPanel>
+            <StackPanel>
+              <Label>Varia</Label>
+              <CheckBox Name="creepCheck">Luba creepypasta intro</CheckBox>
+              <CheckBox Name="specialCheck">Luba special intro</CheckBox>
+              <CheckBox Name="introCheck">Luba introd</CheckBox>
+              <StackPanel Orientation="Horizontal">
+                <Label Margin="0,0,15,0">Kuva</Label>
+                <ComboBox Name="MonMode">
+                  <ComboBoxItem>Laienda</ComboBoxItem>
+                  <ComboBoxItem>Kuva ainult esimene ekraan (sisemine)</ComboBoxItem>
+                  <ComboBoxItem>Kuva ainult teine ekraan (väline)</ComboBoxItem>
+                  <ComboBoxItem>Dubleeri</ComboBoxItem>
+                </ComboBox>
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal">
+            <Button Click="RunMs">Käivita MarkuStation</Button>
+            <Button Name="LoadButton" Click="MsLoadSettings">Laadi seadistused</Button>
+            <Button Click="MsSaveConfig">Salvesta seadistused</Button>
+          </StackPanel>
+        </StackPanel>
+      </TabItem>
+<!--Konfiguratsioon-->
+      <TabItem Header="Konfiguratsioon">
+        <StackPanel>
+          <Label Classes="H1" Margin="0,10">Konfiguratsioon</Label>
+          <CheckBox Name="ShowMasLogoCheck" Click="ConfigCheck">Kuva Markuse asjade logo integratsioonitarkvara käivitumisel</CheckBox>
+          <CheckBox Name="AllowScheduledTasksCheck" Click="ConfigCheck">Luba ajastatud sündmused</CheckBox>
+          <CheckBox Name="StartDesktopNotesCheck" Click="ConfigCheck">Käivita töölauamärkmed käivitumisel</CheckBox>
+          <Label Classes="H1" Margin="0,10">Taustad</Label>
+          <WrapPanel HorizontalAlignment="Center" Orientation="Horizontal">
+            <StackPanel Margin="0,0">
+              <Image Name="ThumbDesktop" Width="200" Height="200" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp" DoubleTapped="ChangeDesktop"></Image>
+              <Label HorizontalAlignment="Center">Töölaud</Label>
+            </StackPanel>
+            <StackPanel Margin="20,0,0,0">
+              <Image Name="ThumbLockscreen" Width="200" Height="200" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp" DoubleTapped="ChangeLogin"></Image>
+              <Label HorizontalAlignment="Center">Logimisekraan</Label>
+            </StackPanel>
+            <StackPanel Margin="20,0,0,0">
+              <Image Name="ThumbMiniversion" Width="200" Height="200" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp" DoubleTapped="ChangeMini"></Image>
+              <Label HorizontalAlignment="Center">Miniversioon</Label>
+            </StackPanel>
+          </WrapPanel>
+          <WrapPanel>
+            <Button Click="SwapBgs">Vaheta miniversioon töölauataustaga</Button>
+            <Button Click="EditScheds">Redigeeri ajastatud sündmuseid</Button>
+            <Button Click="EditBg">Teema taust</Button>
+            <Button Click="EditFg">Teema tekst</Button>
+          </WrapPanel>
+        </StackPanel>
+      </TabItem>
+<!--Teave-->
+      <TabItem Header="Teave">
+        <Grid>
+          <Panel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5">
+            <TextBlock Name="WhatNewLabel" TextAlignment="Right">
+                Mis on uut?
+            </TextBlock>
+          </Panel>
+          <Panel>
+            <StackPanel>
+              <Label Classes="H1">Markuse arvuti juhtpaneel</Label>
+              <Label Name="CpanelVersionLabel">versioon X.XX</Label>
+              <Label Margin="0,10,0,0">kasutab Avalonia UI raamistikku</Label>
+              <Label>Markuse tarkvara ©2024</Label>
+              <Panel Margin="0,10">
+                <StackPanel>
+                  <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                    <Rectangle Name="EditionBox" Fill="Gray" MinWidth="100" MinHeight="100"/>
+                    <StackPanel Margin="0">
+                      <Label Name="MasName" Margin="15,-5" FontSize="25" FontWeight="SemiLight" VerticalAlignment="Top">Markuse arvuti asjad</Label>
+                      <Label Name="MasEditionLabel" Margin="15,3" FontSize="18" FontWeight="SemiLight" VerticalAlignment="Top">Tundmatu väljaanne</Label>
+                    </StackPanel>
+                  </StackPanel>
+                  <TextBlock Name="EditionDetails" Margin="0,16" TextWrapping="WrapWithOverflow" Width="400" HorizontalAlignment="Left">
+                    Lorem ipsum dolor sit amet
+                  </TextBlock>
+              </StackPanel>
+                <StackPanel HorizontalAlignment="Right">
+                  <Label Margin="-5,5">Funktsioonid</Label>
+                  <WrapPanel Width="400">
+                    <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
+                      <Image Name="FeatTS" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Label Margin="10,10">Interaktiivne töölaud</Label>
+                    </StackPanel>
+                    <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
+                      <Image Name="FeatRM" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Label Margin="10,10">Rainmeter</Label>
+                    </StackPanel>
+                    <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
+                      <Image Name="FeatIP" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Label Margin="10,10">Integratsioonitarkvara</Label>
+                    </StackPanel>
+                    <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
+                      <Image Name="FeatCS" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Label Margin="10,10">Klassikaline start menüü</Label>
+                    </StackPanel>
+                    <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
+                      <Image Name="FeatMM" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Label Margin="10,10">Standardfunktsioonid</Label>
+                    </StackPanel>
+                    <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
+                      <Image Name="FeatRD" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Label Margin="10,10">Kaugjuhtimine</Label>
+                    </StackPanel>
+                    <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
+                      <Image Name="FeatWX" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Label Margin="10,10">Windows 10+</Label>
+                    </StackPanel>
+                    <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
+                      <Image Name="FeatLT" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Label Margin="10,10">LiveTuner optimeerimised</Label>
+                    </StackPanel>
+                    <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
+                      <Image Name="FeatGP" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Label Margin="10,10">Grupipoliitika</Label>
+                    </StackPanel>
+                  </WrapPanel>
+                </StackPanel>
+              </Panel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+              <Button Click="ComputerInfoClicked">Arvuti teave</Button>
+              <Button Click="OpenMasRootClicked">Ava mas kaust</Button>
+              <Button Click="ReRootClicked">Juuruta</Button>
+            </StackPanel>
+          </Panel>
+        </Grid>
+      </TabItem>
+    </TabControl>
+  </Grid>
+<!-- Styles -->
+  <Window.Styles>
+    <Style Selector="Window">
+      <Setter Property="FontFamily" Value="Segoe UI,Ubuntu,sans-serif"/>
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="Margin" Value="0,10,10,10"/>
+    </Style>
+    <Style Selector="Label.H1">
+      <Setter Property="FontSize" Value="20"/>
+    </Style>
+    <Style Selector="WrapPanel">
+      <Setter Property="Orientation" Value="Horizontal"/>
+    </Style>
+    <Style Selector="WrapPanel.Left">
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style Selector="TabItem > TextBlock">
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="TabControl WrapPanel">
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="StackPanel">
+      <Setter Property="Margin" Value="5"/>
+    </Style>
+    <Style Selector="StackPanel.NM">
+      <Setter Property="Margin" Value="0"/>
+    </Style>
+    <Style Selector="CheckBox">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="FontSize" Value="14"/>
+    </Style>
+  </Window.Styles>
+</Window>

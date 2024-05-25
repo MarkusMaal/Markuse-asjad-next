@@ -1,0 +1,971 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Data;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.OpenGL;
+using Avalonia.Platform.Storage;
+using Avalonia.Styling;
+using Avalonia.Threading;
+using MsBox.Avalonia;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Markuse_arvuti_juhtpaneel
+{
+    public partial class MainWindow : Window
+    {
+        string masRoot = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas";
+        Color[] scheme;
+        int rotation = 0;
+        string[] locations;
+        bool freezeTimer = false;
+        readonly string whatNew = "+ Üleminek Avalonia UI raamistikule, nullist uuesti kirjutamine";
+        public MainWindow()
+        {
+            InitializeComponent();
+            InitResources();
+
+            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
+            {
+                TopLabel.Text = "markuse virtuaalarvuti juhtpaneel";
+                this.Title = "Markuse virtuaalarvuti juhtpaneel";
+            }
+            string devPrefix = "Markuse arvuti asjade";
+            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
+            {
+                devPrefix = "Markuse virtuaalarvuti asjade";
+            }
+            if (File.Exists(masRoot + "/edition.txt"))
+            {
+
+                switch (Verifile2())
+                {
+                    case "VERIFIED":
+                        break;
+                    case "FOREIGN":
+                        MessageBoxShow("See programm töötab ainult Markuse arvutis.\n\nVeakood: VF_FOREIGN", "Markuse asjad", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                        this.Close();
+                        break;
+                    case "FAILED":
+                        MessageBoxShow("Verifile püsivuskontrolli läbimine nurjus.\n\nVeakood: VF_FAILED", "Markuse asjad", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                        this.Close();
+                        break;
+                    case "TAMPERED":
+                        MessageBoxShow("See arvuti pole õigesti juurutatud. Seda võis põhjustada hiljutine riistvaramuudatus. Palun kasutage juurutamiseks Markuse asjade juurutamistööriista.\n\nVeakood: VF_TAMPERED", "Markuse asjad", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                        this.Close();
+                        break;
+                    case "LEGACY":
+                        MessageBoxShow("See arvuti on juurutatud vana juurutamistööriistaga. Palun juurutage arvuti uuesti uue juurutamistarkvaraga.\n\nVeakood: VF_LEGACY", "Markuse asjad", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                        this.Close();
+                        break;
+                }
+                if (Verifile())
+                {
+                    scheme = LoadTheme();
+                    ApplyTheme();
+                    InitTimers();
+                    GetEditionInfo();
+                }
+                else
+                {
+                    MessageBoxShow(devPrefix + " tarkvara ei ole õigesti juurutatud. Palun juurutage seade kasutades juurutamise tööriista.", "Valesti juurutatud", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                    this.Close();
+                }
+            }
+            if (File.Exists(masRoot + "/mas.cnf"))
+            {
+                string[] cnfs = File.ReadAllText(masRoot + "/mas.cnf").Split(';');
+                ShowMasLogoCheck.IsChecked = cnfs[0].ToString() == "true";                  // Kuva Markuse asjade logo integratsioonitarkvara käivitumisel
+                AllowScheduledTasksCheck.IsChecked = cnfs[1].ToString() == "true";          // Käivita töölauamärkmed arvuti käivitumisel
+                StartDesktopNotesCheck.IsChecked = cnfs[2].ToString() == "true";            // Käivita töölauamärkmed arvuti käivitumisel
+                if (File.Exists(masRoot + "/irunning.log"))
+                {
+                    // Projekt ITS aktiivne
+                    WindowState = WindowState.FullScreen;
+                }
+            }
+            else
+            {
+                MessageBoxShow(devPrefix + " tarkvara ei ole juurutatud. Palun juurutage seade kasutades juurutamise tööriista.", "Markuse asjade tarkvara pole paigaldatud", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                this.Close();
+            }
+
+        }
+
+        /* Avaleht */
+        private void StartTaskMgr(object sender, RoutedEventArgs e)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                StartWin32Process("taskmgr.exe");
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                Process.Start("ksysguard");
+            }
+        }
+
+        private void StartCmd(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                StartWin32Process("cmd");
+            } else if (OperatingSystem.IsLinux())
+            {
+                Process.Start("konsole");
+            }
+        }
+
+        private void StartDevmgmt(object sender, RoutedEventArgs e)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                StartWin32Process("devmgmt.msc");
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                Process.Start("hardinfo2");
+            }
+        }
+
+        private void StartRegedit(object sender, RoutedEventArgs e)
+        {
+            StartWin32Process("regedit");
+        }
+
+        private void StartCompmgmt(object sender, RoutedEventArgs e)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                StartWin32Process("compmgmt.msc");
+            } else if (OperatingSystem.IsLinux())
+            {
+                Process.Start("bash", "~/scripts/Tools.sh");
+            }
+        }
+
+
+        private void FindFlash(object? sender, RoutedEventArgs e)
+        {
+            string[] drives = Directory.GetLogicalDrives();
+            string drv = "bad";
+            foreach (string str in drives)
+            {
+                if (File.Exists(str + "/E_INFO/edition.txt"))
+                {
+                    drv = str; break;
+                }
+            }
+            if (drv != "bad")
+            {
+                try
+                {
+                    File.Copy(drv + "/Markuse mälupulk/Markuse mälupulk/bin/Debug/Markuse mälupulk.exe", masRoot + "/Mälupulk.exe", true);
+                } catch
+                {
+                    MessageBoxShow("Ei saanud kopeerida ajakohast versiooni Markuse mälupulgalt.\nOlge kindlad, et sisestatud seade oleks kindlasti Markuse mälupulk.\nProgramm käivitub viimase salvestatud mälupulga tarkvara versiooniga...", "Viga", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                }
+            } else
+            {
+                MessageBoxShow("Ei saanud kopeerida ajakohast versiooni Markuse mälupulgalt", "Teade", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning);
+            }
+            if (File.Exists(masRoot + "/Mälupulk.exe"))
+            {
+                StartWin32Process(masRoot + "/Mälupulk.exe");
+            } else
+            {
+                MessageBoxShow("Programmi käivitumine ebaõnnestus.\nPõhjus: Faili ei leitud", "Tõrge", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+            }
+        }
+
+        private void QuickNotes(object? sender, RoutedEventArgs e)
+        {
+            if (File.Exists(masRoot + "/sharpNotepad.exe"))
+            {
+                StartWin32Process(masRoot + "/sharpNotepad.exe");
+            }
+        }
+
+        private void RestartMas(object? sender, RoutedEventArgs e)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                Process p = new Process();
+                p.StartInfo.FileName = masRoot + "/remas.bat";
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                p.Start();
+            } else
+            {
+                NotWindows();
+            }
+        }
+
+        private void InfoText(object? sender, PointerEventArgs e)
+        {
+            string devPrefix = "Markuse arvuti asjade";
+            if (Directory.Exists(masRoot + "/.masv"))
+            {
+                devPrefix = "Markuse virtuaalarvuti asjade";
+            }
+            Dictionary<string, string> hints = new Dictionary<string, string>();
+            hints["Loo kuvatõmmis ja salvesta nim."] = "Teeb praegusest ekraanist kuvatõmmise ja kuvab salvestamise dialoogi, kus saate valida kausta kuhu salvestada, faili nime ja formaadi.";
+            hints["Loo kuvatõmmis ja salvesta"] = "Teeb praegusest ekraanist kuvatõmmise ja salvestab selle piltide teeki.";
+            hints["Markuse mälupulk"] = "Käivitab Markuse mälupulga juhtpaneeli (mälupulk).";
+            hints["Kiirmärkmik"] = "Käivitab lihtsa tekstitöötluse programmi (sharpNotepad.exe).";
+            hints["Taaskäivita Markuse asjad"] = "Taaskäivitab " + devPrefix + " integratsiooniprogrammi ja Windows Explorer'i.";
+            hints["Tegumihaldur"] = "Käivitab Windowsi tegumihalduri, millega saate vaadata avatud tegumeid, neid sulgeda, muuta nende prioriteeti ja resursside kasutust, samuti saate vaadata aktiivseid teenuseid (taustaprogramme) (taskmgr, valikuline administraator).";
+            hints["Käsuviip"] = "Käivitab tarviku käsuviip (cmd, administraator).";
+            hints["Seadmehaldur"] = "Käivitab seadmehalduri, millega saate vaadata seadmesse paigaldatud riistvara ning installida/uuendada draivereid (devmgmt.msc, valikuline administraator).";
+            hints["Start menüü"] = "Avab Windowsi start menüü (Ctrl + Esc).";
+            hints["Registrite redigeerija"] = "Käivitab registrite redigeerija (regedit, administraator).";
+            hints["Arvuti haldamine"] = "Käivitab seadme haldamise utilliidid (compmgmt.msc, administraator).";
+            this.InfoTextBlock.Text = hints[(string?)((Button)e.Source).Content];
+        }
+
+        private void DefaultInfo(object? sender, PointerEventArgs e)
+        {
+            this.InfoTextBlock.Text = "Siin kuvatakse teave, kui liigutate kursori teatud nupu peale.";
+        }
+
+        /* Misc functions */
+
+        // Reimplementation of WinForms MessageBox.Show
+        private Task MessageBoxShow(string message, string caption = "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum buttons = MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon icon = MsBox.Avalonia.Enums.Icon.None)
+        {
+            var box = MessageBoxManager.GetMessageBoxStandard(caption, message, buttons, icon);
+            var result = box.ShowWindowDialogAsync(this);
+            return result;
+        }
+
+        private void NotWindows()
+        {
+            MessageBoxShow("Pole väljaspool Windowsit implementeeritud", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+        }
+
+        // Windows-only, will not work on other operating systems
+        private void StartWin32Process(string filename)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                Process p = new Process();
+                p.StartInfo.FileName = "cmd";
+                p.StartInfo.Arguments = "/c start " + filename;
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                p.Start();
+            }
+            else
+            {
+                NotWindows();
+            }
+        }
+
+        /* Loads mas theme */
+        Color[] LoadTheme()
+        {
+            string[] bgfg = File.ReadAllText(masRoot + "/scheme.cfg").Split(';');
+            string[] bgs = bgfg[0].ToString().Split(':');
+            string[] fgs = bgfg[1].ToString().Split(':');
+            Color[] cols = { Color.FromArgb(255, byte.Parse(bgs[0]), byte.Parse(bgs[1]), byte.Parse(bgs[2])), Color.FromArgb(255, byte.Parse(fgs[0]), byte.Parse(fgs[1]), byte.Parse(fgs[2])) };
+            return cols;
+        }
+
+        void ApplyTheme()
+        {
+            this.Background = new SolidColorBrush(scheme[0]);
+            this.Foreground = new SolidColorBrush(scheme[1]);
+            ImageBrush IB = new ImageBrush(new Bitmap(masRoot + "/bg_common.png"));
+            IB.Stretch = Stretch.Fill;
+            this.Styles.Add(new Style(x => x.OfType<Button>())
+            {
+                Setters = { new Setter(ForegroundProperty, new SolidColorBrush(scheme[1])) },
+                Children =
+                {
+                    new Style(x => x.Nesting().Class(":disabled"))
+                    {
+                        Setters = {
+                            new Setter(ForegroundProperty, new SolidColorBrush(scheme[0])),
+                        }
+                    },
+                }
+            });
+            this.Styles.Add(new Style(x => x.OfType<CheckBox>())
+            {
+                Setters = { new Setter(ForegroundProperty, new SolidColorBrush(scheme[1])) }
+            });
+            this.Styles.Add(new Style(x => x.OfType<TabItem>())
+            {
+                Setters = { new Setter(ForegroundProperty, new SolidColorBrush(scheme[1])) },
+                Children =
+                {
+                    new Style(x => x.Nesting().Class(":pointerover"))
+                    {
+                        Setters = { new Setter(ForegroundProperty, new SolidColorBrush(scheme[1])) }
+                    },
+                    new Style(x => x.Nesting().Class(":selected"))
+                    {
+                        Setters = {
+                            new Setter(ForegroundProperty, new SolidColorBrush(scheme[1])),
+                            new Setter(FontWeightProperty, FontWeight.SemiBold)
+                        }
+                    }
+                }
+            });
+            this.ErtGrid.Background = IB;
+        }
+
+        private void CheckTheme(object sender, EventArgs e)
+        {
+            try
+            {
+                if (freezeTimer)
+                {
+                    return;
+                }
+                Color[] tempScheme = LoadTheme();
+                if (tempScheme != scheme)
+                {
+                    scheme = LoadTheme();
+                    ApplyTheme();
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
+
+        private string Verifile2()
+        {
+            Process p = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "java",
+                    Arguments = "-jar " + masRoot + "/verifile2.jar",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                }
+            };
+            p.Start();
+            while (!p.StandardOutput.EndOfStream)
+            {
+                string line = p.StandardOutput.ReadLine() ?? "";
+                return line.Split('\n')[0];
+            }
+            return "FAILED";
+        }
+
+
+        private bool Verifile()
+        {
+            return Verifile2() == "VERIFIED";
+        }
+
+        private void InitTimers()
+        {
+            DispatcherTimer dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(CheckTheme);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
+            dispatcherTimer.Start();
+        }
+
+        private void InitResources()
+        {
+            Bitmap icon;
+            using (var ms = new MemoryStream(Properties.Resources.mas_web))
+            {
+                icon = new Bitmap(ms);
+            }
+            this.Icon = new WindowIcon(icon);
+            this.Logo.Source = icon;
+            ReloadThumbs();
+        }
+
+
+        private void Image_DoubleTapped(object? sender, Avalonia.Input.TappedEventArgs e)
+        {
+            Bitmap icon;
+            using (var ms = new MemoryStream(Properties.Resources.mas_web))
+            {
+                icon = new Bitmap(ms);
+            }
+            ((Image)e.Source).Source = icon;
+            MessageBoxShow("Töötlemisel...");
+        }
+
+        private void Grid_SizeChanged(object? sender, Avalonia.Controls.SizeChangedEventArgs e)
+        {
+            InfoTextBlock.Width = this.Width - 20;
+        }
+
+        /* MarkuStation */
+        private void MarkuStationTabLoad(object? sender, RoutedEventArgs e)
+        {
+            MsLoadSettings(sender, e);
+        }
+
+        private void MsLoadSettings(object? sender, RoutedEventArgs e)
+        {
+
+            string file = File.ReadAllLines(masRoot + "/ms_display.txt")[0];
+            switch (file)
+            {
+                case "internal":
+                    this.MonMode.SelectedIndex = 1;
+                    break;
+                case "external":
+                    this.MonMode.SelectedIndex = 2;
+                    break;
+                case "extend":
+                    this.MonMode.SelectedIndex = 0;
+                    break;
+                case "clone":
+                    this.MonMode.SelectedIndex = 3;
+                    break;
+            }
+            file = File.ReadAllText(masRoot + "/setting.txt");
+            string[] lines = file.Split('\n');
+            creepCheck.IsChecked = lines[0] == "true";
+            specialCheck.IsChecked = lines[1] == "true";
+            introCheck.IsChecked = lines[2] == "true";
+            file = File.ReadAllText(masRoot + "/ms_games.txt");
+            file = file.Substring(0, file.Length - 2);
+            GameList.Items.Clear();
+            foreach (string line in file.Split('\n').Skip(1))
+            {
+                ListBoxItem lbi = new ListBoxItem();
+                lbi.Content = line;
+                GameList.Items.Add(lbi);
+            }
+            file = File.ReadAllText(masRoot + "/ms_exec.txt");
+            file = file.Substring(0, file.Length - 2);
+            locations = file.Split('\n').Skip(1).ToArray();
+        }
+
+        private void RunMs(object? sender, RoutedEventArgs e)
+        {
+            StartWin32Process(masRoot + "/MarkuStation.exe");
+        }
+
+        private async void BrowseButtonAsync(object? sender, RoutedEventArgs e)
+        {
+            // source: https://docs.avaloniaui.net/docs/basics/user-interface/file-dialogs
+            // Get top level from the current control. Alternatively, you can use Window reference instead.
+            var topLevel = TopLevel.GetTopLevel(this);
+
+            // Start async operation to open the dialog.
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Markuse arvuti juhtpaneel",
+                AllowMultiple = false
+            });
+
+            if (files.Count >= 1)
+            {
+                this.LocationBox.Text = files[0].Path.AbsolutePath;
+            }
+        }
+
+        private void AddButton(object? sender, RoutedEventArgs e)
+        {
+            string[] new_locations = new string[locations.Length + 1];
+            for (int i = 0; i < locations.Length; i++)
+            {
+                new_locations[i] = locations[i];
+            }
+            new_locations[locations.Length] = (LocationBox.Text ?? "") + ";";
+            ListBoxItem lbi = new ListBoxItem();
+            lbi.Content = GameNameBox.Text ?? "";
+            if ((lbi.Content == "") || (new_locations[locations.Length] == ""))
+            {
+                MessageBoxShow("Palun täitke kõik väljad!", "Mängu lisamine", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                return;
+            }
+            locations = new_locations;
+            GameList.Items.Add(lbi);
+            LocationBox.Text = "";
+            GameNameBox.Text = "";
+        }
+
+        private void MsGameEdit(object? sender, TappedEventArgs e)
+        {
+            if (GameList.SelectedItems?.Count > 0)
+            {
+                string SelectedGame = ((ListBoxItem)GameList.Selection.SelectedItems[0]).Content.ToString();
+                string GameLocation = locations[GameList.SelectedIndex];
+                GameLocation = GameLocation.Substring(0, GameLocation.Length - 1);
+                MessageBoxShow(string.Format("Nimi: {0}\nAsukoht: {1}", SelectedGame, GameLocation));
+            }
+        }
+
+        private void MsSaveConfig(object? sender, RoutedEventArgs e)
+        {
+            string scrntype = "extend";
+            switch (MonMode.SelectedIndex)
+            {
+                case 1:
+                    scrntype = "internal";
+                    break;
+                case 2:
+                    scrntype = "external";
+                    break;
+                case 3:
+                    scrntype = "clone";
+                    break;
+                default:
+                    break;
+            }
+            File.WriteAllText(masRoot + @"/ms_display.txt", scrntype + Environment.NewLine);
+            StringBuilder? builder = new StringBuilder();
+            builder.Append("* MarkuStation mängude loetelu *").Append("\n");
+            foreach (ListBoxItem? lvi in GameList.Items)
+            {
+                string? val = lvi?.Content?.ToString();
+                if ((val != "") && (val != null))
+                {
+                    builder.Append(val);
+                    builder.Append("\n");
+                }
+            }
+            string temp = builder.ToString();
+            temp += "\n";
+            File.WriteAllText(masRoot + "/ms_games.txt", temp, Encoding.UTF8);
+            temp = "";
+            builder = null;
+            builder = new StringBuilder();
+            builder.Append("* MarkuStation käivitaja loetelu (ärge eemaldage/lisage semikooloneid)*;").Append("\n");
+            foreach (string val in locations)
+            {
+                if (val != "")
+                {
+                    builder.Append(val);
+                    builder.Append("\n");
+                }
+            }
+            temp = builder.ToString();
+            temp = temp + "\n";
+            File.WriteAllText(masRoot + "/ms_exec.txt", temp, Encoding.UTF8);
+            temp = "";
+            if (creepCheck.IsChecked == true) { temp = "true"; }
+            if (creepCheck.IsChecked == false) { temp = "false"; }
+            if (specialCheck.IsChecked == true) { temp += "\ntrue"; }
+            if (specialCheck.IsChecked == false) { temp += "\nfalse"; }
+            if (introCheck.IsChecked == true) { temp += "\ntrue"; }
+            if (introCheck.IsChecked == false) { temp += "\nfalse"; }
+            File.WriteAllText(masRoot + "/setting.txt", temp);
+            temp = "";
+        }
+
+        /* Konfiguratsioon */
+        private void ConfigCheck(object? sender, RoutedEventArgs e)
+        {
+            string saveprog = "";
+            saveprog += (bool)ShowMasLogoCheck.IsChecked ? "true;" : "false;";
+            saveprog += (bool)AllowScheduledTasksCheck.IsChecked ? "true;" : "false;";
+            saveprog += (bool)StartDesktopNotesCheck.IsChecked ? "true;" : "false;";
+            File.WriteAllText(masRoot + "/mas.cnf", saveprog);
+        }
+
+        private void ReloadThumbs()
+        {
+            ThumbDesktop.Source = new Bitmap(masRoot + "/bg_desktop.png");
+            ThumbLockscreen.Source = new Bitmap(masRoot + "/bg_login.png");
+            ThumbMiniversion.Source = new Bitmap(masRoot + "/bg_uncommon.png");
+        }
+
+        private void ChangeDesktop(object? sender, TappedEventArgs e)
+        {
+            DesktopFunction();
+        }
+
+        private void ChangeMini(object? sender, TappedEventArgs e)
+        {
+            MiniFunction();
+        }
+
+        private void ChangeLogin(object? sender, TappedEventArgs e)
+        {
+            LoginFunction();
+        }
+
+        private async void DesktopFunction()
+        {
+            var topLevel = TopLevel.GetTopLevel(this);
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Markuse arvuti juhtpaneel",
+                AllowMultiple = false
+            });
+
+            if (files.Count < 1)
+            {
+                return;
+            }
+            string filename = files[0].Path.AbsolutePath;
+            if (OperatingSystem.IsWindows())
+            {
+                ThumbDesktop.Source = null;
+                foreach (Process p in Process.GetProcesses())
+                {
+                    if ((p.ProcessName == "Markuse arvuti integratsioonitarkvara.exe") || (p.ProcessName == "Markuse arvuti integratsioonitarkvara.EXE") || (p.ProcessName == "Markuse arvuti integratsioonitarkvara"))
+                    {
+                        p.Kill();
+                    }
+                }
+                Process pr = new Process();
+                pr.StartInfo.FileName = masRoot + "/ChangeWallpaper.exe";
+                pr.StartInfo.UseShellExecute = false;
+                pr.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                pr.StartInfo.CreateNoWindow = true;
+                pr.StartInfo.Arguments = masRoot.Replace("/", "\\") + "\\bg_login.png";
+                pr.Start();
+                pr.StartInfo.FileName = "cmd.exe";
+                pr.StartInfo.Arguments = "/k move " + masRoot + "\\bg_desktop.png " + masRoot + "\\bg_desktop.temp";
+                pr.Start();
+                while (!File.Exists(masRoot + "/bg_desktop.temp")) { }
+                File.Copy(filename, masRoot + "/bg_desktop.png");
+                File.Delete(masRoot + "/bg_desktop.temp");
+                pr.StartInfo.Arguments = "";
+                pr.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+                pr.StartInfo.CreateNoWindow = false;
+                pr.StartInfo.FileName = masRoot + "/Markuse asjad/Markuse arvuti integratsioonitarkvara.exe";
+                pr.Start();
+                if (File.Exists(masRoot + "/bg_desktop.png"))
+                {
+                    ThumbDesktop.Source = new Bitmap(masRoot + "/bg_desktop.png");
+                }
+                foreach (Process p in Process.GetProcesses())
+                {
+                    if ((p.ProcessName == "cmd.exe") || (p.ProcessName == "cmd.EXE") || (p.ProcessName == "cmd"))
+                    {
+                        p.Kill();
+                    }
+                    else if ((p.ProcessName == "conhost.exe") || (p.ProcessName == "conhost.EXE") || (p.ProcessName == "conhost"))
+                    {
+                        p.Kill();
+                    }
+                }
+            } else
+            {
+                NotWindows();
+            }
+        }
+
+        private async void LoginFunction()
+        {
+            var topLevel = GetTopLevel(this);
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Markuse arvuti juhtpaneel",
+                AllowMultiple = false
+            });
+
+            if (files.Count < 1)
+            {
+                return;
+            }
+            string filename = files[0].Path.AbsolutePath;
+            ThumbLockscreen.Source = null;
+            File.Delete(masRoot + "/bg_login.png");
+            File.Copy(filename, masRoot + "/bg_login.png");
+            if (File.Exists(masRoot + "/bg_desktop.png"))
+            {
+                ThumbLockscreen.Source = new Bitmap(masRoot + "/bg_login.png");
+            }
+        }
+
+        private async void MiniFunction()
+        {
+            var topLevel = GetTopLevel(this);
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Markuse arvuti juhtpaneel",
+                AllowMultiple = false
+            });
+
+            if (files.Count < 1)
+            {
+                return;
+            }
+            string filename = files[0].Path.AbsolutePath;
+            ThumbMiniversion.Source = null;
+            File.Delete(masRoot + "/bg_uncommon.png");
+            File.Copy(filename, masRoot + "/bg_uncommon.png");
+            if (File.Exists(masRoot + "/bg_uncommon.png"))
+            {
+                ThumbMiniversion.Source = new Bitmap(masRoot + "/bg_uncommon.png");
+            }
+        }
+
+        private void SwapBgs(object sender, RoutedEventArgs e)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                bool rng;
+                rng = false;
+                foreach (Process p in Process.GetProcesses())
+                {
+                    if ((p.ProcessName == "Markuse arvuti integratsioonitarkvara.exe") || (p.ProcessName == "Markuse arvuti integratsioonitarkvara.EXE") || (p.ProcessName == "Markuse arvuti integratsioonitarkvara"))
+                    {
+                        rng = true;
+                        p.Kill();
+                    }
+                }
+                ThumbDesktop.Source = null;
+                ThumbLockscreen.Source = null;
+                ThumbMiniversion.Source = null;
+                string rootBackSlash = masRoot.Replace("/", "\\");
+                //võta kasutusele ajutine taustapilt
+                Process pr = new Process();
+                pr.StartInfo.FileName = masRoot + "/ChangeWallpaper.exe";
+                pr.StartInfo.UseShellExecute = false;
+                pr.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                pr.StartInfo.CreateNoWindow = true;
+                pr.StartInfo.Arguments = rootBackSlash + "\\bg_login.png";
+                pr.Start();
+                pr.StartInfo.FileName = "cmd.exe";
+                pr.StartInfo.Arguments = "/k move " + rootBackSlash + "\\bg_desktop.png " + rootBackSlash + "\\bg_desktop.temp";
+                pr.Start();
+                while (!File.Exists(masRoot + "/bg_desktop.temp")) { }
+                pr.StartInfo.Arguments = "/k move " + rootBackSlash + "\\bg_uncommon.png " + rootBackSlash + "\\bg_desktop.png";
+                pr.Start();
+                while (!File.Exists(masRoot + "/bg_desktop.png")) { }
+                pr.StartInfo.Arguments = "/k move " + rootBackSlash + "\\bg_desktop.temp " + rootBackSlash + "\\bg_uncommon.png";
+                pr.Start();
+                while (!File.Exists(masRoot + "/bg_uncommon.png")) { }
+                pr.StartInfo.Arguments = "";
+                pr.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+                pr.StartInfo.CreateNoWindow = false;
+                pr.StartInfo.FileName = masRoot + "/Markuse asjad/Markuse arvuti integratsioonitarkvara.exe";
+                pr.Start();
+                ReloadThumbs();
+                foreach (Process p in Process.GetProcesses())
+                {
+                    try
+                    {
+                        if ((p.ProcessName == "cmd.exe") || (p.ProcessName == "cmd.EXE") || (p.ProcessName == "cmd"))
+                        {
+                            p.Kill();
+                        }
+                        else if ((p.ProcessName == "conhost.exe") || (p.ProcessName == "conhost.EXE") || (p.ProcessName == "conhost"))
+                        {
+                            p.Kill();
+                        }
+                    } catch
+                    {
+
+                    }
+            }
+            } else
+            {
+                NotWindows();
+            }
+        }
+
+        private void EditScheds(object sender, RoutedEventArgs e)
+        {
+            if (AllowScheduledTasksCheck.IsChecked ?? false)
+            {
+                if (File.Exists(masRoot + "/events.txt"))
+                {
+                    Process p = new Process();
+                    p.StartInfo = new ProcessStartInfo(masRoot + "/events.txt")
+                    {
+                        UseShellExecute = true,
+                    };
+                    p.Start();
+
+                } else
+                {
+                    MessageBoxShow("Sündmuste faili ei eksisteeri", "Probleem", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                }
+            } else
+            {
+                MessageBoxShow("Ajastatud sündmused on keelatud", "Probleem", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+            }
+        }
+
+        private async void EditBg(object sender, RoutedEventArgs e)
+        {
+            ColorPickerDialog cpd = new ColorPickerDialog();
+            cpd.Color.Color = scheme[0];
+            await cpd.ShowDialog(this);
+            this.scheme[0] = cpd.Color.Color;
+            if (cpd.result)
+            {
+                freezeTimer = true;
+                File.WriteAllText(masRoot + "/scheme.cfg", cpd.Color.Color.R.ToString() + ":" + cpd.Color.Color.G.ToString() + ":" + cpd.Color.Color.B.ToString() + ":;" + this.scheme[1].R + ":" + this.scheme[1].G + ":" + this.scheme[1].B + ":;");
+                freezeTimer = false;
+                LoadTheme();
+                ApplyTheme();
+            }
+        }
+
+        private async void EditFg(object sender, RoutedEventArgs e)
+        {
+            ColorPickerDialog cpd = new ColorPickerDialog();
+            cpd.Color.Color = scheme[1];
+            await cpd.ShowDialog(this);
+            this.scheme[1] = cpd.Color.Color;
+            if (cpd.result)
+            {
+                freezeTimer = true;
+                File.WriteAllText(masRoot + "/scheme.cfg", this.scheme[0].R.ToString() + ":" + this.scheme[0].G.ToString() + ":" + this.scheme[0].B.ToString() + ":;" + cpd.Color.Color.R + ":" + cpd.Color.Color.G + ":" + cpd.Color.Color.B + ":;");
+                freezeTimer = false;
+                LoadTheme();
+                ApplyTheme();
+            }
+        }
+
+        /* Teave */
+
+        private void GetEditionInfo()
+        {
+            Bitmap cross;
+            Bitmap check;
+            using (var ms = new MemoryStream(Properties.Resources.failure))
+            {
+                cross = new Bitmap(ms);
+            }
+            using (var ms = new MemoryStream(Properties.Resources.success))
+            {
+                check = new Bitmap(ms);
+            }
+            string[] masVer = File.ReadAllLines(masRoot + "/edition.txt");
+            string edition = masVer[1];
+            FileInfo fi = new FileInfo(masRoot + "/edition.txt");
+            MasEditionLabel.Content = edition;
+            switch (edition)
+            {
+                case "Basic":
+                case "Basic+":
+                    EditionBox.Fill = new SolidColorBrush(Colors.Yellow);
+                    break;
+                case "Starter":
+                    EditionBox.Fill = new SolidColorBrush(Colors.Lime);
+                    break;
+                case "Premium":
+                    EditionBox.Fill = new SolidColorBrush(Colors.DarkRed);
+                    break;
+                case "Pro":
+                    EditionBox.Fill = new SolidColorBrush(Colors.DeepSkyBlue);
+                    break;
+                case "Ultimate":
+                    EditionBox.Fill = new SolidColorBrush(Colors.BlueViolet);
+                    break;
+            }
+            StringBuilder editionDetails = new StringBuilder();
+            editionDetails.AppendLine("Versioon: " + masVer[2]);
+            editionDetails.AppendLine("Järk: " + masVer[3]);
+            editionDetails.AppendLine("Nimi: " + masVer[10]);
+            editionDetails.AppendLine("Keel: " + masVer[6]);
+            editionDetails.AppendLine("Juurutatud?: " + (masVer[4] == "Yes" ? "Jah" : "Ei"));
+            editionDetails.Append("Muutmisaeg: ")
+                          .Append(fi.LastWriteTime.ToShortDateString())
+                          .Append(" ")
+                          .Append(fi.LastWriteTime.ToShortTimeString());
+            editionDetails.AppendLine();
+            editionDetails.AppendLine("Kinnituskood: " + masVer[9]);
+            editionDetails.AppendLine("Olek: " + Verifile2());
+            EditionDetails.Text = editionDetails.ToString();
+            string[] features = masVer[8].Split('-');
+            FeatTS.Source = cross;
+            FeatRM.Source = cross;
+            FeatIP.Source = cross;
+            FeatCS.Source = cross;
+            FeatMM.Source = cross;
+            FeatRD.Source = cross;
+            FeatWX.Source = cross;
+            FeatLT.Source = cross;
+            FeatGP.Source = cross;
+            foreach (string feature in features)
+            {
+                switch (feature)
+                {
+                    case "MM":
+                        FeatMM.Source = check;
+                        break;
+                    case "TS":
+                        FeatTS.Source = check;
+                        break;
+                    case "RM":
+                        FeatRM.Source = check;
+                        break;
+                    case "IP":
+                        FeatIP.Source = check;
+                        break;
+                    case "CS":
+                        FeatCS.Source = check;
+                        break;
+                    case "WX":
+                        FeatWX.Source = check;
+                        break;
+                    case "RD":
+                        FeatRD.Source = check;
+                        break;
+                    case "LT":
+                        FeatLT.Source = check;
+                        break;
+                    case "GP":
+                        FeatGP.Source = check;
+                        break;
+                }
+            }
+            WhatNewLabel.Text += "\n" + whatNew;
+            string[] fullVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString().Split(".");
+            CpanelVersionLabel.Content = "versioon " + fullVersion[0] + "." + fullVersion[1];
+        }
+
+        private void ComputerInfoClicked(object sender, RoutedEventArgs e)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                Process.Start("msinfo32");
+            } else if (OperatingSystem.IsLinux())
+            {
+                Process.Start("ksysguard");
+            }
+        }
+
+        private void OpenMasRootClicked(object sender, RoutedEventArgs e)
+        {
+            Process p = new Process();
+            p.StartInfo = new ProcessStartInfo(masRoot)
+            {
+                UseShellExecute = true,
+            };
+            p.Start();
+        }
+
+        private void ReRootClicked(object sender, RoutedEventArgs e)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                Process.Start(masRoot + "/Markuse asjad/JTR.exe");
+                this.Close();
+            }
+            else
+            {
+                MessageBoxShow("Juurutamine selles Markuse arvuti asjade versioonis on võimalik ainult Windowsis", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+            }
+        }
+    }
+}
