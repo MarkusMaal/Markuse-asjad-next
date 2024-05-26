@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="929" d:DesignHeight="681"
         x:Class="Markuse_arvuti_juhtpaneel.MainWindow"
         Title="Markuse arvuti juhtpaneel"
-        Width="929" Height="681">
+        Width="929" Height="681" Loaded="Window_Loaded">
   <Grid Name="ErtGrid" SizeChanged="Grid_SizeChanged">
     <Grid.RowDefinitions>
       <RowDefinition Height="120"></RowDefinition>
@@ -22,19 +22,19 @@
         <StackPanel>
           <Label>Integratsioonimenüü</Label>
           <WrapPanel Classes="Left">
-            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" IsEnabled="False">Loo kuvatõmmis ja salvesta nim.</Button>
-            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" IsEnabled="False">Loo kuvatõmmis ja salvesta</Button>
-            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="FindFlash">Markuse mälupulk</Button>
-            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="QuickNotes">Kiirmärkmik</Button>
-            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="RestartMas">Taaskäivita Markuse asjad</Button>
+            <Button Name="ScreenshotAsButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="ScreenshotAs" IsEnabled="False">Loo kuvatõmmis ja salvesta nim.</Button>
+            <Button Name="ScreenshotButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="ScreenshotNow" IsEnabled="False">Loo kuvatõmmis ja salvesta</Button>
+            <Button Name="FlashDriveButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="FindFlash">Markuse mälupulk</Button>
+            <Button Name="QuickNotesButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="QuickNotes">Kiirmärkmik</Button>
+            <Button Name="RestartMasButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="RestartMas">Taaskäivita Markuse asjad</Button>
           </WrapPanel>
-          <Label>Windowsi tarvikud</Label>
+          <Label Name="WinUtilsLabel">Windowsi tarvikud</Label>
           <WrapPanel Classes="Left">
-            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartTaskMgr">Tegumihaldur</Button>
-            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartCmd">Käsuviip</Button>
-            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartDevmgmt">Seadmehaldur</Button>
-            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartRegedit">Registrite redigeerija</Button>
-            <Button PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartCompmgmt">Arvuti haldamine</Button>
+            <Button Name="TaskmgrButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartTaskMgr">Tegumihaldur</Button>
+            <Button Name="CommandButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartCmd">Käsuviip</Button>
+            <Button Name="DevmgmtButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartDevmgmt">Seadmehaldur</Button>
+            <Button Name="RegeditButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartRegedit">Registrite redigeerija</Button>
+            <Button Name="CompManButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="StartCompmgmt">Arvuti haldamine</Button>
           </WrapPanel>
           <WrapPanel Orientation="Vertical" HorizontalAlignment="Left">
             <Label Classes="H1">Info</Label>

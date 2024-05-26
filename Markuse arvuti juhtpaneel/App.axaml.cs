@@ -35,7 +35,7 @@ namespace Markuse_arvuti_juhtpaneel
 
         private static bool CheckVerifileTamper()
         {
-            if (!File.Exists(root + "\\verifile2.jar"))
+            if (!File.Exists(root + "/verifile2.jar"))
             {
                 Console.WriteLine("Verifile 2.0 tarkvara (verifile2.jar) ei ole Markuse asjade juurkaustas.\nVeakood: VF_MISSING");
                 return false;
@@ -43,14 +43,14 @@ namespace Markuse_arvuti_juhtpaneel
             string hash = "";
             using (var sha256 = SHA256.Create())
             {
-                using (var stream = File.OpenRead(root + "\\verifile2.jar"))
+                using (var stream = File.OpenRead(root + "/verifile2.jar"))
                 {
                     hash = BitConverter.ToString(sha256.ComputeHash(stream));
                 }
             }
             if (!whitelistedHashes.Contains(hash.Replace("-", "")))
             {
-                Console.WriteLine("Arvuti p¸sivuskontrolli k‰ivitamine nurjus. Pıhjus: Verifile 2.0 r‰si ei ole sobiv.");
+                Console.WriteLine("Arvuti p√ºsivuskontrolli k√§ivitamine nurjus. P√µhjus: Verifile 2.0 r√§si ei ole sobiv.");
                 return false;
             }
             return true;
