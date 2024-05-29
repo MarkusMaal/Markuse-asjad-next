@@ -6,6 +6,7 @@ using Avalonia.Dialogs.Internal;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,31 +19,102 @@ namespace Markuse_arvuti_integratsioonitarkvara
         private bool allowCode = true;
         private TrayIcon ti;
         private App app;
+        private bool initialized = false;
         Color[] scheme;
+        DispatcherTimer dispatcherTimer = new DispatcherTimer();
         public MainWindow()
         {
             InitializeComponent();
             app = (App)Application.Current;
             ti = app.GetTrayIcon();
             scheme = LoadTheme();
+            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
+            {
+                this.DeviceLabel.Content = "markuse virtuaalarvuti asjad";
+                this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_virtualpc);
+            } else
+            {
+                this.DeviceLabel.Content = "markuse arvuti asjad";
+                this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_computers);
+            }
+            InitTimers();
         }
 
-        private void Window_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private void InitTimers()
         {
-            ApplyTheme();
-            ti.IsVisible = true;
+            dispatcherTimer.Tick += new EventHandler(GeneralTimer);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 2);
+            dispatcherTimer.Start();
+        }
+
+        private void GeneralTimer(object? sender, EventArgs e)
+        {
+            initialized = true;
+            if (dispatcherTimer.Interval < new TimeSpan(0, 0, 5))
+            {
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
+            }
             this.IsVisible = false;
+            ReloadMenu();
+            scheme = LoadTheme();
+            ApplyTheme();
+            CheckLogFiles();
+        }
+
+        private void CheckLogFiles()
+        {
+            if (File.Exists(app.mas_root + "/showabout.txt"))
+            {
+                File.Delete(app.mas_root + "/showabout.txt");
+                //teaveMarkuseAsjadeKohtaToolStripMenuItem.PerformClick();
+            }
+            // M.A.I.A. ligipääsu taotlemine
+            if (File.Exists(app.mas_root + @"/maia/request_permission.maia") || File.Exists(app.mas_root + "/maia/request_permission.mai"))
+            {
+                if (allowCode)
+                {
+                    ShowCode sc = new ShowCode();
+                    sc.bg = scheme[0];
+                    sc.fg = scheme[1];
+                    sc.Show();
+                }
+                else
+                {
+                    try { File.Delete(app.mas_root + "/maia/request_permission.maia"); } catch { File.Delete(app.mas_root + "/maia/request_permission.mai"); }
+                }
+            }
+        }
+
+        private bool IconType() {
+            if (OperatingSystem.IsWindows())
+            {
+                return File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile).ToString() + "\\Desktop\\Peida need töölauaikoonid.lnk");
+            } else
+            {
+                return false;
+            }
+        }
+
+
+        private void ReloadMenu()
+        {
             //foreach (NativeMenuItemBase nmi in ti.Menu.Items)
             List<NativeMenuItem> toRemove = new List<NativeMenuItem>();
             for (int i = 0; i < ti.Menu.Items.Count; i++)
             {
                 NativeMenuItemBase nmi = ti.Menu.Items[i];
                 NativeMenuItem n = (NativeMenuItem)nmi;
-                switch (n.Header) {
+                switch (n.Header)
+                {
+                    case "Markuse mälupulk":
                     case "Ühtegi mälupulka pole sisestatud":
-                        if (app.fmount != "") {
+                        if (app.fmount != "")
+                        {
                             n.Header = "Markuse mälupulk";
-                        } else {
+                        }
+                        else
+                        {
+                            n.Header = "Ühtegi mälupulka pole sisestatud";
                             n.IsEnabled = false;
                         }
                         break;
@@ -53,70 +125,150 @@ namespace Markuse_arvuti_integratsioonitarkvara
                             switch (sm.Header)
                             {
                                 case "Valge":
+                                    sm.Click -= SaveThemeWhite;
                                     sm.Click += SaveThemeWhite;
                                     break;
                                 case "Öörežiim":
+                                    sm.Click -= SaveThemeBlack;
                                     sm.Click += SaveThemeBlack;
                                     break;
                                 case "Sinine":
+                                    sm.Click -= SaveThemeBlue;
                                     sm.Click += SaveThemeBlue;
                                     break;
                                 case "Jõulud":
+                                    sm.Click -= SaveThemeXmas;
                                     sm.Click += SaveThemeXmas;
                                     break;
                             }
                         }
                         break;
                     case "Tarkvara paigaldamise režiim":
-                        if (!OperatingSystem.IsWindows()) {
-                            toRemove.Add(n);
+                        if (!initialized)
+                        {
+                            if (!OperatingSystem.IsWindows())
+                            {
+                                toRemove.Add(n);
+                            }
+                            n.Click += (object? sender, EventArgs e) =>
+                            {
+                                bool redo = !IconType();
+                                if (redo)
+                                {
+                                    Process p = new Process();
+                                    p.StartInfo.FileName = app.mas_root + "/organize_desktop.bat";
+                                    p.StartInfo.CreateNoWindow = true;
+                                    p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                                    p.Start();
+                                }
+                                WaitInstall wi = new WaitInstall
+                                {
+                                    Background = new SolidColorBrush(this.scheme[0]),
+                                    Foreground = new SolidColorBrush(this.scheme[1]),
+                                    redo = redo
+                                };
+                                wi.Show();
+                            };
                         }
                         break;
                     case "Sünkroniseeri versioon":
-                        if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv")) {
-                            toRemove.Add(n);
+                        if (!initialized)
+                        {
+                            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
+                            {
+                                toRemove.Add(n);
+                            }
                         }
                         break;
                     case "Käivita virtuaalarvuti":
-                        if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas/vpc")) {
-                            toRemove.Add(n);
+                        if (!initialized)
+                        {
+                            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas/vpc"))
+                            {
+                                toRemove.Add(n);
+                            }
                         }
                         break;
-                    case "M.A.I.A. server haldamine":
-                        
+                    case "Kuva kõik töölauaikoonid":
+                    case "Peida need töölauaikoonid":
+                        if (!initialized)
+                        {
+                            n.Click += (object? sender, EventArgs e) =>
+                            {
+                                NativeMenuItem nvmi = ((NativeMenuItem)sender);
+                                if (nvmi.Header == "Kuva kõik töölauaikoonid")
+                                {
+                                    nvmi.Header = "Peida need töölauaikoonid";
+                                } else
+                                {
+                                    nvmi.Header = "Kuva kõik töölauaikoonid";
+                                }
+                                if (OperatingSystem.IsWindows())
+                                {
+                                    Process p = new Process();
+                                    p.StartInfo.FileName = app.mas_root + "/organize_desktop.bat";
+                                    p.StartInfo.CreateNoWindow = true;
+                                    p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                                    p.Start();
+                                }
+                            };
+                        }
+                        n.Header = IconType() ? "Peida need töölauaikoonid" : "Kuva kõik töölauaikoonid";
+                        break;
+                    case "M.A.I.A. serveri haldamine":
+
                         foreach (NativeMenuItemBase snmi in n.Menu.Items)
                         {
                             NativeMenuItem sm = (NativeMenuItem)snmi;
-                            switch (sm.Header) {
+                            switch (sm.Header)
+                            {
+                                case "Käivita":
                                 case "Peata":
                                     bool running = false;
-                                    foreach (Process p in Process.GetProcesses()) {
-                                        if (p.ProcessName.Contains("python") || p.ProcessName.Contains("py.exe")) {
+                                    foreach (Process p in Process.GetProcesses())
+                                    {
+                                        if (p.ProcessName.Contains("python") || p.ProcessName.Contains("py.exe"))
+                                        {
                                             running = true;
                                         }
                                     }
-                                    if (!running) {
+                                    if (!running)
+                                    {
                                         sm.Header = "Käivita";
                                         sm.Icon = app.GetResource(Properties.Resources._new);
+                                        sm.Click -= StartMaia;
                                         sm.Click += StartMaia;
-                                    } else {
+                                    }
+                                    else
+                                    {
+                                        sm.Header = "Peata";
+                                        sm.Icon = app.GetResource(Properties.Resources.failure);
+                                        sm.Click -= StopMaia;
                                         sm.Click += StopMaia;
                                     }
                                     break;
                                 case "Võimalda ligipääsu taotlemine":
-                                    sm.Click += (object? sender, EventArgs e) => {
-                                        NativeMenuItem obj = ((NativeMenuItem)sender);
-                                        obj.IsChecked = !obj.IsChecked;
-                                        allowCode = obj.IsChecked;
-                                    };
+                                    if (!initialized)
+                                    {
+                                        sm.Click += (object? sender, EventArgs e) =>
+                                        {
+                                            NativeMenuItem obj = ((NativeMenuItem)sender);
+                                            obj.IsChecked = !obj.IsChecked;
+                                            allowCode = obj.IsChecked;
+                                        };
+                                    }
                                     break;
                                 case "Ava brauseris":
-                                    sm.Click += (object? sender, EventArgs e) => {
-                                        Process pr = new Process();
-                                        pr.StartInfo.FileName = "http://localhost:14414";
-                                        pr.StartInfo.UseShellExecute = true;
-                                        pr.Start();
-                                    };
+                                    if (!initialized)
+                                    {
+                                        sm.Click += (object? sender, EventArgs e) =>
+                                        {
+                                            Process pr = new Process();
+                                            pr.StartInfo.FileName = "http://localhost:14414";
+                                            pr.StartInfo.UseShellExecute = true;
+                                            pr.Start();
+                                        };
+                                    }
                                     break;
                             }
                         }
@@ -127,6 +279,13 @@ namespace Markuse_arvuti_integratsioonitarkvara
             {
                 ti.Menu.Items.Remove(r);
             }
+        }
+
+        private void Window_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            ApplyTheme();
+            ti.IsVisible = true;
+            ReloadMenu();
         }
 
         private void StopMaia(object sender, EventArgs e) {

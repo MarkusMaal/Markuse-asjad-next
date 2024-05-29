@@ -1,0 +1,28 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="410" d:DesignHeight="163"
+        x:Class="Markuse_arvuti_integratsioonitarkvara.WaitInstall"
+        Title="WaitInstall"
+        Width="410" Height="163"
+        WindowStartupLocation="Manual" Position="70,30"
+        CanResize="False" ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
+  <StackPanel Margin="15,10">
+    <Label FontSize="16" Margin="-2,0,0,3">Paigaldusrežiim</Label>
+    <Label>1. Avage paigaldusprogramm ja järgige juhiseid</Label>
+    <Label>2. Oodake, kuni programm on lõpetanud paigaldamise</Label>
+    <Label>3. Sulgege installer</Label>
+    <Label>4. Vajutage allolevat nuppu, et lõpetada paigaldamise protsess</Label>
+    <Button Margin="0,10" Click="Button_Click">Lõpeta paigaldamine</Button>
+  </StackPanel>
+  <Window.Styles>
+    <Style Selector="Label">
+      <Setter Property="FontFamily" Value="Segoe UI,Ubuntu,sans-serif" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Margin" Value="-2" />
+    </Style>
+  </Window.Styles>
+</Window>
