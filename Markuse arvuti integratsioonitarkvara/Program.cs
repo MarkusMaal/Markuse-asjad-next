@@ -1,5 +1,8 @@
 ﻿using Avalonia;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Diagnostics;
+using System.Threading;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
@@ -18,5 +21,6 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace();
+
     }
 }

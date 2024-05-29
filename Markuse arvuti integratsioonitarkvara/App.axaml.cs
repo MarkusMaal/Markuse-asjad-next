@@ -5,6 +5,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media.Imaging;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -21,7 +22,6 @@ namespace Markuse_arvuti_integratsioonitarkvara
             AvaloniaXamlLoader.Load(this);
             this.DataContext = this;
             fmount = GetMount();
-            
             
         }
 
@@ -41,6 +41,19 @@ namespace Markuse_arvuti_integratsioonitarkvara
             p.StartInfo.FileName = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             p.StartInfo.UseShellExecute = true;
             p.Start();
+        }
+
+        public Bitmap GetResource(byte[] resource) {
+            Bitmap icon;
+            using (var ms = new MemoryStream(resource))
+            {
+                icon = new Bitmap(ms);
+            }
+            return icon;
+        }
+
+        public void RestartMainWindow() {
+            
         }
 
         private void FlashUnlock_Click(object? sender, System.EventArgs e)
@@ -83,8 +96,18 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 if (fmount != "")
                 {
                     Process p = new Process();
-                    p.StartInfo.FileName = fmount + "/Markuse m�lupulk/Markuse m�lupulk/bin/Debug/Markuse m�lupulk.exe";
-                    p.StartInfo.WorkingDirectory = fmount + "/Markuse m�lupulk/Markuse m�lupulk/bin/Debug";
+                    p.StartInfo.FileName = fmount + "/Markuse mälupulk/Markuse mälupulk/bin/Debug/Markuse mälupulk.exe";
+                    p.StartInfo.WorkingDirectory = fmount + "/Markuse mälupulk/Markuse mälupulk/bin/Debug";
+                    p.StartInfo.UseShellExecute = false;
+                    p.Start();
+                }
+            } else if (OperatingSystem.IsLinux()) {
+                if (fmount != "")
+                {
+                    Process p = new Process();
+                    p.StartInfo.FileName = "java";
+                    p.StartInfo.Arguments = "-jar " + fmount + "/.fdpanel/fdpanel.jar";
+                    p.StartInfo.WorkingDirectory = fmount + "/.fdpanel";
                     p.StartInfo.UseShellExecute = false;
                     p.Start();
                 }

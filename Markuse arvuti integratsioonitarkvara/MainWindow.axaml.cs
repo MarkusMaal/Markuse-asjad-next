@@ -7,12 +7,15 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
     public partial class MainWindow : Window
     {
+        private bool allowCode = true;
         private TrayIcon ti;
         private App app;
         Color[] scheme;
@@ -29,34 +32,136 @@ namespace Markuse_arvuti_integratsioonitarkvara
             ApplyTheme();
             ti.IsVisible = true;
             this.IsVisible = false;
-            if (app.fmount != "")
+            //foreach (NativeMenuItemBase nmi in ti.Menu.Items)
+            List<NativeMenuItem> toRemove = new List<NativeMenuItem>();
+            for (int i = 0; i < ti.Menu.Items.Count; i++)
             {
-                ModifyContextText("Ühtegi mälupulka pole sisestatud", "Markuse mälupulk");
-            }
-            foreach (NativeMenuItemBase nmi in ti.Menu.Items)
-            {
-                if (((NativeMenuItem)nmi).Header == "Värviskeem")
-                {
-                    foreach (NativeMenuItemBase snmi in ((NativeMenuItem)nmi).Menu.Items)
-                    {
-                        switch (((NativeMenuItem)snmi).Header)
-                        {
-                            case "Valge":
-                                ((NativeMenuItem)snmi).Click += SaveThemeWhite;
-                                break;
-                            case "Ööreþiim":
-                                ((NativeMenuItem)snmi).Click += SaveThemeBlack;
-                                break;
-                            case "Sinine":
-                                ((NativeMenuItem)snmi).Click += SaveThemeBlue;
-                                break;
-                            case "Jõulud":
-                                ((NativeMenuItem)snmi).Click += SaveThemeXmas;
-                                break;
+                NativeMenuItemBase nmi = ti.Menu.Items[i];
+                NativeMenuItem n = (NativeMenuItem)nmi;
+                switch (n.Header) {
+                    case "Ãœhtegi mÃ¤lupulka pole sisestatud":
+                        if (app.fmount != "") {
+                            n.Header = "Markuse mÃ¤lupulk";
+                        } else {
+                            n.IsEnabled = false;
                         }
-                    }
+                        break;
+                    case "VÃ¤rviskeem":
+                        foreach (NativeMenuItemBase snmi in n.Menu.Items)
+                        {
+                            NativeMenuItem sm = (NativeMenuItem)snmi;
+                            switch (sm.Header)
+                            {
+                                case "Valge":
+                                    sm.Click += SaveThemeWhite;
+                                    break;
+                                case "Ã–Ã¶reÅ¾iim":
+                                    sm.Click += SaveThemeBlack;
+                                    break;
+                                case "Sinine":
+                                    sm.Click += SaveThemeBlue;
+                                    break;
+                                case "JÃµulud":
+                                    sm.Click += SaveThemeXmas;
+                                    break;
+                            }
+                        }
+                        break;
+                    case "Tarkvara paigaldamise reÅ¾iim":
+                        if (!OperatingSystem.IsWindows()) {
+                            toRemove.Add(n);
+                        }
+                        break;
+                    case "SÃ¼nkroniseeri versioon":
+                        if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv")) {
+                            toRemove.Add(n);
+                        }
+                        break;
+                    case "KÃ¤ivita virtuaalarvuti":
+                        if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas/vpc")) {
+                            toRemove.Add(n);
+                        }
+                        break;
+                    case "M.A.I.A. server haldamine":
+                        
+                        foreach (NativeMenuItemBase snmi in n.Menu.Items)
+                        {
+                            NativeMenuItem sm = (NativeMenuItem)snmi;
+                            switch (sm.Header) {
+                                case "Peata":
+                                    bool running = false;
+                                    foreach (Process p in Process.GetProcesses()) {
+                                        if (p.ProcessName.Contains("python") || p.ProcessName.Contains("py.exe")) {
+                                            running = true;
+                                        }
+                                    }
+                                    if (!running) {
+                                        sm.Header = "KÃ¤ivita";
+                                        sm.Icon = app.GetResource(Properties.Resources._new);
+                                        sm.Click += StartMaia;
+                                    } else {
+                                        sm.Click += StopMaia;
+                                    }
+                                    break;
+                                case "VÃµimalda ligipÃ¤Ã¤su taotlemine":
+                                    sm.Click += (object? sender, EventArgs e) => {
+                                        NativeMenuItem obj = ((NativeMenuItem)sender);
+                                        obj.IsChecked = !obj.IsChecked;
+                                        allowCode = obj.IsChecked;
+                                    };
+                                    break;
+                                case "Ava brauseris":
+                                    sm.Click += (object? sender, EventArgs e) => {
+                                        Process pr = new Process();
+                                        pr.StartInfo.FileName = "http://localhost:14414";
+                                        pr.StartInfo.UseShellExecute = true;
+                                        pr.Start();
+                                    };
+                                    break;
+                            }
+                        }
+                        break;
                 }
             }
+            foreach (NativeMenuItem r in toRemove)
+            {
+                ti.Menu.Items.Remove(r);
+            }
+        }
+
+        private void StopMaia(object sender, EventArgs e) {
+            Console.WriteLine("Stop M.A.I.A.");
+            foreach (Process p in Process.GetProcesses()) {
+                if (p.ProcessName.Contains("python") || p.ProcessName.Contains("py.exe")) {
+                    p.Kill();
+                }
+            }
+        }
+
+        private void StartMaia(object sender, EventArgs e) {
+            Console.WriteLine("Start M.A.I.A.");
+            Process p = new Process();
+            if (!OperatingSystem.IsWindows()) {
+                p.StartInfo.FileName = "python3";
+            } else {
+                p.StartInfo.FileName = "py.exe";
+            }
+            p.StartInfo.Arguments = app.mas_root + "/maia/server.py";
+            p.StartInfo.UseShellExecute = true;
+            p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            p.StartInfo.CreateNoWindow = true;
+            p.Start();
+        }
+
+
+        public void Restart() {
+            Process p = new Process();
+            p.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "/" + GetType().Namespace.Replace("_", " ");
+            if (OperatingSystem.IsWindows()) {
+                p.StartInfo.FileName += ".exe";
+            }
+            p.Start();
+            this.Close();
         }
 
         private void SaveThemeWhite(object? sender, EventArgs e)

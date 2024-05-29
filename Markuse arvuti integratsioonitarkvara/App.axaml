@@ -36,7 +36,7 @@
             <NativeMenuItem Header="M.A.I.A. server haldamine" Icon="Resources/br.png">
               <NativeMenu>
                 <NativeMenuItem Header="Ava brauseris" Icon="Resources/unknown.png"/>
-                <NativeMenuItem Header="Võimalda ligipääsu taotlemine" IsChecked="True" />
+                <NativeMenuItem Header="Võimalda ligipääsu taotlemine" IsChecked="True" ToggleType="CheckBox" />
                 <NativeMenuItem Header="Peata" Icon="Resources/failure.gif"/>
               </NativeMenu>
             </NativeMenuItem>
