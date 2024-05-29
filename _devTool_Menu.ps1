@@ -26,7 +26,6 @@ function ClearScreen {
 function Get-GitStatus {
     ClearScreen
     git show
-    Pause
     ClearScreen
 }
 
@@ -43,7 +42,7 @@ function Perform-GitCommit {
     Write-Host "Commit message: $message"
     $confirm = false
     $cancel = false
-    while ($confirm -eq [bool]@(0)) {
+    while (!$confirm) {
         $title = 'Commit message'
         $question = 'Append more lines or commit?'
         $choices = 'Conti&nue', '&Commit', 'C&ancel'
