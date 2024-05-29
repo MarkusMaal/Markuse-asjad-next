@@ -40,41 +40,10 @@ function Perform-GitCommit {
     Write-Host "Pushing to remote: $rem" -NoNewline
     Write-Host "Branch: $brnch" -NoNewline
     Write-Host "Commit message: $message"
-    $confirm = false
-    $cancel = false
-    while (!$confirm) {
-        $title = 'Commit message'
-        $question = 'Append more lines or commit?'
-        $choices = 'Conti&nue', '&Commit', 'C&ancel'
-        $decision = $Host.UI.PromptForChoice($title, $question, $choices, 0)
-        if ($decision -eq 0) {
-            ClearScreen
-            & "./_devTool_Logo.ps1" # header
-            $msg2 = Read-Host "Please enter Git message"
-            $message = "$message\n$msg2"
-            ClearScreen
-            & "./_devTool_Logo.ps1" # header
-            Write-Host "Pushing to remote: $rem" -NoNewline
-            Write-Host "Commit message: $message"
-            $confirm = false
-        }
-        if ($decision -eq 1) {
-            $confirm = true
-        }
-        if ($decision -eq 2) {
-            $cancel = true
-            $confirm = true
-        }
-    }
-    if (!$cancel) {
-        git add .
-        git commit -m "$message"
-        git push
-        Pause
-    } else {
-        Write-Host "Cancelled!!!"
-        Pause
-    }
+    git add .
+    git commit -m "$message"
+    git push
+    Pause
     ClearScreen
 }
 
