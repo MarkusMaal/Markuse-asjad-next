@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markuse arvuti juhtpaneel", "Markuse arvuti juhtpaneel\Markuse arvuti juhtpaneel.csproj", "{A02911E5-406E-46DB-942C-51BF286ADDEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markuse arvuti juhtpaneel", "Markuse arvuti juhtpaneel\Markuse arvuti juhtpaneel.csproj", "{A02911E5-406E-46DB-942C-51BF286ADDEC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markuse arvuti ooterežiim", "Markuse arvuti ooterežiim\Markuse arvuti ooterežiim.csproj", "{F900DBBE-6215-4668-B0F4-07054BDE5EED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markuse arvuti integratsioonitarkvara", "Markuse arvuti integratsioonitarkvara\Markuse arvuti integratsioonitarkvara.csproj", "{9BFEDA51-AC11-45FC-A6B4-8DBDFB8CFCC1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{A02911E5-406E-46DB-942C-51BF286ADDEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A02911E5-406E-46DB-942C-51BF286ADDEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A02911E5-406E-46DB-942C-51BF286ADDEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F900DBBE-6215-4668-B0F4-07054BDE5EED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F900DBBE-6215-4668-B0F4-07054BDE5EED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F900DBBE-6215-4668-B0F4-07054BDE5EED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F900DBBE-6215-4668-B0F4-07054BDE5EED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BFEDA51-AC11-45FC-A6B4-8DBDFB8CFCC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BFEDA51-AC11-45FC-A6B4-8DBDFB8CFCC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BFEDA51-AC11-45FC-A6B4-8DBDFB8CFCC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BFEDA51-AC11-45FC-A6B4-8DBDFB8CFCC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

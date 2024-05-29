@@ -32,6 +32,8 @@ namespace Markuse_arvuti_juhtpaneel
         int rotation = 0;
         string[] locations;
         bool freezeTimer = false;
+        DispatcherTimer dispatcherTimer2 = new DispatcherTimer();
+        DispatcherTimer rotateLogo = new DispatcherTimer();
         readonly string whatNew = "+ Linuxi tugi\n+ Kuvatõmmise tegemine Spectacle abiga (Linux)\n- Eemaldatud kuvatõmmise nupud Windowsi versioonist";
         public MainWindow()
         {
@@ -206,7 +208,21 @@ namespace Markuse_arvuti_juhtpaneel
             string currentDate = year + month.PadLeft(2, '0') + day.PadLeft(2, '0');
             string currentTime = DateTime.Now.ToLongTimeString().Replace(":", "");
             string filename = "Screenshot_" + currentDate + "_" + currentTime + ".png";
-            RunCommand("spectacle", "-f -b -o \"" + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Pildid/Screenshots/" + filename + "\"", false);
+            if (OperatingSystem.IsLinux())
+            {
+                RunCommand("spectacle", "-f -b -o \"" + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Pildid/Screenshots/" + filename + "\"", false);
+            } else if (OperatingSystem.IsWindows())
+            {
+                filename = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/" + filename;
+                Process p = new Process();
+                p.StartInfo.FileName = "powershell";
+                p.StartInfo.Arguments = masRoot.Replace("/", "\\") + "\\ScreenShot.ps1 -FileName \"" + filename.Replace("/", "\\") + "\"";
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                p.Start();
+                p.WaitForExit();
+                MessageBoxShow("Kuvatõmmis salvestati edukalt", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success);
+            }
         }
 
         private async void ScreenshotAs(object? sender, RoutedEventArgs e) {
@@ -230,8 +246,22 @@ namespace Markuse_arvuti_juhtpaneel
             if (file is not null)
             {
                 filename = file.Path.AbsolutePath;
-                Thread.Sleep(5000);
-                RunCommand("spectacle", "-f -b -o \"" + filename + "\"", false);
+                Thread.Sleep(2000);
+                if (OperatingSystem.IsWindows())
+                {
+                    Process p = new Process();
+                    p.StartInfo.FileName = "powershell";
+                    p.StartInfo.Arguments = masRoot.Replace("/", "\\") + "\\ScreenShot.ps1 -FileName \"" + filename.Replace("/", "\\") + "\"";
+                    p.StartInfo.CreateNoWindow = true;
+                    p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    p.Start();
+                    p.WaitForExit();
+                    _ = MessageBoxShow("Kuvatõmmis salvestati edukalt", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success);
+                }
+                else if (OperatingSystem.IsLinux())
+                {
+                    RunCommand("spectacle", "-f -b -o \"" + filename + "\"", false);
+                }
         
             }
 
@@ -397,6 +427,84 @@ namespace Markuse_arvuti_juhtpaneel
             dispatcherTimer.Tick += new EventHandler(CheckTheme);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
             dispatcherTimer.Start();
+            dispatcherTimer2.Tick += new EventHandler(CollectInfo);
+            dispatcherTimer2.Interval = new TimeSpan(0, 0, 0);
+            dispatcherTimer2.Start();
+            rotateLogo.Tick += new EventHandler(RotateLogo);
+            rotateLogo.Interval = new TimeSpan(0, 0, 0, 0, 16);
+        }
+
+        private void CollectInfo(object sender, EventArgs e)
+        {
+            dispatcherTimer2.Stop();
+            string devPrefix = "Markuse arvuti asjade";
+            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
+            {
+                devPrefix = "Markuse virtuaalarvuti asjade";
+            }
+            if (File.Exists(masRoot + "/mas.cnf"))
+            {
+                string[] cnfs = File.ReadAllText(masRoot + "/mas.cnf").Split(';');
+                ShowMasLogoCheck.IsChecked = cnfs[0].ToString() == "true";                  // Kuva Markuse asjade logo integratsioonitarkvara käivitumisel
+                AllowScheduledTasksCheck.IsChecked = cnfs[1].ToString() == "true";          // Käivita töölauamärkmed arvuti käivitumisel
+                StartDesktopNotesCheck.IsChecked = cnfs[2].ToString() == "true";            // Käivita töölauamärkmed arvuti käivitumisel
+            }
+            else
+            {
+                MessageBoxShow(devPrefix + " tarkvara ei ole juurutatud. Palun juurutage seade kasutades juurutamise tööriista.", "Markuse asjade tarkvara pole paigaldatud", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                this.Close();
+            }
+            if (File.Exists(masRoot + "/edition.txt"))
+            {
+
+                switch (Verifile2())
+                {
+                    case "VERIFIED":
+                        break;
+                    case "FOREIGN":
+                        Console.WriteLine("See programm töötab ainult Markuse arvutis.\nVeakood: VF_FOREIGN");
+                        this.Close();
+                        return;
+                    case "FAILED":
+                        Console.WriteLine("Verifile püsivuskontrolli läbimine nurjus.\nVeakood: VF_FAILED");
+                        this.Close();
+                        return;
+                    case "TAMPERED":
+                        Console.WriteLine("See arvuti pole õigesti juurutatud. Seda võis põhjustada hiljutine riistvaramuudatus. Palun kasutage juurutamiseks Markuse asjade juurutamistööriista.\nVeakood: VF_TAMPERED");
+                        this.Close();
+                        return;
+                    case "LEGACY":
+                        Console.WriteLine("See arvuti on juurutatud vana juurutamistööriistaga. Palun juurutage arvuti uuesti uue juurutamistarkvaraga.\nVeakood: VF_LEGACY");
+                        this.Close();
+                        return;
+                }
+                if (Verifile())
+                {
+                    scheme = LoadTheme();
+                    ApplyTheme();
+                    this.IsVisible = true;
+                    GetEditionInfo();
+
+                    this.Title = "Markuse arvuti juhtpaneel";
+                    if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
+                    {
+                        TopLabel.Text = "markuse virtuaalarvuti juhtpaneel";
+                        this.Title = "Markuse virtuaalarvuti juhtpaneel";
+                    }
+                    if (File.Exists(masRoot + "/irunning.log"))
+                    {
+                        // Projekt ITS aktiivne
+                        WindowState = WindowState.FullScreen;
+                    }
+                    TabsControl.IsEnabled = true;
+                }
+                else
+                {
+                    Console.WriteLine(devPrefix + " tarkvara ei ole õigesti juurutatud. Palun juurutage seade kasutades juurutamise tööriista.");
+                    this.Close();
+                    return;
+                }
+            }
         }
 
         private void InitResources()
@@ -413,19 +521,16 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void InitButtons() {
             if (OperatingSystem.IsLinux()) {
-                this.FlashDriveButton.IsVisible = false;
+                //this.FlashDriveButton.IsVisible = false;
                 this.QuickNotesButton.IsVisible = false;
                 this.RegeditButton.IsVisible = false;
                 this.CommandButton.Content = "Konsool";
                 this.TaskmgrButton.Content = "Protsessid";
                 this.DevmgmtButton.Content = "Riistvara info";
                 this.CompManButton.Content = "Käsurea utilliidid";
-                this.ScreenshotAsButton.IsEnabled = true;
-                this.ScreenshotButton.IsEnabled = true;
                 WinUtilsLabel.Content = "Linuxi tarvikud";
             } else if (OperatingSystem.IsWindows()) {
-                this.ScreenshotAsButton.IsVisible = false;
-                this.ScreenshotButton.IsVisible = false;
+                return;
             } else {
                 Console.WriteLine("Hoiatus: Operatsioonsüsteemi ei toetata!");
             }
@@ -434,13 +539,25 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void Image_DoubleTapped(object? sender, Avalonia.Input.TappedEventArgs e)
         {
-            Bitmap icon;
-            using (var ms = new MemoryStream(Properties.Resources.mas_web))
+            if (rotateLogo.IsEnabled)
             {
-                icon = new Bitmap(ms);
+                rotateLogo.Stop();
+            } else
+            {
+                rotateLogo.Start();
             }
-            ((Image)e.Source).Source = icon;
-            MessageBoxShow("Töötlemisel...");
+        }
+
+        private void RotateLogo(object sender, EventArgs e)
+        {
+            rotation += 3;
+            if (rotation % 90 == 0)
+            {
+                rotateLogo.Stop();
+            }
+            TransformGroup tg = new TransformGroup();
+            tg.Children.Add(new RotateTransform(rotation));
+            Logo.RenderTransform = tg;
         }
 
         private void Grid_SizeChanged(object? sender, Avalonia.Controls.SizeChangedEventArgs e)
@@ -1037,71 +1154,7 @@ namespace Markuse_arvuti_juhtpaneel
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
-            {
-                TopLabel.Text = "markuse virtuaalarvuti juhtpaneel";
-                this.Title = "Markuse virtuaalarvuti juhtpaneel";
-            }
-            string devPrefix = "Markuse arvuti asjade";
-            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
-            {
-                devPrefix = "Markuse virtuaalarvuti asjade";
-            }
-            if (File.Exists(masRoot + "/mas.cnf"))
-            {
-                string[] cnfs = File.ReadAllText(masRoot + "/mas.cnf").Split(';');
-                ShowMasLogoCheck.IsChecked = cnfs[0].ToString() == "true";                  // Kuva Markuse asjade logo integratsioonitarkvara käivitumisel
-                AllowScheduledTasksCheck.IsChecked = cnfs[1].ToString() == "true";          // Käivita töölauamärkmed arvuti käivitumisel
-                StartDesktopNotesCheck.IsChecked = cnfs[2].ToString() == "true";            // Käivita töölauamärkmed arvuti käivitumisel
-                if (File.Exists(masRoot + "/irunning.log"))
-                {
-                    // Projekt ITS aktiivne
-                    WindowState = WindowState.FullScreen;
-                }
-            }
-            else
-            {
-                MessageBoxShow(devPrefix + " tarkvara ei ole juurutatud. Palun juurutage seade kasutades juurutamise tööriista.", "Markuse asjade tarkvara pole paigaldatud", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
-                this.Close();
-            }
-            if (File.Exists(masRoot + "/edition.txt"))
-            {
-
-                switch (Verifile2())
-                {
-                    case "VERIFIED":
-                        break;
-                    case "FOREIGN":
-                        Console.WriteLine("See programm töötab ainult Markuse arvutis.\nVeakood: VF_FOREIGN");
-                        this.Close();
-                        return;
-                    case "FAILED":
-                        Console.WriteLine("Verifile püsivuskontrolli läbimine nurjus.\nVeakood: VF_FAILED");
-                        this.Close();
-                        return;
-                    case "TAMPERED":
-                        Console.WriteLine("See arvuti pole õigesti juurutatud. Seda võis põhjustada hiljutine riistvaramuudatus. Palun kasutage juurutamiseks Markuse asjade juurutamistööriista.\nVeakood: VF_TAMPERED");
-                        this.Close();
-                        return;
-                    case "LEGACY":
-                        Console.WriteLine("See arvuti on juurutatud vana juurutamistööriistaga. Palun juurutage arvuti uuesti uue juurutamistarkvaraga.\nVeakood: VF_LEGACY");
-                        this.Close();
-                        return;
-                }
-                if (Verifile())
-                {
-                    scheme = LoadTheme();
-                    ApplyTheme();
-                    InitTimers();
-                    GetEditionInfo();
-                }
-                else
-                {
-                    Console.WriteLine(devPrefix + " tarkvara ei ole õigesti juurutatud. Palun juurutage seade kasutades juurutamise tööriista.");
-                    this.Close();
-                    return;
-                }
-            }
+            InitTimers();
         }
     }
 }
