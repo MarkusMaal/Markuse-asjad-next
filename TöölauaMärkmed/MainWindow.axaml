@@ -1,0 +1,79 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="218" Height="210"
+        x:Class="TöölauaMärkmed.MainWindow" ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        Background="PaleGoldenrod"
+        Foreground="Black"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        IsHitTestVisible="True" BorderThickness="0"
+        Title="TöölauaMärkmed">
+  <StackPanel>
+    <Grid Name="TitleBar" Background="SteelBlue" Classes="TitleBar"  PointerPressed="TitleBar_PointerPressed" PointerMoved="TitleBar_PointerMoved" PointerReleased="TitleBar_PointerReleased">
+      <Label Name="TitleBarLabel">Märkmik</Label>
+      <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+        <Label Name="AddBtn" HorizontalAlignment="Right" Background="Green" PointerEntered="Add_Enter" PointerExited="Add_Leave" PointerPressed="Add_Click">+</Label>
+        <Label Name="ExitBtn" HorizontalAlignment="Right" Background="Maroon" PointerEntered="Exit_Enter" PointerExited="Exit_Leave" PointerPressed="Exit_Click">X</Label>
+      </StackPanel>
+    </Grid>
+    <TextBox Name="NoteBox" ClipToBounds="True" VerticalAlignment="Stretch" Height="999" Background="Transparent" BorderBrush="Transparent" Classes="transparent" TextWrapping="Wrap" CaretBrush="Black" TextChanged="NoteBox_TextChanged">
+      <TextBox.ContextMenu>
+        <ContextMenu>
+          <MenuItem Header="Paberi värv">
+              <MenuItem Header="Kollane" Click="Color_Click"/>
+              <MenuItem Header="Punane" Click="Color_Click"/>
+              <MenuItem Header="Roheline" Click="Color_Click"/>
+              <MenuItem Header="Sinine" Click="Color_Click"/>
+              <MenuItem Header="Valge" Click="Color_Click"/>
+              <MenuItem Header="Hall" Click="Color_Click"/>
+              <MenuItem Header="Pruun" Click="Color_Click"/>
+              <MenuItem Header="Lilla" Click="Color_Click"/>
+          </MenuItem>
+          <MenuItem Click="New_Click" Header="Uus märge"/>
+          <MenuItem Click="Del_Click" Header="Kustuta see märge"/>
+        </ContextMenu>
+      </TextBox.ContextMenu>
+    </TextBox>
+  </StackPanel>
+  <Window.Styles>
+    <Style Selector="Grid.TitleBar > Label">
+      <Setter Property="Foreground" Value="White"></Setter>
+      <Setter Property="Padding" Value="8,4"/>
+    </Style>
+    <Style Selector="Grid.TitleBar > StackPanel > Label">
+      <Setter Property="Foreground" Value="White"></Setter>
+      <Setter Property="Padding" Value="8,4"/>
+    </Style>
+    <Style Selector="Grid.TitleBar">
+      <Setter Property="Margin" Value="5"/>
+    </Style>
+    <Style Selector="TextBox">
+      <Setter Property="Margin" Value="5"/>
+      <Setter Property="Foreground" Value="Black" />
+      <Setter Property="FontFamily" Value="Segoe Print" />
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="FontWeight" Value="Regular" />
+    </Style>
+    <!--  Default State  -->
+    <Style Selector="TextBox.transparent">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+
+    </Style>
+
+    <!--  Hover State  -->
+    <Style Selector="TextBox.transparent:pointerover">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+
+    <!--  Focused State  -->
+    <Style Selector="TextBox.transparent:focused">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+  </Window.Styles>
+</Window>

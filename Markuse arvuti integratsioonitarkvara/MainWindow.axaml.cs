@@ -5,6 +5,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Dialogs.Internal;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Metadata;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using System;
@@ -26,25 +27,98 @@ namespace Markuse_arvuti_integratsioonitarkvara
         {
             InitializeComponent();
             app = (App)Application.Current;
-            ti = app.GetTrayIcon();
-            scheme = LoadTheme();
-            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
+            if (app.Verifile() && !app.croot)
             {
-                this.DeviceLabel.Content = "markuse virtuaalarvuti asjad";
-                this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_virtualpc);
+                app.InitSettings();
+                if (!app.showsplash)
+                {
+                    this.IsVisible = false;
+                    this.Opacity = 0;
+                }
+                ti = app.GetTrayIcon();
+                scheme = LoadTheme();
+                if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
+                {
+                    this.DeviceLabel.Content = "markuse virtuaalarvuti asjad";
+                    this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_virtualpc);
+                }
+                else
+                {
+                    this.DeviceLabel.Content = "markuse arvuti asjad";
+                    this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_computers);
+                }
+                InitTimers();
+            } else if (app.croot)
+            {
+                RerootForm rf = new RerootForm();
+                rf.Show();
             } else
             {
-                this.DeviceLabel.Content = "markuse arvuti asjad";
-                this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_computers);
+                Environment.Exit(255);
+                return;
             }
-            InitTimers();
         }
 
         private void InitTimers()
         {
             dispatcherTimer.Tick += new EventHandler(GeneralTimer);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 2);
+            if (app.showsplash)
+            {
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 2);
+            } else
+            {
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0);
+            }
             dispatcherTimer.Start();
+        }
+
+        private void CheckEvents()
+        {
+            //erisündmused
+            try
+            {
+                if ((app.specialevents != null) && (app.specialevents.Length > 0))
+                {
+                    //käi läbi erisündmuste massiivist
+                    foreach (string element in app.specialevents)
+                    {
+                        //loo alamelemendid
+                        string[] subelements = element.Split('-');
+                        //loo kp elemendid
+                        string[] dateelements = { subelements[0].ToString(), subelements[1].ToString(), subelements[2].ToString() };
+                        //kui kp pole sama, siis ignoreeri
+                        if (!(dateelements[0].ToString() == DateTime.Today.Day.ToString() && dateelements[0].ToString() == DateTime.Today.Month.ToString() && dateelements[2].ToString() == DateTime.Today.Year.ToString()))
+                        {
+                            continue;
+                        }
+                        //loo kellaaja elemendid
+                        string[] timestamp = { subelements[3].ToString(), subelements[4].ToString(), subelements[5].ToString() };
+                        //kui kellaaeg varasem, siis ignoreeri
+                        if (!(Convert.ToInt32(timestamp[0].ToString()) >= DateTime.Now.Hour && Convert.ToInt32(timestamp[1].ToString()) >= DateTime.Now.Minute && Convert.ToInt32(timestamp[2].ToString()) >= DateTime.Now.Second))
+                        {
+                            continue;
+                        }
+                        //leia failinimi
+                        string file = subelements[6].ToString();
+                        //leia binraarne muutuja
+                        bool willclose = Convert.ToBoolean(subelements[7].ToString());
+                        //loo protsess
+                        Process p = new Process();
+                        p.StartInfo.FileName = file;
+                        p.StartInfo.Arguments = subelements[8].ToString();
+                        p.Start();
+                        //sulge programm kui willclose on tõene
+                        if (willclose)
+                        {
+                            app.croot = true;
+                            Environment.Exit(0);
+                        }
+                        //eemalda elemendid specialevent massiivist
+                        app.specialevents = null;
+                    }
+                }
+            }
+            catch { }
         }
 
         private void GeneralTimer(object? sender, EventArgs e)
@@ -59,6 +133,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
             scheme = LoadTheme();
             ApplyTheme();
             CheckLogFiles();
+            CheckEvents();
         }
 
         private void CheckLogFiles()
@@ -115,6 +190,38 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         else
                         {
                             n.Header = "Ühtegi mälupulka pole sisestatud";
+                            n.IsEnabled = false;
+                        }
+                        break;
+                    case "Lülita mälupulga lukustus sisse":
+                    case "Lülita mälupulga lukustus välja":
+                        bool flashLocked = File.Exists(app.mas_root + "/flash_unlock_is_enabled.log");
+                        n.Header = flashLocked ? "Lülita mälupulga lukustus välja" : "Lülita mälupulga lukustus sisse";
+                        if (!initialized) {
+                            n.Click += (object? sender, EventArgs e) => {
+                                if (OperatingSystem.IsLinux()) {
+                                    bool flashLocked = File.Exists(app.mas_root + "/flash_unlock_is_enabled.log");
+                                    if (!flashLocked) {
+                                        Process p = new();
+                                        p.StartInfo.FileName = "python3";
+                                        p.StartInfo.Arguments = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/scripts/device.py";
+                                        p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                                        p.StartInfo.CreateNoWindow = true;
+                                        p.StartInfo.UseShellExecute = false;
+                                        p.Start();
+                                    } else {
+                                        File.Delete(app.mas_root + "/flash_unlock_is_enabled.log");
+                                    }
+                                } else if (OperatingSystem.IsWindows()) {
+                                // do something for Windows
+                                }
+                            };
+                        }
+                        break;
+                    case "Ava töölauamärkmed":
+                    case "Käivita Projekt ITS":
+                    case "Käivita MarkuStation":
+                        if (!initialized && !OperatingSystem.IsWindows()) {
                             n.IsEnabled = false;
                         }
                         break;
@@ -214,6 +321,27 @@ namespace Markuse_arvuti_integratsioonitarkvara
                             };
                         }
                         n.Header = IconType() ? "Peida need töölauaikoonid" : "Kuva kõik töölauaikoonid";
+                        break;
+                    case "Sulge see menüü":
+                        if (!initialized) {
+                            if (app.dev) {
+                                n.Click += (object? sender, EventArgs e) => {
+                                    this.Close();
+                                };
+                                n.Header = "Lõpeta silumine";
+                            }
+                        }
+                        break;
+                    case "Juurutamine":
+                        if (!initialized) {
+                            n.Click += (object? sender, EventArgs e) => {
+                                RerootForm rf = new RerootForm();
+                                rf.Show();
+                            };
+                            if (!app.dev) {
+                                toRemove.Add(n);
+                            }
+                        }
                         break;
                     case "M.A.I.A. serveri haldamine":
 

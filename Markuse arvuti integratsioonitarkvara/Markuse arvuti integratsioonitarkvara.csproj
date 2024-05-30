@@ -60,7 +60,7 @@
     <EmbeddedResource Include="Resources\update.png" />
     <EmbeddedResource Include="Resources\user_black.png" />
     <EmbeddedResource Include="Resources\user_blue.png" />
-    <AvaloniaResource Include="Resources\**"/>
+    <AvaloniaResource Include="Resources\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,7 +69,9 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
+    <!--<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />-->
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.10" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

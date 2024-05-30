@@ -12,7 +12,7 @@ Write-Output "Stage 1: Stopping any existing processes..."
 Write-Output "Stage 2: Restarting integration program..."
 $mit_path = $mas_root + "/Markuse asjad/Markuse arvuti integratsioonitarkvara"
 # append .exe if we're running this script under Windows
-if ($platform = "Win32NT") {
+if ($platform -eq "Win32NT") {
 	$mit_path = $mit_path + ".exe"
 }
 Start-Process -FilePath $mit_path
