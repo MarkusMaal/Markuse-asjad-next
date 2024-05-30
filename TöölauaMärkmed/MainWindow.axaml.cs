@@ -273,7 +273,7 @@ namespace TöölauaMärkmed
         {
             if (NoteBox.Text?.Length > 0)
             {
-                TitleBarLabel.Content = "Märkmik " + currentindex.ToString() + " - " + NoteBox.Text.Split('\n')[0].ToString();
+                TitleBarLabel.Content = "Märkmik " + currentindex.ToString() + " - " + NoteBox.Text.Split('\n')[0].ToString().Replace("\n", "").Replace("\r", "");
             }
             else
             {

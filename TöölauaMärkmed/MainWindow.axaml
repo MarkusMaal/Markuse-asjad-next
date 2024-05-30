@@ -9,7 +9,7 @@
         Foreground="Black"
         ExtendClientAreaTitleBarHeightHint="-1"
         IsHitTestVisible="True" BorderThickness="0"
-        Title="TöölauaMärkmed">
+        Title="TöölauaMärkmed" ShowInTaskbar="False">
   <StackPanel>
     <Grid Name="TitleBar" Background="SteelBlue" Classes="TitleBar"  PointerPressed="TitleBar_PointerPressed" PointerMoved="TitleBar_PointerMoved" PointerReleased="TitleBar_PointerReleased">
       <Label Name="TitleBarLabel">Märkmik</Label>
@@ -18,7 +18,7 @@
         <Label Name="ExitBtn" HorizontalAlignment="Right" Background="Maroon" PointerEntered="Exit_Enter" PointerExited="Exit_Leave" PointerPressed="Exit_Click">X</Label>
       </StackPanel>
     </Grid>
-    <TextBox Name="NoteBox" ClipToBounds="True" VerticalAlignment="Stretch" Height="999" Background="Transparent" BorderBrush="Transparent" Classes="transparent" TextWrapping="Wrap" CaretBrush="Black" TextChanged="NoteBox_TextChanged">
+    <TextBox Name="NoteBox" ClipToBounds="True" VerticalAlignment="Stretch" Height="999" Background="Transparent" BorderBrush="Transparent" Classes="transparent" TextWrapping="Wrap" CaretBrush="Black" TextChanged="NoteBox_TextChanged" MaxLines="32768" AcceptsReturn="True">
       <TextBox.ContextMenu>
         <ContextMenu>
           <MenuItem Header="Paberi värv">
