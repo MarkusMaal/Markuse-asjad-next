@@ -70,6 +70,16 @@ namespace MarkuStation2.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] MarkuStation_awesome {
+            get {
+                object obj = ResourceManager.GetObject("MarkuStation_awesome", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
         internal static System.IO.UnmanagedMemoryStream MarkuStation_device {
@@ -179,6 +189,16 @@ namespace MarkuStation2.Properties {
         internal static byte[] MarkuStation_startup_video {
             get {
                 object obj = ResourceManager.GetObject("MarkuStation_startup_video", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] s {
+            get {
+                object obj = ResourceManager.GetObject("s", resourceCulture);
                 return ((byte[])(obj));
             }
         }

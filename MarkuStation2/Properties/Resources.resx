@@ -121,6 +121,9 @@
   <data name="MarkuStation_ambient" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MarkuStation_ambient.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="MarkuStation_awesome" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MarkuStation_awesome.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="MarkuStation_device" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MarkuStation_device.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -156,5 +159,8 @@
   </data>
   <data name="MarkuStation_startup_video" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MarkuStation_startup_video.MP4;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="s" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\s.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

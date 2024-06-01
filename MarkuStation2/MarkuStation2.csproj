@@ -21,6 +21,7 @@
     <None Remove="Resources\MarkuStation_menu_select.wav" />
     <None Remove="Resources\MarkuStation_startup.wav" />
     <None Remove="Resources\MarkuStation_startup_video.MP4" />
+    <None Remove="Resources\s.png" />
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Resources\MarkuStation_ambient.wav" />
@@ -36,6 +37,7 @@
     <AvaloniaResource Include="Resources\MarkuStation_menu_select.wav" />
     <AvaloniaResource Include="Resources\MarkuStation_startup.wav" />
     <AvaloniaResource Include="Resources\MarkuStation_startup_video.MP4" />
+    <AvaloniaResource Include="Resources\s.png" />
   </ItemGroup>
 
   <ItemGroup>

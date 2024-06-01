@@ -13,7 +13,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TöölauaMärkmed", "Tööl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pidu!", "Pidu!\Pidu!.csproj", "{C8B27F42-AA3B-49FF-8FFC-0FD582AD83BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkuStation2", "MarkuStation2\MarkuStation2.csproj", "{97DED963-9E09-47ED-8B16-3CF194FCEA35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarkuStation2", "MarkuStation2\MarkuStation2.csproj", "{97DED963-9E09-47ED-8B16-3CF194FCEA35}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4C8A8C8F-9645-44BF-8FCA-E5F9B7E7F9CD}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

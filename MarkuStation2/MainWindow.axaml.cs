@@ -1,10 +1,16 @@
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using LibVLCSharp.Shared;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace MarkuStation2
 {
@@ -17,24 +23,59 @@ namespace MarkuStation2
         readonly string mas_root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas";
         readonly DispatcherTimer timer = new();
         private string currentMenu = "startup";
-        private string nextMenu = "main";
         int angle = 10;
         int angle2 = 40;
         int angle3 = 70;
         int angle4 = 100;
-        int position;
         int opacity = 0;
         int sel = 0;
         bool invert = false;
         int circle_offset = 0;
+        readonly bool running = false;
+        readonly bool nodata = true;
+        int browser_idx = -1;
         readonly Random rand = new();
+        DispatcherTimer moveCircle = new();
+        readonly IDictionary<string, string> ms_games = new Dictionary<string, string>();
         public MainWindow()
         {
             InitializeComponent();
             _libVLC = new LibVLC();
             mp = new MediaPlayer(_libVLC);
             mp2 = new MediaPlayer(_libVLC);
-            position = (int)100;
+            if (!Directory.Exists(mas_root))
+            {
+                Directory.CreateDirectory(mas_root);
+            }
+            string[] games = [];
+            string[] execs = [];
+            if (File.Exists(mas_root + "/ms_games.txt") && File.Exists(mas_root + "/ms_exec.txt"))
+            {
+                games = File.ReadAllText(mas_root + "/ms_games.txt", Encoding.UTF8).Split("\n").Skip(1).ToArray();
+                execs = File.ReadAllText(mas_root + "/ms_exec.txt", Encoding.UTF8).Replace("\n", "").Split(";").Skip(1).ToArray();
+            }
+            int i = 0;
+            foreach (string game in games) {
+                if (game != "")
+                {
+                    ms_games[game] = execs[i].Replace("\\", "/") ;
+                }
+                i ++;
+            }
+            if (ms_games.Count > 0)
+            {
+                nodata = false;
+                NoData.IsVisible = false;
+            }
+
+            foreach (Process p in Process.GetProcesses())
+            {
+                if (p.ProcessName.Contains("MarkuStation"))
+                {
+                    running = true;
+                    break;
+                }
+            }
             // extract intro movie
             File.WriteAllBytes(mas_root + "/_temp.mp4", Properties.Resources.MarkuStation_startup_video);
             File.WriteAllBytes(mas_root + "/_temp.wav", GetStreamBytes(Properties.Resources.MarkuStation_startup));
@@ -47,40 +88,45 @@ namespace MarkuStation2
                 switch (currentMenu)
                 {
                     case "startup":
-                        if (!((VideoPlayer?.MediaPlayer?.IsPlaying ?? false) || VideoPlayer?.MediaPlayer?.State != VLCState.Ended) || (!File.Exists(mas_root + "/dont_play.txt")))
+                        if (!((VideoPlayer?.MediaPlayer?.IsPlaying ?? false) || VideoPlayer?.MediaPlayer?.State != VLCState.Ended) || (!running))
                         {
                             VideoPlayer.MediaPlayer.Media = null;
                             mp2.Media = null;
                             File.Delete(mas_root + "/_temp.mp4");
                             File.Delete(mas_root + "/_temp.wav");
-                            mp2.Media = new(_libVLC, mas_root + "/_amb.wav");
-                            mp2.Play();
+                            if (running)
+                            {
+                                mp2.Media = new(_libVLC, mas_root + "/_amb.wav");
+                                mp2.Play();
+                            }
                             VideoPlayer.IsVisible = false;
                             currentMenu = "enter";
                             timer.Interval = new TimeSpan(64000);
-                            this.Dot1.Opacity = 0;
-                            this.Dot2.Opacity = 0;
-                            this.Dot3.Opacity = 0;
-                            this.Dot4.Opacity = 0;
-                            this.Dot1.RenderTransform = new RotateTransform(angle, 200, 0);
-                            this.Dot2.RenderTransform = new RotateTransform(angle2, 200, 0);
-                            this.Dot3.RenderTransform = new RotateTransform(angle3, 200, 0);
-                            this.Dot4.RenderTransform = new RotateTransform(angle4, 200, 0);
+                            Dot1.Opacity = 0;
+                            Dot2.Opacity = 0;
+                            Dot3.Opacity = 0;
+                            Dot4.Opacity = 0;
+                            Dot1.RenderTransform = new RotateTransform(angle, 200, 0);
+                            Dot2.RenderTransform = new RotateTransform(angle2, 200, 0);
+                            Dot3.RenderTransform = new RotateTransform(angle3, 200, 0);
+                            Dot4.RenderTransform = new RotateTransform(angle4, 200, 0);
                         }
                         break;
                     case "enter":
-                        position -= 1;
                         opacity += 1;
                         if (opacity > 100)
                         {
                             opacity = 100;
                         }
-                        this.Dot1.Opacity = (double)opacity/ 100.0;
-                        this.Dot2.Opacity = (double)opacity / 100.0;
-                        this.Dot3.Opacity = (double)opacity / 100.0;
-                        this.Dot4.Opacity = (double)opacity / 100.0;
+                        Dot1.Opacity = opacity/ 100.0;
+                        Dot2.Opacity = opacity / 100.0;
+                        Dot3.Opacity = opacity / 100.0;
+                        Dot4.Opacity = opacity / 100.0;
+                        RotateCircle();
                         if ((opacity == 100))
                         {
+                            Menu.IsVisible = true;
+                            MenuHotkeys.IsVisible = true;
                             currentMenu = "main";
                             return;
                         }
@@ -109,7 +155,6 @@ namespace MarkuStation2
                         mp.Media = new(_libVLC, mas_root + "/_enter.wav");
                         mp.Play();
                         currentMenu = "fade_version";
-                        nextMenu = "version";
                         opacity = 100;
                         RotateCircle();
                         break;
@@ -131,13 +176,86 @@ namespace MarkuStation2
                             currentMenu = "fade_browser";
                             Browser.IsVisible = true;
                             opacity = 0;
+                            WhiteDot.Margin = new Avalonia.Thickness(-this.Width / 2, 0, 0, 0);
+                            if (!nodata)
+                            {
+                                Label noDataLabel = NoData;
+                                GamePanel.Children.Clear();
+                                Bitmap icon;
+                                using (var ms = new MemoryStream(Properties.Resources.MarkuStation_awesome))
+                                {
+                                    icon = new Bitmap(ms);
+                                }
+                                foreach (KeyValuePair<string, string> kvp in ms_games)
+                                {
+                                    Image sImage = new()
+                                    {
+                                        Source = icon,
+                                        Margin = new Thickness(20),
+                                        Width = 64,
+                                        Name = kvp.Key,
+                                    };
+
+                                    GamePanel.Children.Add(sImage);
+                                }
+                                GamePanel.Children.Add(noDataLabel);
+                                browser_idx = 0;
+                                GameName.IsVisible = true;
+                                GameName.Content = ms_games.First().Key;
+                                WhiteDot.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
+                                WhiteDot.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
+                            }
                         }
+                        break;
+                    case "exit_browser":
+                        if (opacity > 0)
+                        {
+                            opacity -= 1;
+                        }
+                        if (opacity == 0)
+                        {
+                            Browser.Opacity = 0;
+                            Browser.IsVisible = false;
+                            Dot1.IsVisible = true;
+                            Dot2.IsVisible = true;
+                            Dot3.IsVisible = true;
+                            Dot4.IsVisible = true;
+                            mp2.Media = new(_libVLC, mas_root + "/_amb.wav");
+                            mp2.Play();
+                            currentMenu = "return_menu";
+                        }
+                        Browser.Opacity = opacity / 100.0;
+                        break;
+                    case "return_menu":
+                        if (opacity < 100)
+                        {
+                            opacity += 1;
+                        }
+                        FunkyDots.Opacity = opacity / 100.0;
+                        if (opacity == 100)
+                        {
+                            currentMenu = "main";
+                            KeyEsc.Opacity = 1;
+                            KeyReturn.Opacity = 1;
+                            Menu.IsVisible = true;
+                            KeyEsc.IsVisible = true;
+                            KeyReturn.IsVisible = true;
+                            FunkyDots.IsVisible = true;
+                            MenuHotkeys.IsVisible = true;
+                        }
+                        RotateCircle();
                         break;
                     case "fade_browser":
                         opacity += 1;
                         Browser.Opacity = opacity / 100.0;
                         if (opacity == 100)
                         {
+                            if (ms_games.Count > 0)
+                            {
+                                Image firstEl = (Image)GamePanel.Children[0];
+                                MoveCircle(GetAbsolutePosition(firstEl));
+                            }
+                            WhiteDot.ZIndex = -1;
                             Browser.Opacity = 1;
                             currentMenu = "browser";
                         }
@@ -179,27 +297,159 @@ namespace MarkuStation2
                     case "version":
                         RotateCircle();
                         break;
+                    case "run_game":
+                        if (opacity == 100)
+                        {
+                            MoveCircle(new Point(this.Width, this.Height), true);
+                        } else if (opacity == 0)
+                        {
+                            VideoPlayer.MediaPlayer.Media = new(_libVLC, mas_root + "/_temp.mp4");
+                            mp2.Media = new(_libVLC, mas_root + "/_temp.wav");
+                            VideoPlayer.IsVisible = true;
+                            VideoPlayer.MediaPlayer.Play();
+                            mp2.Play();
+                            currentMenu = "prepare_game";
+                        }
+                        opacity--;
+                        Browser.Opacity = opacity / 100.0;
+                        break;
+                    case "prepare_game":
+                        if (!((VideoPlayer?.MediaPlayer?.IsPlaying ?? false) || VideoPlayer?.MediaPlayer?.State != VLCState.Ended))
+                        {
+                            VideoPlayer.MediaPlayer.Media.Dispose();
+                            mp.Media.Dispose();
+                            if (File.Exists(ms_games[ms_games.Keys.ToArray()[browser_idx]]))
+                            {
+                                try
+                                {
+                                    File.Delete(mas_root + "/_temp.mp4");
+                                    File.Delete(mas_root + "/_temp.wav");
+                                } catch { }
+                                Process p = new();
+                                p.StartInfo.FileName = ms_games[ms_games.Keys.ToArray()[browser_idx]];
+                                p.StartInfo.UseShellExecute = true;
+                                p.Start();
+                                Close();
+                            } else
+                            {
+                                VideoPlayer.IsVisible = false;
+                                currentMenu = "fade_browser";
+                                moveCircle.Stop();
+                                browser_idx = 0;
+                                GameName.Content = ms_games.Keys.First();
+                            }
+                        }
+                        break;
                 }
             };
         }
 
+        public void MoveCircle(Point p, bool slowly = false)
+        {
+            if (slowly)
+            {
+                if ((moveCircle.IsEnabled))
+                {
+                    moveCircle.Stop();
+                }
+                moveCircle.Interval = new TimeSpan(64000);
+                moveCircle.Tick += (object? sender, EventArgs e) =>
+                {
+                    bool adjusted = false;
+                    double marginX = WhiteDot.Margin.Left;
+                    double marginY = WhiteDot.Margin.Top;
+                    if (WhiteDot.Margin.Left < p.X)
+                    {
+                        marginX += 1;
+                        adjusted = true;
+                    }
+                    else if (WhiteDot.Margin.Left > p.X)
+                    {
+                        marginX += -1;
+                        adjusted = true;
+                    }
+                    if (WhiteDot.Margin.Top < p.Y)
+                    {
+                        marginY += 1;
+                        adjusted = true;
+                    }
+                    else if (WhiteDot.Margin.Top > p.Y)
+                    {
+                        marginY += -1;
+                        adjusted = true;
+                    }
+                    if (adjusted)
+                    {
+                        WhiteDot.Margin = new Thickness(marginX, marginY, 0, 0);
+                    } else
+                    {
+                        moveCircle.Stop();
+                        moveCircle = new();
+                        return;
+                    }
+                };
+                moveCircle.Start();
+            } else
+            {
+                WhiteDot.Margin = new Thickness(p.X, p.Y, 0, 0);
+            }
+        }
+
+        public static Point GetAbsolutePosition(Control control) // chatgpt helped a bit with this
+        {
+            if (control.GetVisualRoot() is not Control topLevel)
+            {
+                return new Point(0, 0);
+            }
+            var transform = control.TransformToVisual(topLevel);
+            return transform?.Transform(new Point(0,0)) ?? new Point(0, 0);
+        }
+
         private void MoveCircle()
         {
-            if (!invert)
+            if (nodata)
             {
-                WhiteDot.RenderTransform = new TranslateTransform(circle_offset, circle_offset);
-                circle_offset += 1;
-                if (circle_offset > this.Height + WhiteDot.Height)
+                if (!invert)
                 {
-                    invert = !invert;
+                    WhiteDot.RenderTransform = new TranslateTransform(circle_offset, circle_offset);
+                    circle_offset += 1;
+                    if (circle_offset > this.Height + WhiteDot.Height)
+                    {
+                        invert = !invert;
+                        WhiteDot.Margin = new Avalonia.Thickness(0, 0, -this.Width / 4, 0);
+                    }
+                }
+                else
+                {
+                    WhiteDot.RenderTransform = new TranslateTransform(-circle_offset, circle_offset);
+                    circle_offset -= 1;
+                    if (circle_offset < -WhiteDot.Height)
+                    {
+                        invert = !invert;
+                        WhiteDot.Margin = new Avalonia.Thickness(-this.Width / 2, 0, 0, 0);
+                    }
                 }
             } else
             {
-                WhiteDot.RenderTransform = new TranslateTransform(circle_offset, circle_offset);
-                circle_offset -= 1;
-                if (circle_offset < -WhiteDot.Height)
+                if (!invert)
                 {
-                    invert = !invert;
+                    circle_offset += 1;
+                    if (circle_offset > 100)
+                    {
+                        invert = !invert;
+                        circle_offset = 100;
+                    }
+                    WhiteDot.Opacity = circle_offset / 100.0;
+                }
+                else
+                {
+                    circle_offset -= 1;
+                    if (circle_offset < 0)
+                    {
+                        invert = !invert;
+                        circle_offset = 0;
+                    }
+                    WhiteDot.Opacity = circle_offset / 100.0;
                 }
             }
         }
@@ -214,10 +464,10 @@ namespace MarkuStation2
             angle3 = angle3 > 359 ? angle3 - 360 : angle3;
             angle4 += rand.Next(1, 3);
             angle4 = angle4 > 359 ? angle4 - 360 : angle4;
-            this.Dot1.RenderTransform = new RotateTransform(angle, 200, 0);
-            this.Dot2.RenderTransform = new RotateTransform(angle2, 200, 0);
-            this.Dot3.RenderTransform = new RotateTransform(angle3, 200, 0);
-            this.Dot4.RenderTransform = new RotateTransform(angle4, 200, 0);
+            Dot1.RenderTransform = new RotateTransform(angle, 200, 0);
+            Dot2.RenderTransform = new RotateTransform(angle2, 200, 0);
+            Dot3.RenderTransform = new RotateTransform(angle3, 200, 0);
+            Dot4.RenderTransform = new RotateTransform(angle4, 200, 0);
         }
 
         private static byte[] GetStreamBytes(UnmanagedMemoryStream ms)
@@ -244,7 +494,7 @@ namespace MarkuStation2
             VideoPlayer.MediaPlayer = mp;
             mp2.Media = new(_libVLC, mas_root + "/_temp.wav");
             VideoPlayer.MediaPlayer.Media = new(_libVLC, mas_root + "/_temp.mp4");
-            if (File.Exists(mas_root + "/dont_play.txt"))
+            if (running)
             {
                 VideoPlayer.MediaPlayer.Play();
                 mp2.Play();
@@ -269,12 +519,53 @@ namespace MarkuStation2
                         Enter();
                         break;
                     case Avalonia.Input.Key.Escape:
+                        VersionContent.IsVisible = true;
+                        ConfigContent.IsVisible = false;
                         currentMenu = "enter_version";
                         break;
                 }
             } else if (currentMenu == "version")
             {
                 currentMenu = "unfade_version";
+            } else if (currentMenu == "browser")
+            {
+                switch (key)
+                {
+                    case Avalonia.Input.Key.Left:
+                    case Avalonia.Input.Key.Up:
+                        if (ms_games.Count > 0)
+                        {
+                            SelSound();
+                            browser_idx -= 1;
+                            if (browser_idx < 0)
+                            {
+                                browser_idx = ms_games.Count - 1;
+                            }
+                            GameName.Content = ms_games.Keys.ToArray()[browser_idx];
+                            MoveCircle(GetAbsolutePosition(GamePanel.Children[browser_idx]));
+                        }
+                        break;
+                    case Avalonia.Input.Key.Down:
+                    case Avalonia.Input.Key.Right:
+                        if (ms_games.Count > 0)
+                        {
+                            SelSound();
+                            browser_idx += 1;
+                            if (browser_idx >= ms_games.Count)
+                            {
+                                browser_idx = 0;
+                            }
+                            GameName.Content = ms_games.Keys.ToArray()[browser_idx];
+                            MoveCircle(GetAbsolutePosition(GamePanel.Children[browser_idx]));
+                        }
+                        break;
+                    case Avalonia.Input.Key.Escape:
+                        currentMenu = "exit_browser";
+                        break;
+                    case Avalonia.Input.Key.Enter:
+                        Enter();
+                        break;
+                }
             }
         }
 
@@ -298,14 +589,47 @@ namespace MarkuStation2
                     mp2.Stop();
                 } else
                 {
-
+                    VersionContent.IsVisible = false;
+                    ConfigContent.IsVisible = true;
+                    currentMenu = "enter_version";
                 }
+            } else if ((currentMenu == "browser") && (ms_games.Count > 0))
+            {
+                mp.Stop();
+                mp.Media = new(_libVLC, mas_root + "/_enter.wav");
+                mp.Play();
+                currentMenu = "run_game";
+                File.WriteAllBytes(mas_root + "/_temp.mp4", Properties.Resources.MarkuStation_logo_animation);
+                File.WriteAllBytes(mas_root + "/_temp.wav", GetStreamBytes(Properties.Resources.MarkuStation_logo));
             }
         }
 
         private void Window_KeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
         {
             Navigate(e.Key);
+        }
+
+        private void Window_Closing(object? sender, WindowClosingEventArgs e)
+        {
+            try
+            {
+                DeleteIfExists(mas_root + "/_sel.wav");
+                DeleteIfExists(mas_root + "/_enter.wav");
+                DeleteIfExists(mas_root + "/_amb.wav");
+                DeleteIfExists(mas_root + "/_temp.wav");
+                DeleteIfExists(mas_root + "/_temp.mp4");
+            } catch
+            {
+                Console.WriteLine("Failed to remove extracted temporary assets, please manually erase the files at \"" + mas_root + "\"");
+            }
+        }
+
+        private static void DeleteIfExists(string path)
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
         }
     }
 }
