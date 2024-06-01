@@ -129,6 +129,16 @@ namespace MarkuStation2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] MarkuStation_menu_dot_white {
+            get {
+                object obj = ResourceManager.GetObject("MarkuStation_menu_dot_white", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] MarkuStation_menu_dot2 {
             get {
                 object obj = ResourceManager.GetObject("MarkuStation_menu_dot2", resourceCulture);

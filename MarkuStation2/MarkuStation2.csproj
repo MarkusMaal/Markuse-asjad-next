@@ -16,6 +16,7 @@
     <None Remove="Resources\MarkuStation_logo_old.wav" />
     <None Remove="Resources\MarkuStation_menu_dot.png" />
     <None Remove="Resources\MarkuStation_menu_dot2.png" />
+    <None Remove="Resources\MarkuStation_menu_dot_white.png" />
     <None Remove="Resources\MarkuStation_menu_enter.wav" />
     <None Remove="Resources\MarkuStation_menu_select.wav" />
     <None Remove="Resources\MarkuStation_startup.wav" />
@@ -30,6 +31,7 @@
     <AvaloniaResource Include="Resources\MarkuStation_logo_old.wav" />
     <AvaloniaResource Include="Resources\MarkuStation_menu_dot.png" />
     <AvaloniaResource Include="Resources\MarkuStation_menu_dot2.png" />
+    <AvaloniaResource Include="Resources\MarkuStation_menu_dot_white.png" />
     <AvaloniaResource Include="Resources\MarkuStation_menu_enter.wav" />
     <AvaloniaResource Include="Resources\MarkuStation_menu_select.wav" />
     <AvaloniaResource Include="Resources\MarkuStation_startup.wav" />

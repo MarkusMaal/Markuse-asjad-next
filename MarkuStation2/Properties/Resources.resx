@@ -142,6 +142,9 @@
   <data name="MarkuStation_menu_dot2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MarkuStation_menu_dot2.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="MarkuStation_menu_dot_white" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MarkuStation_menu_dot_white.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="MarkuStation_menu_enter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MarkuStation_menu_enter.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
