@@ -7,10 +7,8 @@ using LibVLCSharp.Shared;
 using Avalonia.Platform.Storage;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
-using Avalonia;
-using System.IO;
 using MsBox.Avalonia;
+using Avalonia.Logging;
 
 namespace Pidu_
 {
@@ -19,13 +17,14 @@ namespace Pidu_
         // VLC stuff
         public LibVLC _libVLC;
         public MediaPlayer mp;
-        public Media media;
+        public Media? media;
         public bool isPlaying = false;
-        string[] playlist;
+        string[]? playlist;
         int track = 0;
-        DispatcherTimer timer = new DispatcherTimer();
-        DispatcherTimer volume = new DispatcherTimer();
-        string imageSource = null;
+        readonly DispatcherTimer timer = new();
+        readonly DispatcherTimer volume = new();
+        bool custMessage = false;
+        readonly string idleString = "Hetkel ei m√§ngi √ºhtegi pala";
 
         public MainWindow()
         {
@@ -35,29 +34,32 @@ namespace Pidu_
             timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
             volume.Interval = new TimeSpan(0, 0, 0, 0, 20);
             VolumeControl.Value = mp.Volume;
+            mp.EncounteredError += Mp_EncounteredError;
             timer.Tick += (object? sender, EventArgs e) =>
             {
                 if (this.WindowState != WindowState.Minimized)
                 {
                     this.WindowState = WindowState.FullScreen;
                 }
+
                 if (mp.Media?.State == VLCState.Ended)
                 {
                     track++;
+                    custMessage = false;
                     if (Playlist.IsVisible)
                     {
                         Playlist.SelectedIndex = track;
                     }
-                    if (track >= playlist.Length)
+                    if (track >= playlist?.Length)
                     {
                         isPlaying = false;
-                        BigTitle.Content = "Hetkel ei m‰ngi ¸htegi pala";
+                        BigTitle.Content = idleString;
                     } else
                     {
                         PlayTrack();
                     }
                 }
-                if (mp.IsPlaying)
+                if (mp.IsPlaying && !custMessage)
                 {
                     if ((mp.Media?.Meta(MetadataType.Album) != null) && (mp.Media?.Meta(MetadataType.Artist) != null))
                     {
@@ -71,7 +73,7 @@ namespace Pidu_
                     {
                         BigTitle.Content = "Hetkel esitusel: " + mp.Media.Meta(MetadataType.Artist) + " - " + mp.Media.Meta(MetadataType.Title);
                     }
-                    else
+                    else if (mp.Media != null)
                     {
                         BigTitle.Content = "Hetkel esitusel: " + mp.Media.Meta(MetadataType.Title);
                     }
@@ -116,9 +118,14 @@ namespace Pidu_
                     VolumeControl.Value = mp.Volume;
                     VolumeControl.IsEnabled = true;
                 }
-                else if (mp.Time > mp.Length - 10000L)
+                else if (mp.Time > mp.Length - 11000L)
                 {
-                    mp.Volume = ((int)(mp.Length - mp.Time) / 100);
+                    int level = ((int)(mp.Length - 1000 - mp.Time) / 100);
+                    if (level < 0)
+                    {
+                        level = 0;
+                    }
+                    mp.Volume = level;
                     VolumeControl.Value = mp.Volume;
                     VolumeControl.IsEnabled = false;
                 }
@@ -127,7 +134,12 @@ namespace Pidu_
             volume.Start();
         }
 
-        private string NiceTime(long millis)
+        private void Mp_EncounteredError(object? sender, EventArgs e)
+        {
+            _ = MessageBoxShow(mp.Media?.Statistics.ToString() ?? "Tundmatu rike", "Viga esitamisel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+        }
+
+        private static string NiceTime(long millis)
         {
             int totalSecs = (int)millis / 1000;
             if (totalSecs < 0 )
@@ -152,11 +164,15 @@ namespace Pidu_
         private void Slider_ValueChanged(object? sender, Avalonia.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             mp.Volume = (int)e.NewValue;
-            StatusLabel.Content = StatusLabel.Content.ToString().Replace((int)e.OldValue + "%", (int)e.NewValue + "%");
+            if ((StatusLabel.Content != null) && (StatusLabel != null))
+            {
+                StatusLabel.Content = (StatusLabel.Content.ToString() ?? "").Replace((int)e.OldValue + "%", (int)e.NewValue + "%");
+            }
         }
 
         private void ShowPlaylist_PointerReleased(object? sender, Avalonia.Input.PointerReleasedEventArgs e)
         {
+            if (sender == null) { return; }
             if (e.InitialPressMouseButton == Avalonia.Input.MouseButton.Left)
             {
                 Playlist.IsVisible = !Playlist.IsVisible;
@@ -175,15 +191,21 @@ namespace Pidu_
 
         private void ShowPlaylist_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
         {
+            if (sender == null) { return; }
             ((TextBlock)sender).Foreground = new SolidColorBrush(Color.FromRgb(128, 255, 255));
         }
 
-        private async void AddMusic_Click(object? sender, RoutedEventArgs e)
+        private void AddMusic_Click(object? sender, RoutedEventArgs e)
+        {
+            AddMusic();
+        }
+
+        private async void AddMusic()
         {
             // source: https://docs.avaloniaui.net/docs/basics/user-interface/file-dialogs
             // Get top level from the current control. Alternatively, you can use Window reference instead.
             var topLevel = TopLevel.GetTopLevel(this);
-
+            if (topLevel == null) { return; }
             // Start async operation to open the dialog.
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
@@ -203,15 +225,18 @@ namespace Pidu_
                     }
                     for (int i = 0; i < files.Count; i++)
                     {
-                        playlist[oldSongs.Length+i] = Uri.UnescapeDataString(files[i].Path.AbsolutePath);
+                        playlist[oldSongs.Length + i] = Uri.UnescapeDataString(files[i].Path.AbsolutePath);
                     }
-                } else
+                }
+                else
                 {
                     playlist = new string[files.Count];
                     for (int i = 0; i < files.Count; i++)
                     {
                         playlist[i] = Uri.UnescapeDataString(files[i].Path.AbsolutePath);
                     }
+                    track = 0;
+                    PlayTrack();
                 }
                 if (Playlist.IsVisible)
                 {
@@ -225,7 +250,7 @@ namespace Pidu_
             }
         }
 
-        private async void PausePlay_Click(object? sender,  RoutedEventArgs e)
+        private void PausePlay_Click(object? sender,  RoutedEventArgs e)
         {
             if (!isPlaying)
             {
@@ -247,8 +272,8 @@ namespace Pidu_
             mp.Stop();
             mp = new MediaPlayer(_libVLC);
             isPlaying = false;
-            BigTitle.Content = "Hetkel ei m‰ngi ¸htegi pala";
-            playlist = Array.Empty<string>();
+            BigTitle.Content = idleString;
+            playlist = [];
             Playlist.Items.Clear();
             track = 0;
         }
@@ -293,13 +318,15 @@ namespace Pidu_
 
         private void PlayTrack()
         {
-            if (track < playlist?.Length)
+            if ((track > -1) && (track < playlist?.Length))
             {
+                custMessage = false;
                 _libVLC.Dispose();
                 mp.Dispose();
                 _libVLC = new LibVLC();
-                Media vlcMed = new Media(_libVLC, playlist[track]);   // removes URL encodings, such as %20, etc.
+                Media vlcMed = new(_libVLC, playlist[track]);   // removes URL encodings, such as %20, etc.
                 mp = new MediaPlayer(vlcMed);
+                mp.EncounteredError += Mp_EncounteredError;
                 mp.Play();
                 if (Playlist.IsVisible)
                 {
@@ -345,13 +372,14 @@ namespace Pidu_
             Button? me = (Button?)sender;
             if (me != null)
             {
-                me.Content = volume.IsEnabled ? "Hajumine v‰lja" : "Hajumine sisse";
+                me.Content = volume.IsEnabled ? "Hajumine v√§lja" : "Hajumine sisse";
             }
         }
 
         private async void Background_Click(object? sender, RoutedEventArgs e)
         {
             var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel == null) { return; }
 
             // Start async operation to open the dialog.
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
@@ -361,35 +389,91 @@ namespace Pidu_
             });
             if (files.Count > 0)
             {
-                ImageBrush ib = new ImageBrush(new Bitmap(Uri.UnescapeDataString(files[0].Path.AbsolutePath)));
-                ib.Stretch = Stretch.Fill;
-                MainGrid.Background = ib;
-                this.imageSource = files[0].Path.AbsolutePath;
+                BackgroundImage.Source = new Bitmap(Uri.UnescapeDataString(files[0].Path.AbsolutePath));
             }
         }
 
         private async void Message_Click(object? sender, RoutedEventArgs e)
         {
-            MessageEntry me = new MessageEntry();
-            await me.ShowDialog(this);
-            this.BigTitle.Content = me.MessageField.Text ?? "";
+            if (sender == null) { return; }
+            if (!custMessage)
+            {
+                MessageEntry me = new();
+                await me.ShowDialog(this);
+                if (me.MessageField.Text != null)
+                {
+                    ((Button)sender).Content = "Pala pealkiri";
+                    custMessage = true;
+                    this.BigTitle.Content = me.MessageField.Text;
+                }
+            } else
+            {
+                ((Button)sender).Content = "Isikup√§rastatud teade";
+                custMessage = false;
+            }
         }
         private void Help_Click(object? sender, RoutedEventArgs e)
         {
-            _ = MessageBoxShow("Selle programmiga saate kuulata muusikat ja\ntunda ennast nagu p‰ris DJ. ‹leval vasakus nurgas on\nerinevad nupud. Hajumine v‰lja/sisse vımaldab\nheli automaatselt hajutada palade alguses ja lıpus\nVasakul pool ekraani on esitusloend ehk\nPlaylist. Seal on m‰ngiv muusika ja tulevased palad.\nVajutage nupul Lisa muusikat, et lisada Playlisti\nuusi palasid. T¸hjenda esitusloend nupp kustutab\nkıik palad playlistist. Teil on vıimalik muuta\ntaustapilti playlisti ja nuppude taga. Vaiketausta-\npilt on rahvast pidutsemas, kuid te vıite panna\nselle asemel enda pildi. Teil on vıimalik ka kuulata\nYouTube-ist muusikat. See avab brauseri, millest saate\nvalida video ja minna muusikapala nime valimise juurde.\nTe saate valida v‰rve ja fonte, et muuta loo pealkirja\nisikup‰rasemaks. Teave kuvab t‰psema info programmi\nkohta ning spikker avab praeguse dialoogi.", "Spikker", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Question);
+            _ = MessageBoxShow("Selle programmiga saate kuulata muusikat ja\ntunda ennast nagu p√§ris DJ. √úleval vasakus nurgas on\nerinevad nupud. Hajumine v√§lja/sisse v√µmaldab\nheli automaatselt hajutada palade alguses ja l√µpus\nVasakul pool ekraani on esitusloend ehk\nPlaylist. Seal on m√§ngiv muusika ja tulevased palad.\nVajutage nupul Lisa muusikat, et lisada Playlisti\nuusi palasid. T√ºhjenda esitusloend nupp kustutab\nk√µik palad playlistist. Teil on v√µimalik muuta\ntaustapilti playlisti ja nuppude taga. Vaiketausta-\npilt on rahvast pidutsemas, kuid te v√µite panna\nselle asemel enda pildi. Teil on v√µimalik ka kuulata\nYouTube-ist muusikat. See avab brauseri, millest saate\nvalida video ja minna muusikapala nime valimise juurde.\nTe saate valida v√§rve ja fonte, et muuta loo pealkirja\nisikup√§rasemaks. Teave kuvab t√§psema info programmi\nkohta ning spikker avab praeguse dialoogi.", "Spikker", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Question);
         }
 
         private void About_Click(object? sender, RoutedEventArgs e)
         {
-            _ = MessageBoxShow("Teeme pidu!\nNullist uuesti kirjutatud Avalonia UI ja .NET Core 8.0 raamistikes\nC# keeles.\n\nKasutab LibVLCSharp teeki\nVersioon 2.0 / 31.05.2024\nTegi: Markus Maal\nKogu muusika kuulub nende respektiivsetele omanikele.\nAutoriıiguste rikkumine ei ole lubatud!\n\nMis on uut?\n+ ‹leminek Avalonia UI raamistikule\n- Eemaldati klaviatuuritulede nupp\n- Eemaldati visualiseeringu kuvamise nupp\n+ Tausta tumendamine", "Pidu!", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
+            _ = MessageBoxShow("Teeme pidu!\nNullist uuesti kirjutatud Avalonia UI ja .NET Core 8.0 raamistikes\nC# keeles.\n\nKasutab LibVLCSharp teeki\nVersioon 2.0 / 31.05.2024\nTegi: Markus Maal\nKogu muusika kuulub nende respektiivsetele omanikele.\nAutori√µiguste rikkumine ei ole lubatud!\n\nMis on uut?\n+ √úleminek Avalonia UI raamistikule\n- Eemaldati klaviatuuritulede nupp\n- Eemaldati visualiseeringu kuvamise nupp\n+ Tausta tumendamine", "Pidu!", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
         }
 
         // Reimplementation of WinForms MessageBox.Show
-        private Task MessageBoxShow(string message, string caption = "Pidu!", MsBox.Avalonia.Enums.ButtonEnum buttons = MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon icon = MsBox.Avalonia.Enums.Icon.None)
+        private Task<MsBox.Avalonia.Enums.ButtonResult> MessageBoxShow(string message, string caption = "Pidu!", MsBox.Avalonia.Enums.ButtonEnum buttons = MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon icon = MsBox.Avalonia.Enums.Icon.None)
         {
             var box = MessageBoxManager.GetMessageBoxStandard(caption, message, buttons, icon);
             var result = box.ShowWindowDialogAsync(this);
             return result;
+        }
+
+        private void Window_KeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
+        {
+            if (e.Key == Avalonia.Input.Key.F4)
+            {
+                mp.Stop();
+                playlist = [];
+                track = 0;
+                Playlist.Items.Clear();
+                BigTitle.Content = idleString;
+                return;
+            }
+            if (e.KeyModifiers == Avalonia.Input.KeyModifiers.Control)
+            {
+                switch (e.Key)
+                {
+                    case Avalonia.Input.Key.P:
+                        if (mp.IsPlaying) { mp.Pause(); } else { mp.Play(); };
+                        break;
+                    case Avalonia.Input.Key.O:
+                        AddMusic();
+                        break;
+                    case Avalonia.Input.Key.Left:
+                        mp.Stop();
+                        track--;
+                        PlayTrack();
+                        break;
+                    case Avalonia.Input.Key.Right:
+                        mp.Stop();
+                        track++;
+                        PlayTrack();
+                        break;
+                }
+            } else if (e.KeyModifiers == Avalonia.Input.KeyModifiers.Alt)
+            {
+                switch (e.Key)
+                {
+                    case Avalonia.Input.Key.Left:
+                        mp.Time -= 10000;
+                        break;
+                    case Avalonia.Input.Key.Right:
+                        mp.Time += 10000;
+                        break;
+                }
+            }
         }
     }
 }

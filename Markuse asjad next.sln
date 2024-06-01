@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markuse arvuti ooterežiim"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markuse arvuti integratsioonitarkvara", "Markuse arvuti integratsioonitarkvara\Markuse arvuti integratsioonitarkvara.csproj", "{9BFEDA51-AC11-45FC-A6B4-8DBDFB8CFCC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TöölauaMärkmed", "TöölauaMärkmed\TöölauaMärkmed.csproj", "{104E8FD1-F20C-4146-A08E-D7E6096DC222}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TöölauaMärkmed", "TöölauaMärkmed\TöölauaMärkmed.csproj", "{104E8FD1-F20C-4146-A08E-D7E6096DC222}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pidu!", "Pidu!\Pidu!.csproj", "{C8B27F42-AA3B-49FF-8FFC-0FD582AD83BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pidu!", "Pidu!\Pidu!.csproj", "{C8B27F42-AA3B-49FF-8FFC-0FD582AD83BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkuStation2", "MarkuStation2\MarkuStation2.csproj", "{97DED963-9E09-47ED-8B16-3CF194FCEA35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{C8B27F42-AA3B-49FF-8FFC-0FD582AD83BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8B27F42-AA3B-49FF-8FFC-0FD582AD83BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8B27F42-AA3B-49FF-8FFC-0FD582AD83BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97DED963-9E09-47ED-8B16-3CF194FCEA35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97DED963-9E09-47ED-8B16-3CF194FCEA35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97DED963-9E09-47ED-8B16-3CF194FCEA35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97DED963-9E09-47ED-8B16-3CF194FCEA35}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

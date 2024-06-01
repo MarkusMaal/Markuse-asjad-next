@@ -6,8 +6,8 @@
         x:Class="Pidu_.MainWindow" WindowState="FullScreen"
         Title="Pidu_" Foreground="White" FontFamily="Microsoft Sans Serif"
         Closing="Window_Closing" PointerPressed="Window_PointerPressed_1"
-        Background="Black">
-  <Grid Name="MainGrid">
+        Background="Black" KeyDown="Window_KeyDown">
+  <Grid Name="MainGrid" Background="Transparent">
     <Panel Name="Overlay" Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0.25">
       
     </Panel>
@@ -39,9 +39,7 @@
       </StackPanel>
       <Label Name="StatusLabel" HorizontalAlignment="Right" Margin="10,0">19.06.2001 16:26:35  |  0%  |  0:00 / 0:00</Label>
     </StackPanel>
-    <Grid.Background>
-      <ImageBrush Source="Resources/Party-Wallpapers.jpg" Stretch="Fill" Opacity="0.75"/>
-    </Grid.Background>
+    <Image Name="BackgroundImage" Source="Resources/Party-Wallpapers.jpg" Stretch="Fill" ZIndex="-1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
   </Grid>
   <Window.Styles>
     <Style Selector="Button">

@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
+        x:Class="MarkuStation2.MainWindow" WindowState="FullScreen" Background="Black"
+        Title="MarkuStation2" Foreground="White" Loaded="Window_Loaded" KeyDown="Window_KeyDown">
+  <Grid>
+    <Panel>
+      <vlc:VideoView HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch" Name="VideoPlayer">
+      </vlc:VideoView>
+    </Panel>
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+      <Image Name="Dot1" Source="/Resources/MarkuStation_menu_dot2.png" Width="86" Height="86" Margin="-400,0,0,0">
+        <Image.RenderTransform>
+          <RotateTransform Angle="10" CenterX="200" />
+        </Image.RenderTransform>
+      </Image>
+      <Image Name="Dot2" Source="/Resources/MarkuStation_menu_dot2.png" Width="86" Height="86" Margin="-400,0,0,0">
+        <Image.RenderTransform>
+          <RotateTransform Angle="20" CenterX="200" />
+        </Image.RenderTransform>
+      </Image>
+      <Image Name="Dot3" Source="/Resources/MarkuStation_menu_dot2.png" Width="86" Height="86" Margin="-400,0,0,0">
+        <Image.RenderTransform>
+          <RotateTransform Angle="30" CenterX="200" />
+        </Image.RenderTransform>
+      </Image>
+      <Image Name="Dot4" Source="/Resources/MarkuStation_menu_dot2.png" Width="86" Height="86" Margin="-400,0,0,0">
+        <Image.RenderTransform>
+          <RotateTransform Angle="40" CenterX="200" />
+        </Image.RenderTransform>
+      </Image>
+    </StackPanel>
+    <StackPanel Name="Menu" HorizontalAlignment="Center" VerticalAlignment="Center" Classes="MainMenu">
+      <Label Name="BrowserSel" HorizontalContentAlignment="Center" Foreground="DeepSkyBlue">Brauser</Label>
+      <Label Name="ConfigSel" HorizontalContentAlignment="Center">Konfiguratsioon</Label>
+    </StackPanel>
+    <Label HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False">Palun oota...</Label>
+  </Grid>
+  <Window.Styles>
+    <Style Selector="StackPanel.MainMenu > Label">
+      <Setter Property="FontSize" Value="20"></Setter>
+    </Style>
+  </Window.Styles>
+</Window>

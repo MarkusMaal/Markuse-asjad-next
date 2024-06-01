@@ -4,10 +4,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Width="400" Height="120"
         x:Class="Pidu_.MessageEntry"
-        Title="Isikupärastatud teade" WindowStartupLocation="CenterScreen">
+        Title="Isikupärastatud teade" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded_2">
   <StackPanel Margin="20" VerticalAlignment="Center">
     <Label>Sisesta teade</Label>
-    <TextBox Name="MessageField"></TextBox>
+    <TextBox Name="MessageField" KeyDown="TextBox_KeyDown" ></TextBox>
     <Button HorizontalAlignment="Right" Margin="0,10" Padding="20,5" Click="OK_Click">OK</Button>
   </StackPanel>
   

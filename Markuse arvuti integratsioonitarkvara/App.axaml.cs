@@ -368,7 +368,18 @@ namespace Markuse_arvuti_integratsioonitarkvara
                     ((NativeMenuItem)sender).Header = "Ava töölauamärkmed";
                 }
             } else {
-                ((NativeMenuItem)sender).IsEnabled = false;
+                if (!File.Exists(mas_root + "/noteopen.txt"))
+                {
+                    File.WriteAllText(mas_root + "/noteopen.txt", "See fail sisaldab informatsiooni töölauamärkmetega töötamiseks.");
+                    Process.Start(mas_root + "/Markuse asjad/TöölauaMärkmed");
+                    ((NativeMenuItem)sender).Header = "Sulge töölauamärkmed";
+                }
+                else if (File.Exists(mas_root + @"\noteopen.txt"))
+                {
+                    File.Delete(mas_root + "/noteopen.txt");
+                    File.WriteAllText(mas_root + "/closenote.log", "See fail saadab töölauamärkmete rakendusele käskluse sulgeda. Kui te näete seda teksti, palun kustutage see fail.");
+                    ((NativeMenuItem)sender).Header = "Ava töölauamärkmed";
+                }
             }
         }
 

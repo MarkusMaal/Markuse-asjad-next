@@ -18,11 +18,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
     public partial class MainWindow : Window
     {
         private bool allowCode = true;
-        private TrayIcon ti;
-        private App app;
+        private readonly TrayIcon ti;
+        private readonly App app;
         private bool initialized = false;
         Color[] scheme;
-        DispatcherTimer dispatcherTimer = new DispatcherTimer();
+        readonly DispatcherTimer dispatcherTimer = new();
         public MainWindow()
         {
             InitializeComponent();
@@ -50,7 +50,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 InitTimers();
             } else if (app.croot)
             {
-                RerootForm rf = new RerootForm();
+                RerootForm rf = new();
                 rf.Show();
             } else
             {
@@ -85,14 +85,14 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         //loo alamelemendid
                         string[] subelements = element.Split('-');
                         //loo kp elemendid
-                        string[] dateelements = { subelements[0].ToString(), subelements[1].ToString(), subelements[2].ToString() };
+                        string[] dateelements = [subelements[0].ToString(), subelements[1].ToString(), subelements[2].ToString()];
                         //kui kp pole sama, siis ignoreeri
                         if (!(dateelements[0].ToString() == DateTime.Today.Day.ToString() && dateelements[0].ToString() == DateTime.Today.Month.ToString() && dateelements[2].ToString() == DateTime.Today.Year.ToString()))
                         {
                             continue;
                         }
                         //loo kellaaja elemendid
-                        string[] timestamp = { subelements[3].ToString(), subelements[4].ToString(), subelements[5].ToString() };
+                        string[] timestamp = [subelements[3].ToString(), subelements[4].ToString(), subelements[5].ToString()];
                         //kui kellaaeg varasem, siis ignoreeri
                         if (!(Convert.ToInt32(timestamp[0].ToString()) >= DateTime.Now.Hour && Convert.ToInt32(timestamp[1].ToString()) >= DateTime.Now.Minute && Convert.ToInt32(timestamp[2].ToString()) >= DateTime.Now.Second))
                         {
@@ -103,7 +103,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         //leia binraarne muutuja
                         bool willclose = Convert.ToBoolean(subelements[7].ToString());
                         //loo protsess
-                        Process p = new Process();
+                        Process p = new();
                         p.StartInfo.FileName = file;
                         p.StartInfo.Arguments = subelements[8].ToString();
                         p.Start();
@@ -148,9 +148,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
             {
                 if (allowCode)
                 {
-                    ShowCode sc = new ShowCode();
-                    sc.bg = scheme[0];
-                    sc.fg = scheme[1];
+                    ShowCode sc = new()
+                    {
+                        bg = scheme[0],
+                        fg = scheme[1]
+                    };
                     sc.Show();
                 }
                 else
@@ -160,7 +162,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
             }
         }
 
-        private bool IconType() {
+        private static bool IconType() {
             if (OperatingSystem.IsWindows())
             {
                 return File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile).ToString() + "\\Desktop\\Peida need töölauaikoonid.lnk");
@@ -174,7 +176,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
         private void ReloadMenu()
         {
             //foreach (NativeMenuItemBase nmi in ti.Menu.Items)
-            List<NativeMenuItem> toRemove = new List<NativeMenuItem>();
+            List<NativeMenuItem> toRemove = [];
             for (int i = 0; i < ti.Menu.Items.Count; i++)
             {
                 NativeMenuItemBase nmi = ti.Menu.Items[i];
@@ -218,7 +220,6 @@ namespace Markuse_arvuti_integratsioonitarkvara
                             };
                         }
                         break;
-                    case "Ava töölauamärkmed":
                     case "Käivita Projekt ITS":
                     case "Käivita MarkuStation":
                         if (!initialized && !OperatingSystem.IsWindows()) {
@@ -262,13 +263,13 @@ namespace Markuse_arvuti_integratsioonitarkvara
                                 bool redo = !IconType();
                                 if (redo)
                                 {
-                                    Process p = new Process();
+                                    Process p = new();
                                     p.StartInfo.FileName = app.mas_root + "/organize_desktop.bat";
                                     p.StartInfo.CreateNoWindow = true;
                                     p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                                     p.Start();
                                 }
-                                WaitInstall wi = new WaitInstall
+                                WaitInstall wi = new()
                                 {
                                     Background = new SolidColorBrush(this.scheme[0]),
                                     Foreground = new SolidColorBrush(this.scheme[1]),
@@ -312,7 +313,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                                 }
                                 if (OperatingSystem.IsWindows())
                                 {
-                                    Process p = new Process();
+                                    Process p = new();
                                     p.StartInfo.FileName = app.mas_root + "/organize_desktop.bat";
                                     p.StartInfo.CreateNoWindow = true;
                                     p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -335,7 +336,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                     case "Juurutamine":
                         if (!initialized) {
                             n.Click += (object? sender, EventArgs e) => {
-                                RerootForm rf = new RerootForm();
+                                RerootForm rf = new();
                                 rf.Show();
                             };
                             if (!app.dev) {
@@ -391,7 +392,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                                     {
                                         sm.Click += (object? sender, EventArgs e) =>
                                         {
-                                            Process pr = new Process();
+                                            Process pr = new();
                                             pr.StartInfo.FileName = "http://localhost:14414";
                                             pr.StartInfo.UseShellExecute = true;
                                             pr.Start();
@@ -427,7 +428,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void StartMaia(object sender, EventArgs e) {
             Console.WriteLine("Start M.A.I.A.");
-            Process p = new Process();
+            Process p = new();
             if (!OperatingSystem.IsWindows()) {
                 p.StartInfo.FileName = "python3";
             } else {
@@ -442,7 +443,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
 
         public void Restart() {
-            Process p = new Process();
+            Process p = new();
             p.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "/" + GetType().Namespace.Replace("_", " ");
             if (OperatingSystem.IsWindows()) {
                 p.StartInfo.FileName += ".exe";
@@ -454,25 +455,25 @@ namespace Markuse_arvuti_integratsioonitarkvara
         private void SaveThemeWhite(object? sender, EventArgs e)
         {
             SaveTheme(Colors.White, Colors.Black);
-            ApplyTheme(true);
+            ApplyTheme();
         }
 
         private void SaveThemeBlack(object? sender, EventArgs e)
         {
             SaveTheme(Colors.Black, Colors.Silver);
-            ApplyTheme(true);
+            ApplyTheme();
         }
 
         private void SaveThemeBlue(object? sender, EventArgs e)
         {
             SaveTheme(Colors.MidnightBlue, Colors.White);
-            ApplyTheme(true);
+            ApplyTheme();
         }
 
         private void SaveThemeXmas(object? sender, EventArgs e)
         {
             SaveTheme(Colors.DarkRed, Colors.Lime);
-            ApplyTheme(true);
+            ApplyTheme();
         }
 
         /* Loads mas theme */
@@ -481,11 +482,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
             string[] bgfg = File.ReadAllText(app.mas_root + "/scheme.cfg").Split(';');
             string[] bgs = bgfg[0].ToString().Split(':');
             string[] fgs = bgfg[1].ToString().Split(':');
-            Color[] cols = { Color.FromArgb(255, byte.Parse(bgs[0]), byte.Parse(bgs[1]), byte.Parse(bgs[2])), Color.FromArgb(255, byte.Parse(fgs[0]), byte.Parse(fgs[1]), byte.Parse(fgs[2])) };
+            Color[] cols = [Color.FromArgb(255, byte.Parse(bgs[0]), byte.Parse(bgs[1]), byte.Parse(bgs[2])), Color.FromArgb(255, byte.Parse(fgs[0]), byte.Parse(fgs[1]), byte.Parse(fgs[2]))];
             return cols;
         }
 
-        private void ApplyTheme(bool reopen = false)
+        private void ApplyTheme()
         {
             app.Styles.Add(new Style(x => x.OfType<MenuItem>())
             {

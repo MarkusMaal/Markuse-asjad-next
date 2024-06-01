@@ -13,5 +13,18 @@ namespace Pidu_
         {
             this.Close();
         }
+
+        private void Window_Loaded_2(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            MessageField.Focus();
+        }
+
+        private void TextBox_KeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
+        {
+            if (e.Key == Avalonia.Input.Key.Enter)
+            {
+                this.Close();
+            }
+        }
     }
 }
