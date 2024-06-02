@@ -221,7 +221,6 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         }
                         break;
                     case "Käivita Projekt ITS":
-                    case "Käivita MarkuStation":
                         if (!initialized && !OperatingSystem.IsWindows()) {
                             n.IsEnabled = false;
                         }

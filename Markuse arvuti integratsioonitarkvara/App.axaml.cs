@@ -18,7 +18,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
     {
         public string mas_root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas";
         public static string static_mas_root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas";
-        readonly public static string[] whitelistedHashes = { "B881FBAB5E73D3984F2914FAEA743334D1B94DFFE98E8E1C4C8C412088D2C9C2", "A0B93B23301FC596789F83249A99F507A9DA5CBA9D636E4D4F88676F530224CB" };
+        readonly public static string[] whitelistedHashes = { "B881FBAB5E73D3984F2914FAEA743334D1B94DFFE98E8E1C4C8C412088D2C9C2", "A0B93B23301FC596789F83249A99F507A9DA5CBA9D636E4D4F88676F530224CB", "B08AABB1ED294D8292FDCB2626D4B77C0A53CB4754F3234D8E761E413289057F" };
         public bool croot = false;
         public bool dev = false;
         public string fmount = "";
@@ -322,15 +322,29 @@ namespace Markuse_arvuti_integratsioonitarkvara
         }
         private void MS_Click(object? sender, System.EventArgs e)
         {
-            if (OperatingSystem.IsWindows())
+
+            if (File.Exists(mas_root + "/Markuse asjad/MarkuStation2") || File.Exists(mas_root + "/Markuse asjad/MarkuStation2.exe"))
             {
                 Process p = new Process();
-                p.StartInfo.FileName = mas_root + "/MarkuStation.exe";
+                p.StartInfo.FileName = mas_root + "/Markuse asjad/MarkuStation2";
                 p.StartInfo.UseShellExecute = true;
-                p.StartInfo.Verb = "runas";
+                if (OperatingSystem.IsWindows())
+                {
+                    p.StartInfo.FileName += ".exe";
+                }
                 p.Start();
-            } else {
-                ((NativeMenuItem)sender).IsEnabled = false;
+            }
+            else
+            {
+                if (OperatingSystem.IsWindows())
+                {
+
+                    Process p = new Process();
+                    p.StartInfo.FileName = mas_root + "/MarkuStation.exe";
+                    p.StartInfo.UseShellExecute = true;
+                    p.StartInfo.Verb = "runas";
+                    p.Start();
+                }
             }
         }
 

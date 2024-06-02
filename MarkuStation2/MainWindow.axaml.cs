@@ -35,6 +35,10 @@ namespace MarkuStation2
         readonly bool nodata = true;
         int browser_idx = -1;
         readonly Random rand = new();
+       
+        readonly bool playIntros = true;   // displays the "Markuse arvuti meelelahutus" screen on start and a logo animation when launching a game
+        readonly bool legacyIntro = false; // displays the MarkuStation 1 logo when launching a game
+
         DispatcherTimer moveCircle = new();
         readonly IDictionary<string, string> ms_games = new Dictionary<string, string>();
         public MainWindow()
@@ -47,6 +51,7 @@ namespace MarkuStation2
             {
                 Directory.CreateDirectory(mas_root);
             }
+            string[] settings = [];
             string[] games = [];
             string[] execs = [];
             if (File.Exists(mas_root + "/ms_games.txt") && File.Exists(mas_root + "/ms_exec.txt"))
@@ -68,6 +73,16 @@ namespace MarkuStation2
                 NoData.IsVisible = false;
             }
 
+            if (File.Exists(mas_root + "/setting.txt"))
+            {
+                settings = File.ReadAllText(mas_root + "/setting.txt", Encoding.UTF8).Split("\n");
+                playIntros = settings[2] == "true"; // this is true if intros are allowed in cpanel
+                legacyIntro = (settings.Length > 3) && (settings[3] == "true"); // we check length for backwards compatibility reasons
+                if (!playIntros)
+                {
+                    VideoPlayer.IsVisible = false;
+                }
+            }
             foreach (Process p in Process.GetProcesses())
             {
                 if (p.ProcessName.Contains("MarkuStation"))
@@ -88,7 +103,7 @@ namespace MarkuStation2
                 switch (currentMenu)
                 {
                     case "startup":
-                        if (!((VideoPlayer?.MediaPlayer?.IsPlaying ?? false) || VideoPlayer?.MediaPlayer?.State != VLCState.Ended) || (!running))
+                        if (!((VideoPlayer?.MediaPlayer?.IsPlaying ?? false) || VideoPlayer?.MediaPlayer?.State != VLCState.Ended) || (!running) || (!playIntros))
                         {
                             VideoPlayer.MediaPlayer.Media = null;
                             mp2.Media = null;
@@ -303,18 +318,21 @@ namespace MarkuStation2
                             MoveCircle(new Point(this.Width, this.Height), true);
                         } else if (opacity == 0)
                         {
-                            VideoPlayer.MediaPlayer.Media = new(_libVLC, mas_root + "/_temp.mp4");
-                            mp2.Media = new(_libVLC, mas_root + "/_temp.wav");
-                            VideoPlayer.IsVisible = true;
-                            VideoPlayer.MediaPlayer.Play();
-                            mp2.Play();
+                            if (playIntros)
+                            {
+                                VideoPlayer.MediaPlayer.Media = new(_libVLC, mas_root + "/_temp.mp4");
+                                mp2.Media = new(_libVLC, mas_root + "/_temp.wav");
+                                VideoPlayer.IsVisible = true;
+                                VideoPlayer.MediaPlayer.Play();
+                                mp2.Play();
+                            }
                             currentMenu = "prepare_game";
                         }
                         opacity--;
                         Browser.Opacity = opacity / 100.0;
                         break;
                     case "prepare_game":
-                        if (!((VideoPlayer?.MediaPlayer?.IsPlaying ?? false) || VideoPlayer?.MediaPlayer?.State != VLCState.Ended))
+                        if (!((VideoPlayer?.MediaPlayer?.IsPlaying ?? false) || VideoPlayer?.MediaPlayer?.State != VLCState.Ended) || !playIntros)
                         {
                             VideoPlayer.MediaPlayer.Media.Dispose();
                             mp.Media.Dispose();
@@ -328,6 +346,7 @@ namespace MarkuStation2
                                 Process p = new();
                                 p.StartInfo.FileName = ms_games[ms_games.Keys.ToArray()[browser_idx]];
                                 p.StartInfo.UseShellExecute = true;
+                                p.StartInfo.WorkingDirectory = Path.GetDirectoryName(ms_games[ms_games.Keys.ToArray()[browser_idx]]);
                                 p.Start();
                                 Close();
                             } else
@@ -494,7 +513,7 @@ namespace MarkuStation2
             VideoPlayer.MediaPlayer = mp;
             mp2.Media = new(_libVLC, mas_root + "/_temp.wav");
             VideoPlayer.MediaPlayer.Media = new(_libVLC, mas_root + "/_temp.mp4");
-            if (running)
+            if (running && playIntros)
             {
                 VideoPlayer.MediaPlayer.Play();
                 mp2.Play();
@@ -599,8 +618,8 @@ namespace MarkuStation2
                 mp.Media = new(_libVLC, mas_root + "/_enter.wav");
                 mp.Play();
                 currentMenu = "run_game";
-                File.WriteAllBytes(mas_root + "/_temp.mp4", Properties.Resources.MarkuStation_logo_animation);
-                File.WriteAllBytes(mas_root + "/_temp.wav", GetStreamBytes(Properties.Resources.MarkuStation_logo));
+                File.WriteAllBytes(mas_root + "/_temp.mp4", legacyIntro ? Properties.Resources.MarkuStation_legacy_animation : Properties.Resources.MarkuStation_logo_animation);
+                File.WriteAllBytes(mas_root + "/_temp.wav", GetStreamBytes(legacyIntro ? Properties.Resources.MarkuStation_logo_old : Properties.Resources.MarkuStation_logo));
             }
         }
 

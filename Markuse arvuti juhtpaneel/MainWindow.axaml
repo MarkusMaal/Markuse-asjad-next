@@ -72,6 +72,7 @@
               <CheckBox Name="creepCheck">Luba creepypasta intro</CheckBox>
               <CheckBox Name="specialCheck">Luba special intro</CheckBox>
               <CheckBox Name="introCheck">Luba introd</CheckBox>
+              <CheckBox Name="legacyIntroCheck">Luba pärandintro</CheckBox>
               <StackPanel Orientation="Horizontal">
                 <Label Margin="0,0,15,0">Kuva</Label>
                 <ComboBox Name="MonMode">

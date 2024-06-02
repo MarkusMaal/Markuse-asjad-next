@@ -595,6 +595,7 @@ namespace Markuse_arvuti_juhtpaneel
             creepCheck.IsChecked = lines[0] == "true";
             specialCheck.IsChecked = lines[1] == "true";
             introCheck.IsChecked = lines[2] == "true";
+            legacyIntroCheck.IsChecked = (lines.Length > 3) && (lines[3] == "true");
             file = File.ReadAllText(masRoot + "/ms_games.txt");
             file = file.Substring(0, file.Length - 2);
             GameList.Items.Clear();
@@ -611,7 +612,24 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void RunMs(object? sender, RoutedEventArgs e)
         {
-            StartWin32Process(masRoot + "/MarkuStation.exe");
+            // käivita MarkuStation 2 kui see eksisteerib
+            if (File.Exists(masRoot + "/Markuse asjad/MarkuStation2") || File.Exists(masRoot + "/Markuse asjad/MarkuStation2.exe"))
+            {
+                if (OperatingSystem.IsWindows())
+                {
+                    StartWin32Process(masRoot + "/Markuse asjad/MarkuStation2.exe");
+                } else
+                {
+                    Process p = new Process();
+                    p.StartInfo.FileName = masRoot + "/Markuse asjad/MarkuStation2";
+                    p.StartInfo.UseShellExecute = true;
+                    p.Start();
+                }
+            }
+            else
+            { // käivita MarkuStation 1 fallback-ina
+                StartWin32Process(masRoot + "/MarkuStation.exe");
+            }
         }
 
         private async void BrowseButtonAsync(object? sender, RoutedEventArgs e)
@@ -654,14 +672,49 @@ namespace Markuse_arvuti_juhtpaneel
             GameNameBox.Text = "";
         }
 
-        private void MsGameEdit(object? sender, TappedEventArgs e)
+        private async void MsGameEdit(object? sender, TappedEventArgs e)
         {
             if (GameList.SelectedItems?.Count > 0)
             {
-                string SelectedGame = ((ListBoxItem)GameList.Selection.SelectedItems[0]).Content.ToString();
+                string? SelectedGame;
+                if (GameList.Selection.SelectedItems[0] is string)
+                {
+                    SelectedGame = GameList.Selection.SelectedItems[0] as string;
+                } else
+                {
+                    SelectedGame = ((ListBoxItem)GameList.Selection.SelectedItems[0]).Content.ToString();
+                }
                 string GameLocation = locations[GameList.SelectedIndex];
                 GameLocation = GameLocation.Substring(0, GameLocation.Length - 1);
-                MessageBoxShow(string.Format("Nimi: {0}\nAsukoht: {1}", SelectedGame, GameLocation));
+                MarkuStation_Edit mse = new MarkuStation_Edit();
+                mse.NameBox.Text = SelectedGame;
+                mse.LocationBox.Text = GameLocation;
+                await mse.ShowDialog(this).WaitAsync(new CancellationToken(false));
+                if (mse.DialogResult && (mse.LocationBox.Text == ";") && (mse.NameBox.Text == ";"))
+                {
+                    int Deletable = GameList.SelectedIndex;
+                    string[] new_games = new string[locations.Length - 1];
+                    int i = 0;
+                    foreach (string location in locations)
+                    {
+                        if (location == GameLocation + ";")
+                        {
+                            continue;
+                        }
+                        new_games[i] = location;
+                        i++;
+                    }
+                    locations = new_games;
+                    GameList.Items.RemoveAt(Deletable);
+                    _ = MessageBoxShow("Üksus eemaldati edukalt! Vajutage \"Salvesta muudatused\", et list rakendada.", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success);
+                }
+                else if (mse.DialogResult)
+                {
+                    int Modifiable = GameList.SelectedIndex;
+                    locations[Modifiable] = mse.LocationBox.Text + ";";
+                    GameList.Items[Modifiable] = mse.NameBox.Text;
+                    _ = MessageBoxShow("Üksus muudeti edukalt! Vajutage \"Salvesta muudatused\", et list rakendada.", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success);
+                }
             }
         }
 
@@ -685,14 +738,22 @@ namespace Markuse_arvuti_juhtpaneel
             File.WriteAllText(masRoot + @"/ms_display.txt", scrntype + Environment.NewLine);
             StringBuilder? builder = new StringBuilder();
             builder.Append("* MarkuStation mängude loetelu *").Append("\n");
-            foreach (ListBoxItem? lvi in GameList.Items)
+            foreach (var lvi in GameList.Items)
             {
-                string? val = lvi?.Content?.ToString();
-                if ((val != "") && (val != null))
+                string? val;
+                if (lvi is ListBoxItem)
                 {
-                    builder.Append(val);
-                    builder.Append("\n");
+                    val = ((ListBoxItem)lvi).Content?.ToString();
                 }
+                else
+                {
+                    val = lvi.ToString();
+                }
+                if ((val != "") && (val != null))
+                    {
+                        builder.Append(val);
+                        builder.Append("\n");
+                    }
             }
             string temp = builder.ToString();
             temp += "\n";
@@ -719,6 +780,8 @@ namespace Markuse_arvuti_juhtpaneel
             if (specialCheck.IsChecked == false) { temp += "\nfalse"; }
             if (introCheck.IsChecked == true) { temp += "\ntrue"; }
             if (introCheck.IsChecked == false) { temp += "\nfalse"; }
+            if (legacyIntroCheck.IsChecked == true) { temp += "\ntrue"; }
+            if (legacyIntroCheck.IsChecked == false) { temp += "\nfalse"; }
             File.WriteAllText(masRoot + "/setting.txt", temp);
             temp = "";
         }
