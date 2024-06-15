@@ -13,11 +13,11 @@
             Background="Black" Foreground="White" BorderBrush="Transparent"
             Margin="20" Padding="12" Click="Return_Click"
             Classes="Hand Nav" ToolTip.Tip="Tagasi maja juurde">&lt;--</Button>
-    <Button Classes="Black Hand" VerticalAlignment="Center"
+    <Button Classes="Nav Black Hand" VerticalAlignment="Center"
             HorizontalAlignment="Center" Margin="0,500,300,0">
       MarkuStation 2
     </Button>
-    <Button Classes="Black Hand" VerticalAlignment="Center"
+    <Button Classes="Nav Black Hand" VerticalAlignment="Center"
             HorizontalAlignment="Center" Margin="150,800,0,0">
       Käivita pidu!
     </Button>

@@ -4,13 +4,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
         x:Class="Interaktiivne_töölaud.Windows" WindowState="FullScreen"
-        Title="Windows" Loaded="Window_Loaded_1">
+        Title="Windows" Loaded="Window_Loaded_1" Closing="Window_Closing">
   <Window.Background>
     <ImageBrush Source="/Resources/aken.jpg" Stretch="Fill"></ImageBrush>
   </Window.Background>
   <Grid>
     <!-- Top left -->
-    <Label Background="Black" Foreground="White" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="20" Margin="20" Padding="5">Projekt I.T.S.</Label>
+    <Label Name="TopLeftLabel" Background="Black" Foreground="White" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="20" Margin="20" Padding="5">Projekt I.T.S.</Label>
     <!-- Top right -->
     <StackPanel VerticalAlignment="Top" HorizontalAlignment="Right" Margin="15" Orientation="Horizontal">
       <Viewbox Height="40" Width="40" Margin="0,0,10,10" VerticalAlignment="Top">
@@ -32,7 +32,7 @@
           <Image Source="/Resources/network.png" Stretch="None"/>
         </Border>
       </Viewbox>
-      <Viewbox Height="40" Width="40" Margin="0,0,10,10" VerticalAlignment="Top">
+      <!--<Viewbox Height="40" Width="40" Margin="0,0,10,10" VerticalAlignment="Top">
         <ToolTip.Tip>
           <StackPanel Orientation="Horizontal">
             <Image Source="/Resources/hdd.png" Width="64" VerticalAlignment="Top" />
@@ -48,7 +48,7 @@
         <Border x:Name="HddContainer" BorderThickness="2" BorderBrush="Black" Background="#FFC1C1C1">
           <Image Source="/Resources/hdd.png" Stretch="None"/>
         </Border>
-      </Viewbox>
+      </Viewbox>-->
       <Viewbox Height="40" Width="40" Margin="0,0,10,10" VerticalAlignment="Top">
         <ToolTip.Tip>
           <StackPanel Orientation="Horizontal">
@@ -93,21 +93,19 @@
       </ListBox>
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
         <Button ToolTip.Tip="Annab programmile sulgemiskäskluse"
-          Classes="Nav Hand Black">Sulge aken</Button>
+          Classes="Nav Hand Black" Click="CloseWindow_Click">Sulge aken</Button>
         <Button Margin="10,0,0,0" ToolTip.Tip="Peatab sunniviisiliselt programmi protsessi"
-          Classes="Nav Hand Black">Peata protsess</Button>
-        <Button Margin="10,0,0,0" ToolTip.Tip="Kuvab minimeeritud või tagumised aknad"
-          Classes="Nav Hand Black">Tegumid</Button>
-        <Button Margin="10,0,0,0" ToolTip.Tip="Käivitab Windowsi tegumihalduri"
-          Classes="Nav Hand Black">Tegumihaldur</Button>
+          Classes="Nav Hand Black" Click="EndProcess_Click">Peata protsess</Button>
+        <Button Margin="10,0,0,0" ToolTip.Tip="Käivitab tegumihalduri"
+          Classes="Nav Hand Black" Click="Taskmgr_Click">Tegumihaldur</Button>
       </StackPanel>
     </StackPanel>
     <!-- Bottom left -->
     <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Left" Orientation="Horizontal" Margin="15">
       <Button Margin="0,0,10,0" ToolTip.Tip="Salvestab seaded ja lülitab turvaliselt arvuti välja"
-              Classes="Nav Hand Black">Lülitab arvuti välja</Button>
+              Classes="Nav Hand Black" Click="Shutdown_Click">Lülitab arvuti välja</Button>
       <Button Margin="0,0,10,0" ToolTip.Tip="Suleb arvuti ja käivitab selle uuesti"
-              Classes="Nav Hand Black">Taaskäivita</Button>
+              Classes="Nav Hand Black" Click="Restart_Click">Taaskäivita</Button>
       <Button Margin="0,0,10,0" ToolTip.Tip="Sulge Projekt I.T.S ja taasta tavaline operatsioonsüsteemi liides"
               Classes="Nav Hand Black" Click="Restore_Shell_Click">Taasta vaikeliides</Button>
       <Button Margin="0,0,10,0" ToolTip.Tip="Võimaldab käivitada programmi"
@@ -130,7 +128,8 @@ See funktsioon on saadaval kui on ühendatud vähemalt kaks kuvarit."
         <ComboBoxItem>Aeglane</ComboBoxItem>
         <ComboBoxItem>Väga aeglane</ComboBoxItem>
       </ComboBox>
-      <Button Classes="Hand Black" ToolTip.Tip="Taaskäivitab selle töölauahalduri">Taaskäivita I.T.S.</Button>
+      <Button Classes="Nav Hand Black" Click="Restart_ITS"
+              ToolTip.Tip="Taaskäivitab selle töölauahalduri">Taaskäivita I.T.S.</Button>
     </StackPanel>
   </Grid>
   <Window.Styles>

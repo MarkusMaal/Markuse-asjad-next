@@ -69,7 +69,9 @@
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
     <PackageReference Include="Avalonia.Themes.Simple" Version="11.0.10" />
-    <PackageReference Include="AvaloniaInside.SystemManager" Version="1.0.0" />
+    <PackageReference Include="ComputerInfo" Version="0.2.0" />
+    <PackageReference Include="Hardware.Info" Version="100.1.0" />
+    <PackageReference Include="Universe.CpuUsage" Version="2.2.497.598" />
   </ItemGroup>
 
   <ItemGroup>
