@@ -1,0 +1,41 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Interaktiivne_töölaud.App"
+             RequestedThemeVariant="Dark">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Styles>
+        <SimpleTheme />
+        <Style Selector="Button.Hand">
+          <Setter Property="Cursor" Value="Hand"></Setter>
+        </Style>
+      <Style Selector="TextBlock.Hand">
+        <Setter Property="Cursor" Value="Hand"></Setter>
+      </Style>
+      <Style Selector="Panel.Hand">
+        <Setter Property="Cursor" Value="Hand"></Setter>
+      </Style>
+      <Style Selector="Button.Nav:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="Black"></Setter>
+      </Style>
+      <Style Selector="Button.Nav:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="Gray"></Setter>
+      </Style>
+      <Style Selector="Button.Transparent:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"></Setter>
+        <Setter Property="BorderBrush" Value="Transparent"></Setter>
+      </Style>
+      <Style Selector="Button.Transparent:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"></Setter>
+        <Setter Property="BorderBrush" Value="Transparent"></Setter>
+      </Style>
+      <Style Selector="Button.Transparent /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"></Setter>
+        <Setter Property="BorderBrush" Value="Transparent"></Setter>
+      </Style>
+      <Style Selector="Window">
+        <Setter Property="Foreground" Value="Black"></Setter>
+      </Style>
+      <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+    </Application.Styles>
+</Application>

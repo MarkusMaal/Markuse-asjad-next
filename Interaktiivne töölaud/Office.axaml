@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        x:Class="Interaktiivne_töölaud.Office" WindowState="FullScreen"
+        Title="Office">
+  <Window.Background>
+    <ImageBrush Source="/Resources/töölaud.jpg" Stretch="Fill"></ImageBrush>
+  </Window.Background>
+  <Grid>
+    <Button HorizontalAlignment="Right" VerticalAlignment="Center"
+            Background="Black" Foreground="White" BorderBrush="Transparent"
+            Margin="20" Padding="12" Click="Return_Click"
+            Classes="Hand Nav" ToolTip.Tip="Tagasi eluruumi">--&gt;</Button>
+    <Button HorizontalAlignment="Left" VerticalAlignment="Center"
+            Background="Black" Foreground="White" BorderBrush="Transparent"
+            Margin="20" Padding="12" Click="Archive_Click"
+            Classes="Hand Nav" ToolTip.Tip="Dokumendid ja arhiiv">&lt;--</Button>
+    <Label Background="Black" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top"
+           Margin="100,80" FontSize="20" Padding="5"
+           >Kaust töölaud</Label>
+    <DataGrid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" Foreground="Black" Margin="100,130">
+      
+    </DataGrid>
+    <StackPanel Orientation="Horizontal" Margin="95,70">
+      <Button HorizontalAlignment="Left" VerticalAlignment="Bottom"
+              Background="Black" Foreground="White" BorderBrush="Transparent"
+              Margin="5" Padding="12"
+              Classes="Hand Nav" ToolTip.Tip="Tagasi">&lt;--</Button>
+      <Button HorizontalAlignment="Right" VerticalAlignment="Bottom"
+              Background="Black" Foreground="White" BorderBrush="Transparent"
+              Margin="5" Padding="12"
+              Classes="Hand Nav" ToolTip.Tip="Edasi">--&gt;</Button>
+    </StackPanel>
+  </Grid>
+</Window>

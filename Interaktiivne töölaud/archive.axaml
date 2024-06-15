@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080" WindowState="FullScreen"
+        x:Class="Interaktiivne_töölaud.archive"
+        Title="archive">
+  <Window.Background>
+    <ImageBrush Source="/Resources/arhiiv.jpg" Stretch="Fill" />
+  </Window.Background>
+  <Grid>
+    <Button HorizontalAlignment="Right" VerticalAlignment="Center"
+            Background="Black" Foreground="White" BorderBrush="Transparent"
+            Margin="20" Padding="12" Click="Return_Click"
+            Classes="Hand Nav" ToolTip.Tip="Kontor">--&gt;</Button>
+  </Grid>
+</Window>

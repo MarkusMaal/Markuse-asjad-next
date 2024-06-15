@@ -1,0 +1,145 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        x:Class="Interaktiivne_töölaud.Windows" WindowState="FullScreen"
+        Title="Windows" Loaded="Window_Loaded_1">
+  <Window.Background>
+    <ImageBrush Source="/Resources/aken.jpg" Stretch="Fill"></ImageBrush>
+  </Window.Background>
+  <Grid>
+    <!-- Top left -->
+    <Label Background="Black" Foreground="White" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="20" Margin="20" Padding="5">Projekt I.T.S.</Label>
+    <!-- Top right -->
+    <StackPanel VerticalAlignment="Top" HorizontalAlignment="Right" Margin="15" Orientation="Horizontal">
+      <Viewbox Height="40" Width="40" Margin="0,0,10,10" VerticalAlignment="Top">
+        <ToolTip.Tip>
+          <StackPanel Orientation="Horizontal">
+            <Image Source="/Resources/network.png" Width="64" VerticalAlignment="Top" />
+            <StackPanel Margin="10">
+              <TextBlock FontWeight="Bold" Margin="0,0,0,10">Võrgu olek</TextBlock>
+              <TextBlock>Näitab, kas olemas on internetiühendus.</TextBlock>
+              <TextBlock>Punane - Võrguühendus pole saadaval</TextBlock>
+              <TextBlock>Kollane - Võrguühendus on saadaval, kuid juurdepääs internetile puudub</TextBlock>
+              <TextBlock>
+                Roheline - Võrguühendus on saadaval
+              </TextBlock>
+            </StackPanel>
+          </StackPanel>
+        </ToolTip.Tip>
+        <Border x:Name="NetContainer" BorderThickness="2" BorderBrush="Black" Background="#FFC1C1C1">
+          <Image Source="/Resources/network.png" Stretch="None"/>
+        </Border>
+      </Viewbox>
+      <Viewbox Height="40" Width="40" Margin="0,0,10,10" VerticalAlignment="Top">
+        <ToolTip.Tip>
+          <StackPanel Orientation="Horizontal">
+            <Image Source="/Resources/hdd.png" Width="64" VerticalAlignment="Top" />
+            <StackPanel Margin="10">
+              <TextBlock FontWeight="Bold" Margin="0,0,0,10">Kõvaketta olek</TextBlock>
+              <TextBlock>Näitab juurketta aktiivsust</TextBlock>
+              <TextBlock>Punane - Kõrge aktiivsus</TextBlock>
+              <TextBlock>Kollane - Keskmine aktiivsus</TextBlock>
+              <TextBlock>Roheline - Madal aktiivsus/Aktiivsus puudub</TextBlock>
+            </StackPanel>
+          </StackPanel>
+        </ToolTip.Tip>
+        <Border x:Name="HddContainer" BorderThickness="2" BorderBrush="Black" Background="#FFC1C1C1">
+          <Image Source="/Resources/hdd.png" Stretch="None"/>
+        </Border>
+      </Viewbox>
+      <Viewbox Height="40" Width="40" Margin="0,0,10,10" VerticalAlignment="Top">
+        <ToolTip.Tip>
+          <StackPanel Orientation="Horizontal">
+            <Image Source="/Resources/ram.png" Width="64" VerticalAlignment="Top" />
+            <StackPanel Margin="10">
+              <TextBlock FontWeight="Bold" Margin="0,0,0,10">Mälu olek</TextBlock>
+              <TextBlock>Näitab muutmälu aktiivsust</TextBlock>
+              <TextBlock>Punane - Mälukasutus on kõrge</TextBlock>
+              <TextBlock>Kollane - Mälukasutus on keskmine</TextBlock>
+              <TextBlock>Roheline - Mälukasutus on madal</TextBlock>
+            </StackPanel>
+          </StackPanel>
+        </ToolTip.Tip>
+        <Border x:Name="RamContainer" BorderThickness="2" BorderBrush="Black" Background="#FFC1C1C1">
+          <Image Source="/Resources/ram.png" Stretch="None"/>
+        </Border>
+      </Viewbox>
+      <StackPanel Name="CpuCounters">
+        <Viewbox Height="40" Width="40" Margin="0,0,0,10">
+          <ToolTip.Tip>
+            <StackPanel Orientation="Horizontal">
+              <Image Source="/Resources/cpu1.png" Width="64" VerticalAlignment="Top" />
+              <StackPanel Margin="10">
+                <TextBlock FontWeight="Bold" Margin="0,0,0,10">Tuuma olek</TextBlock>
+                <TextBlock>Näitab konkreetse protsessorituuma kasutust</TextBlock>
+                <TextBlock>Punane - Tuum on täielikult hõivatud</TextBlock>
+                <TextBlock>Kollane - Tuum on osaliselt hõivatud</TextBlock>
+                <TextBlock>Roheline - Tuum pole hõivatud</TextBlock>
+              </StackPanel>
+            </StackPanel>
+          </ToolTip.Tip>
+          <Border x:Name="Cpu1Container" BorderThickness="2" BorderBrush="Black" Background="#FFC1C1C1">
+            <Image Source="/Resources/cpu1.png" Stretch="None"/>
+          </Border>
+        </Viewbox>
+      </StackPanel>
+    </StackPanel>
+    <!-- Center -->
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+      <ListBox Width="533" Height="335" FontSize="15" Foreground="White" Padding="15" Background="#a000" Name="ProcessBox">
+        <ListBoxItem>Test</ListBoxItem>
+      </ListBox>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+        <Button ToolTip.Tip="Annab programmile sulgemiskäskluse"
+          Classes="Nav Hand Black">Sulge aken</Button>
+        <Button Margin="10,0,0,0" ToolTip.Tip="Peatab sunniviisiliselt programmi protsessi"
+          Classes="Nav Hand Black">Peata protsess</Button>
+        <Button Margin="10,0,0,0" ToolTip.Tip="Kuvab minimeeritud või tagumised aknad"
+          Classes="Nav Hand Black">Tegumid</Button>
+        <Button Margin="10,0,0,0" ToolTip.Tip="Käivitab Windowsi tegumihalduri"
+          Classes="Nav Hand Black">Tegumihaldur</Button>
+      </StackPanel>
+    </StackPanel>
+    <!-- Bottom left -->
+    <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Left" Orientation="Horizontal" Margin="15">
+      <Button Margin="0,0,10,0" ToolTip.Tip="Salvestab seaded ja lülitab turvaliselt arvuti välja"
+              Classes="Nav Hand Black">Lülitab arvuti välja</Button>
+      <Button Margin="0,0,10,0" ToolTip.Tip="Suleb arvuti ja käivitab selle uuesti"
+              Classes="Nav Hand Black">Taaskäivita</Button>
+      <Button Margin="0,0,10,0" ToolTip.Tip="Sulge Projekt I.T.S ja taasta tavaline operatsioonsüsteemi liides"
+              Classes="Nav Hand Black" Click="Restore_Shell_Click">Taasta vaikeliides</Button>
+      <Button Margin="0,0,10,0" ToolTip.Tip="Võimaldab käivitada programmi"
+              Classes="Nav Hand Black" Click="Run_Click">Käivita</Button>
+      <Button Margin="0,0,10,0" ToolTip.Tip="Peidab teisel kuvaril olevad ruumid ning jätab alles ainult selle akna,
+See funktsioon on saadaval kui on ühendatud vähemalt kaks kuvarit."
+              Classes="Nav Hand Black" IsVisible="False">Peida ruumid</Button>
+    </StackPanel>
+    <!-- Bottom center -->
+    <Button HorizontalAlignment="Center" VerticalAlignment="Bottom"
+            Margin="20" Padding="12" Click="Bottom_Click"
+            Classes="Hand Nav Black" ToolTip.Tip="Tagasi eluruumi" FontFamily="Arial">&#x2193;</Button>
+    <!-- Bottom right -->
+    <StackPanel Orientation="Horizontal" Margin="15" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+      <Label Foreground="White" FontSize="25">Värskenduskiirus</Label>
+      <ComboBox SelectedIndex="2" Width="170" Margin="15,0" Background="#a000" SelectionChanged="ComboBox_SelectionChanged">
+        <ComboBoxItem>Ülikiire</ComboBoxItem>
+        <ComboBoxItem>Kiire</ComboBoxItem>
+        <ComboBoxItem>Keskmine</ComboBoxItem>
+        <ComboBoxItem>Aeglane</ComboBoxItem>
+        <ComboBoxItem>Väga aeglane</ComboBoxItem>
+      </ComboBox>
+      <Button Classes="Hand Black" ToolTip.Tip="Taaskäivitab selle töölauahalduri">Taaskäivita I.T.S.</Button>
+    </StackPanel>
+  </Grid>
+  <Window.Styles>
+    <Style Selector="Button.Black">
+      <Setter Property="Background" Value="Black" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="Padding" Value="15,7" />
+    </Style>
+  </Window.Styles>
+</Window>

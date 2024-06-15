@@ -1,0 +1,39 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        x:Class="Interaktiivne_töölaud.MainWindow"
+        Title="Interaktiivne_töölaud" WindowState="FullScreen"
+        >
+  <Window.Background>
+    <ImageBrush Source="/Resources/väljast.jpg" Stretch="Fill"></ImageBrush>
+  </Window.Background>
+  <!-- Please use Background="Magenta" and remove Transparent class on elements to test click zones -->
+  <Grid>
+    <Button Width="60"
+               VerticalAlignment="Center" HorizontalAlignment="Center"
+               Margin="0,230,490,0" Padding="0,10,0,10"
+               ToolTip.Tip="Logi välja" Foreground="Black"
+               Classes="Hand Transparent">
+      <TextBlock TextWrapping="Wrap" TextAlignment="Center" Width="60">logi välja</TextBlock>
+    </Button>
+    <Button HorizontalAlignment="Center" VerticalAlignment="Center"
+               Width="135" Height="200" Margin="0,350,240,0"
+               ToolTip.Tip="Sisene majja" Background="Transparent"
+               BorderBrush="Transparent" Click="Enter_PointerReleased"
+               Classes="Hand Transparent" Foreground="Gray">
+        (sisene)
+    </Button>
+    <Button HorizontalAlignment="Center" Foreground="White"
+            Background="Navy" CornerRadius="0" Padding="20,10" Height="50"
+            BorderBrush="#8888" Margin="550,650,0,0"
+            ToolTip.Tip="Avab Microsoft Outlook'i"
+            FontSize="24"
+            Classes="Hand Nav">E-post</Button>
+    <Button HorizontalAlignment="Right" VerticalAlignment="Center"
+            Background="Black" Foreground="White" BorderBrush="Transparent"
+            Margin="20" Padding="12" Click="Playground_Click"
+            Classes="Hand Nav" ToolTip.Tip="Mänguväljakule">--&gt;</Button>
+  </Grid>
+</Window>

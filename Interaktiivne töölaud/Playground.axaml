@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        x:Class="Interaktiivne_töölaud.Playground" WindowState="FullScreen"
+        Title="Playground">
+  <Window.Background>
+    <ImageBrush Source="/Resources/playground.png" Stretch="Fill" />
+  </Window.Background>
+  <Grid>
+    <Button HorizontalAlignment="Left" VerticalAlignment="Center"
+            Background="Black" Foreground="White" BorderBrush="Transparent"
+            Margin="20" Padding="12" Click="Return_Click"
+            Classes="Hand Nav" ToolTip.Tip="Tagasi maja juurde">&lt;--</Button>
+    <Button Classes="Black Hand" VerticalAlignment="Center"
+            HorizontalAlignment="Center" Margin="0,500,300,0">
+      MarkuStation 2
+    </Button>
+    <Button Classes="Black Hand" VerticalAlignment="Center"
+            HorizontalAlignment="Center" Margin="150,800,0,0">
+      Käivita pidu!
+    </Button>
+  </Grid>
+  <Window.Styles>
+    <Style Selector="Button.Black">
+      <Setter Property="Background" Value="Black" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="Padding" Value="15,7" />
+    </Style>
+  </Window.Styles>
+</Window>

@@ -1,0 +1,101 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Resources\aken.jpg" />
+    <None Remove="Resources\aken2.png" />
+    <None Remove="Resources\arhiiv.jpg" />
+    <None Remove="Resources\cpu1.png" />
+    <None Remove="Resources\cpu2.png" />
+    <None Remove="Resources\cpu3.png" />
+    <None Remove="Resources\cpu4.png" />
+    <None Remove="Resources\cpu5.png" />
+    <None Remove="Resources\cpu6.png" />
+    <None Remove="Resources\eluruum.jpg" />
+    <None Remove="Resources\free-computer-hard-drive-clipart-harddisk-6.png" />
+    <None Remove="Resources\hdd.png" />
+    <None Remove="Resources\internet_unavailable.png" />
+    <None Remove="Resources\mas_general.png" />
+    <None Remove="Resources\mas_web.png" />
+    <None Remove="Resources\network.png" />
+    <None Remove="Resources\network_available.png" />
+    <None Remove="Resources\network_unavailable.png" />
+    <None Remove="Resources\playground.jpg" />
+    <None Remove="Resources\playground.png" />
+    <None Remove="Resources\ram.png" />
+    <None Remove="Resources\töölaud.jpg" />
+    <None Remove="Resources\väljast.jpg" />
+    <None Remove="Resources\väljast_päev.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Resources\aken.jpg" />
+    <AvaloniaResource Include="Resources\aken2.png" />
+    <AvaloniaResource Include="Resources\arhiiv.jpg" />
+    <AvaloniaResource Include="Resources\cpu1.png" />
+    <AvaloniaResource Include="Resources\cpu2.png" />
+    <AvaloniaResource Include="Resources\cpu3.png" />
+    <AvaloniaResource Include="Resources\cpu4.png" />
+    <AvaloniaResource Include="Resources\cpu5.png" />
+    <AvaloniaResource Include="Resources\cpu6.png" />
+    <AvaloniaResource Include="Resources\eluruum.jpg" />
+    <AvaloniaResource Include="Resources\free-computer-hard-drive-clipart-harddisk-6.png" />
+    <AvaloniaResource Include="Resources\hdd.png" />
+    <AvaloniaResource Include="Resources\internet_unavailable.png" />
+    <AvaloniaResource Include="Resources\mas_general.png" />
+    <AvaloniaResource Include="Resources\mas_web.png" />
+    <AvaloniaResource Include="Resources\network.png" />
+    <AvaloniaResource Include="Resources\network_available.png" />
+    <AvaloniaResource Include="Resources\network_unavailable.png" />
+    <AvaloniaResource Include="Resources\playground.jpg" />
+    <AvaloniaResource Include="Resources\playground.png" />
+    <AvaloniaResource Include="Resources\ram.png" />
+    <AvaloniaResource Include="Resources\töölaud.jpg" />
+    <AvaloniaResource Include="Resources\väljast.jpg" />
+    <AvaloniaResource Include="Resources\väljast_päev.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="11.0.10" />
+    <PackageReference Include="AvaloniaInside.SystemManager" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Windows.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Office.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Run.axaml" />
+  </ItemGroup>
+</Project>

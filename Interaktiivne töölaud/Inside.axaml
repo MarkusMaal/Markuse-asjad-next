@@ -1,0 +1,60 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        x:Class="Interaktiivne_töölaud.Inside" WindowState="FullScreen"
+        Title="Inside">
+  <Window.Background>
+    <ImageBrush Source="/Resources/eluruum.jpg" Stretch="Fill" />
+  </Window.Background>
+  <Grid>
+    <Image Source="/Resources/mas_general.png" Width="42" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10"
+           ToolTip.Tip="Avab Markuse arvuti integratsioonimenüü"/>
+
+    <Button HorizontalAlignment="Center" VerticalAlignment="Center"
+               Width="400" Height="210" Margin="0,0,770,0"
+               ToolTip.Tip="Meediumid" Background="Magenta"
+               BorderBrush="Transparent"
+               Classes="Hand Transparent" Foreground="Gray">
+      <Button.RenderTransform>
+        <RotateTransform Angle="1" />
+      </Button.RenderTransform>
+      <Label>
+        <Label.RenderTransform>
+          <RotateTransform Angle="-1"/>
+        </Label.RenderTransform>
+        (meediumid)
+      </Label>
+    </Button>
+    <Button HorizontalAlignment="Left" VerticalAlignment="Center"
+               Width="330" Height="140" Margin="20,440,0,0"
+               ToolTip.Tip="Kaustad ja failid" Background="magenta"
+               BorderBrush="Transparent"
+               Classes="Hand Transparent" Foreground="Gray">
+      <Button.RenderTransform>
+        <RotateTransform Angle="-3" />
+      </Button.RenderTransform>
+      (failid)
+    </Button>
+    <Button HorizontalAlignment="Left" VerticalAlignment="Center"
+               Width="290" Height="340" Margin="20,0,0,60"
+               ToolTip.Tip="Microsoft Paint" Background="Magenta"
+               BorderBrush="Transparent"
+               Classes="Hand Transparent" Foreground="Black">
+      (paint)
+    </Button>
+    <Button HorizontalAlignment="Right" VerticalAlignment="Center"
+            Background="Black" Foreground="White" BorderBrush="Transparent"
+            Margin="20" Padding="12" Click="ExitHouse_Click"
+            Classes="Hand Nav" ToolTip.Tip="Lahku majast">--&gt;</Button>
+    <Button HorizontalAlignment="Left" VerticalAlignment="Center"
+            Background="Black" Foreground="White" BorderBrush="Transparent"
+            Margin="20" Padding="12" Click="Office_Click"
+            Classes="Hand Nav" ToolTip.Tip="Kontor">&lt;--</Button>
+    <Button HorizontalAlignment="Center" VerticalAlignment="Top"
+            Background="Black" Foreground="White" BorderBrush="Transparent"
+            Margin="20" Padding="12" Click="Attic_Click"
+            Classes="Hand Nav" ToolTip.Tip="Aken" FontFamily="Arial">&#x2191;</Button>
+  </Grid>
+</Window>
