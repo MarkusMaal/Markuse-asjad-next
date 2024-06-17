@@ -27,7 +27,7 @@ public partial class Office : Window
 
     private void Archive_Click(object? sender, RoutedEventArgs e)
     {
-        archive arc = new();
+        Archive arc = new();
         arc.Show();
         Close();
     }

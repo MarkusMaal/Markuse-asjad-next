@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Interaktiivne_töölaud;
 
-public partial class archive : Window
+public partial class Archive : Window
 {
-    public archive()
+    public Archive()
     {
         InitializeComponent();
     }
@@ -30,7 +30,7 @@ public partial class archive : Window
                 continue;
             }
             StringBuilder sb = new();
-            sb.Append(driveInfo.RootDirectory.Name.Replace("\\", "/")).Append(" - ");
+            sb.Append(driveInfo.RootDirectory.FullName.Replace("\\", "/")).Append(" - ");
             sb.Append(GetUserFriendlySize(Convert.ToDouble(driveInfo.TotalSize))).Append(' ');
             switch (driveInfo.DriveType)
             {
