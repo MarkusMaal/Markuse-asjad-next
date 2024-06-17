@@ -40,10 +40,12 @@ public partial class Windows : Window
                 cpuUsage = hardwareInfo.CpuList.First().PercentProcessorTime;
 
                 // Calculate RAM usage
-                ComputerInfo ci = new();
-                double used = ci.TotalPhysicalMemory - ci.AvailablePhysicalMemory;
-                double ram = ci.TotalPhysicalMemory;
-                ramUsage = used / ram * 100.0;
+                if (!OperatingSystem.IsMacOS()) {
+                    ComputerInfo ci = new();
+                    double used = ci.TotalPhysicalMemory - ci.AvailablePhysicalMemory;
+                    double ram = ci.TotalPhysicalMemory;
+                    ramUsage = used / ram * 100.0;
+                }
 
                 Thread.Sleep(100);
                 if (stop)
