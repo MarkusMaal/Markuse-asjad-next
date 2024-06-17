@@ -13,12 +13,12 @@
             Background="Black" Foreground="White" BorderBrush="Transparent"
             Margin="20" Padding="12" Click="Return_Click"
             Classes="Hand Nav" ToolTip.Tip="Tagasi maja juurde">&lt;--</Button>
-    <Button Classes="Nav Black Hand" VerticalAlignment="Center"
-            HorizontalAlignment="Center" Margin="0,500,300,0">
+    <Button Classes="Nav Black Hand" VerticalAlignment="Center" ToolTip.Tip="Avab MarkuStation konsooli"
+            HorizontalAlignment="Center" Margin="0,500,300,0" Click="StartProcess">
       MarkuStation 2
     </Button>
-    <Button Classes="Nav Black Hand" VerticalAlignment="Center"
-            HorizontalAlignment="Center" Margin="150,800,0,0">
+    <Button Classes="Nav Black Hand" VerticalAlignment="Center" ToolTip.Tip="Meediumiestiaja hajumissüsteemiga"
+            HorizontalAlignment="Center" Margin="300,700,0,0" Click="StartProcess">
       Käivita pidu!
     </Button>
   </Grid>
@@ -27,8 +27,8 @@
       <Setter Property="Background" Value="Black" />
       <Setter Property="Foreground" Value="White" />
       <Setter Property="BorderBrush" Value="Transparent" />
-      <Setter Property="FontSize" Value="15" />
-      <Setter Property="Padding" Value="15,7" />
+      <Setter Property="FontSize" Value="24" />
+      <Setter Property="Padding" Value="30,10" />
     </Style>
   </Window.Styles>
 </Window>

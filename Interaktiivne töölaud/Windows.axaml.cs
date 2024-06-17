@@ -18,18 +18,16 @@ namespace Interaktiivne_töölaud;
 
 public partial class Windows : Window
 {
-    DispatcherTimer dpt = new();
+    readonly DispatcherTimer dpt = new();
     private static HardwareInfo? hardwareInfo;
     double cpuUsage;
     double ramUsage;
-    double diskUsage;
     bool stop = false;
-    Thread collectUsage;
+    private readonly Thread collectUsage;
     public Windows()
     {
         cpuUsage = 0;
         ramUsage = 0;
-        diskUsage = 0;
         var cts = new CancellationTokenSource();
         hardwareInfo = new HardwareInfo();
         collectUsage = new (() => // run in a separate thread to avoid interface freezes every second
@@ -57,7 +55,7 @@ public partial class Windows : Window
         });
         collectUsage.Start();
         dpt.Interval = new TimeSpan(0, 0, 1);
-        dpt.Tick += async (object? sender, EventArgs e) =>
+        dpt.Tick += (object? sender, EventArgs e) =>
         {
             int selection = ProcessBox.SelectedIndex;
             ProcessBox.Items.Clear();
@@ -136,7 +134,7 @@ public partial class Windows : Window
 
     
 
-    private async void Window_Loaded_1(object? sender, RoutedEventArgs e)
+    private void Window_Loaded_1(object? sender, RoutedEventArgs e)
     {
         dpt.Start();
     }

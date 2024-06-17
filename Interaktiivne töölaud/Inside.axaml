@@ -10,12 +10,12 @@
   </Window.Background>
   <Grid>
     <Image Source="/Resources/mas_general.png" Width="42" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10"
-           ToolTip.Tip="Avab Markuse arvuti integratsioonimenüü"/>
+           ToolTip.Tip="Avab Markuse arvuti integratsioonimenüü" PointerPressed="Logo_PointerPressed"/>
 
     <Button HorizontalAlignment="Center" VerticalAlignment="Center"
                Width="400" Height="210" Margin="0,0,770,0"
                ToolTip.Tip="Meediumid" Background="Magenta"
-               BorderBrush="Transparent"
+               BorderBrush="Transparent" Click="Media_Click"
                Classes="Hand Transparent" Foreground="Gray">
       <Button.RenderTransform>
         <RotateTransform Angle="1" />
@@ -30,7 +30,7 @@
     <Button HorizontalAlignment="Left" VerticalAlignment="Center"
                Width="330" Height="140" Margin="20,440,0,0"
                ToolTip.Tip="Kaustad ja failid" Background="magenta"
-               BorderBrush="Transparent"
+               BorderBrush="Transparent" Click="Files_Click"
                Classes="Hand Transparent" Foreground="Gray">
       <Button.RenderTransform>
         <RotateTransform Angle="-3" />
@@ -40,7 +40,7 @@
     <Button HorizontalAlignment="Left" VerticalAlignment="Center"
                Width="290" Height="340" Margin="20,0,0,60"
                ToolTip.Tip="Microsoft Paint" Background="Magenta"
-               BorderBrush="Transparent"
+               BorderBrush="Transparent" Click="Paint_Click"
                Classes="Hand Transparent" Foreground="Black">
       (paint)
     </Button>

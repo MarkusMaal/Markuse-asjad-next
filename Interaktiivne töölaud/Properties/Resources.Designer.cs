@@ -83,6 +83,16 @@ namespace Interaktiivne_töölaud.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] apps {
+            get {
+                object obj = ResourceManager.GetObject("apps", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] arhiiv {
             get {
                 object obj = ResourceManager.GetObject("arhiiv", resourceCulture);
@@ -153,9 +163,39 @@ namespace Interaktiivne_töölaud.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] disc {
+            get {
+                object obj = ResourceManager.GetObject("disc", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] disk {
+            get {
+                object obj = ResourceManager.GetObject("disk", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] eluruum {
             get {
                 object obj = ResourceManager.GetObject("eluruum", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] folder {
+            get {
+                object obj = ResourceManager.GetObject("folder", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -183,6 +223,16 @@ namespace Interaktiivne_töölaud.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] help {
+            get {
+                object obj = ResourceManager.GetObject("help", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] internet_unavailable {
             get {
                 object obj = ResourceManager.GetObject("internet_unavailable", resourceCulture);
@@ -196,6 +246,16 @@ namespace Interaktiivne_töölaud.Properties {
         internal static byte[] mas_general {
             get {
                 object obj = ResourceManager.GetObject("mas_general", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] mas_its_symmetric {
+            get {
+                object obj = ResourceManager.GetObject("mas_its_symmetric", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -243,6 +303,36 @@ namespace Interaktiivne_töölaud.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] noteicon {
+            get {
+                object obj = ResourceManager.GetObject("noteicon", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] ots_thumbnail {
+            get {
+                object obj = ResourceManager.GetObject("ots_thumbnail", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] play {
+            get {
+                object obj = ResourceManager.GetObject("play", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] playground {
             get {
                 object obj = ResourceManager.GetObject("playground", resourceCulture);
@@ -273,9 +363,29 @@ namespace Interaktiivne_töölaud.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] setting {
+            get {
+                object obj = ResourceManager.GetObject("setting", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] töölaud {
             get {
                 object obj = ResourceManager.GetObject("töölaud", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Unknown {
+            get {
+                object obj = ResourceManager.GetObject("Unknown", resourceCulture);
                 return ((byte[])(obj));
             }
         }

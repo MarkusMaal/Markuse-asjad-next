@@ -9,9 +9,9 @@
   <Window.Background>
     <ImageBrush Source="/Resources/väljast.jpg" Stretch="Fill"></ImageBrush>
   </Window.Background>
-  <!-- Please use Background="Magenta" and remove Transparent class on elements to test click zones -->
+  <!-- Remove Transparent class on elements to test click zones -->
   <Grid>
-    <Button Width="60"
+    <Button Width="60" Click="LogoutNow"
                VerticalAlignment="Center" HorizontalAlignment="Center"
                Margin="0,230,490,0" Padding="0,10,0,10"
                ToolTip.Tip="Logi välja" Foreground="Black"
@@ -25,12 +25,12 @@
                Classes="Hand Transparent" Foreground="Gray">
         (sisene)
     </Button>
-    <Button HorizontalAlignment="Center" Foreground="White"
+    <!--<Button HorizontalAlignment="Center" Foreground="White"
             Background="Navy" CornerRadius="0" Padding="20,10" Height="50"
             BorderBrush="#8888" Margin="550,650,0,0"
             ToolTip.Tip="Avab Microsoft Outlook'i"
             FontSize="24"
-            Classes="Hand Nav">E-post</Button>
+            Classes="Hand Nav">E-post</Button>-->
     <Button HorizontalAlignment="Right" VerticalAlignment="Center"
             Background="Black" Foreground="White" BorderBrush="Transparent"
             Margin="20" Padding="12" Click="Playground_Click"

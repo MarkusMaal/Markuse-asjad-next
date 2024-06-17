@@ -13,5 +13,31 @@
             Background="Black" Foreground="White" BorderBrush="Transparent"
             Margin="20" Padding="12" Click="Return_Click"
             Classes="Hand Nav" ToolTip.Tip="Kontor">--&gt;</Button>
+    <Button Classes="Black Hand Nav" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Margin="0,0,500,130" ToolTip.Tip="Avab kausta" Click="OpenFolder">Pildikogu</Button>
+    <Button Classes="Black Hand Nav" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Margin="500,0,0,110" ToolTip.Tip="Avab kausta" Click="OpenFolder">Dokumendid</Button>
+    <Button Classes="Black Hand Nav" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Margin="0,350,500,0" ToolTip.Tip="Avab kausta" Click="OpenFolder">Varukoopiad</Button>
+    <Button Classes="Black Hand Nav" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Margin="500,670,0,0" ToolTip.Tip="Avab kausta" Click="OpenFolder">Markuse videod</Button>
+    <Button Classes="Black Hand Nav" HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="DrivesButton"
+            Margin="50" PointerMoved="Show_DriveList" ToolTip.Tip="Kuvab arvutisse sisestatud andmekandjad ja võimaldab neid avada">
+      Andmekandjad
+    </Button>
+    <ListBox HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="520" Height="160"
+      Margin="50" IsVisible="False" Name="DriveList" PointerExited="ListBox_PointerExited_1"
+             Foreground="White" FontSize="20" Background="#8000" DoubleTapped="OpenDrive">
+      
+    </ListBox>
   </Grid>
+  <Window.Styles>
+    <Style Selector="Button.Black">
+      <Setter Property="Background" Value="Black" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="FontSize" Value="24" />
+      <Setter Property="Padding" Value="30,10" />
+    </Style>
+  </Window.Styles>
 </Window>

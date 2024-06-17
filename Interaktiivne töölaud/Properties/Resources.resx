@@ -124,6 +124,9 @@
   <data name="aken2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\aken2.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="apps" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\apps.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="arhiiv" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\arhiiv.jpg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -145,8 +148,17 @@
   <data name="cpu6" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cpu6.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="disc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\disc.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="disk" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\disk.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="eluruum" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\eluruum.jpg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="folder" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\folder.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="free-computer-hard-drive-clipart-harddisk-6" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\free-computer-hard-drive-clipart-harddisk-6.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -154,11 +166,17 @@
   <data name="hdd" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\hdd.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="help" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\help.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="internet_unavailable" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\internet_unavailable.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="mas_general" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mas_general.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="mas_its_symmetric" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mas_its_symmetric.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="mas_web" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mas_web.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -172,6 +190,15 @@
   <data name="network_unavailable" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\network_unavailable.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="noteicon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\noteicon.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ots_thumbnail" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ots_thumbnail.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="play" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\play.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="playground" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\playground.jpg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -181,8 +208,14 @@
   <data name="ram" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ram.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="setting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\setting.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="töölaud" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\töölaud.jpg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Unknown" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Unknown.bmp;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="väljast" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\väljast.jpg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

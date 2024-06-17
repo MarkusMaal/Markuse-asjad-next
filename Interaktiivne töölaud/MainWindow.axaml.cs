@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using System;
+using System.Diagnostics;
 
 namespace Interaktiivne_töölaud
 {
@@ -22,6 +24,28 @@ namespace Interaktiivne_töölaud
             Playground pg = new();
             pg.Show();
             Close();
+        }
+
+        private void LogoutNow(object? sender, RoutedEventArgs e)
+        {
+            Process p = new();
+            if (OperatingSystem.IsMacOS())
+            {
+                p.StartInfo.FileName = "osascript";
+                p.StartInfo.Arguments = "-e 'tell application \\\"System Events\\\" to log out'";
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                p.StartInfo.FileName = "pkill"; // not the recommended method, but one that is guaranteed to work no matter what distro we're on
+                p.StartInfo.Arguments = "-kill -u $USER";
+            }
+            else if (OperatingSystem.IsWindows())
+            {
+                p.StartInfo.FileName = "shutdown";
+                p.StartInfo.Arguments = "/l";
+            }
+            p.StartInfo.UseShellExecute = true;
+            p.Start();
         }
     }
 }
