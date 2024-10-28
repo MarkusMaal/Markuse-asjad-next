@@ -33,7 +33,12 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 if (!app.showsplash)
                 {
                     this.IsVisible = false;
-                    this.Opacity = 0;
+                    this.Opacity = 0;        
+                    if (OperatingSystem.IsMacOS()) {
+                        this.WindowState = WindowState.Minimized;
+                        this.Width = 0;
+                        this.Height = 0;
+                    }
                 }
                 ti = app.GetTrayIcon();
                 scheme = LoadTheme();
@@ -129,6 +134,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
             }
             this.IsVisible = false;
+            if (OperatingSystem.IsMacOS()) {
+                this.WindowState = WindowState.Minimized;
+                this.Width = 0;
+                this.Height = 0;
+            }
             ReloadMenu();
             scheme = LoadTheme();
             ApplyTheme();
@@ -175,6 +185,9 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void ReloadMenu()
         {
+            if (!ti.IsVisible) {
+                return;
+            }
             //foreach (NativeMenuItemBase nmi in ti.Menu.Items)
             List<NativeMenuItem> toRemove = [];
             for (int i = 0; i < ti.Menu.Items.Count; i++)
@@ -221,9 +234,6 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         }
                         break;
                     case "Käivita Projekt ITS":
-                        if (!initialized && !OperatingSystem.IsWindows()) {
-                            n.IsEnabled = false;
-                        }
                         break;
                     case "Värviskeem":
                         foreach (NativeMenuItemBase snmi in n.Menu.Items)

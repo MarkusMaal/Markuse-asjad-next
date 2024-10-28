@@ -317,7 +317,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                     }
                 }
             } else {
-                ((NativeMenuItem)sender).IsEnabled = false;
+                Process.Start(mas_root + "/Markuse asjad/Interaktiivne töölaud");
             }
         }
         private void MS_Click(object? sender, System.EventArgs e)

@@ -29,31 +29,35 @@ public partial class Archive : Window
             {
                 continue;
             }
-            StringBuilder sb = new();
-            sb.Append(driveInfo.RootDirectory.FullName.Replace("\\", "/")).Append(" - ");
-            sb.Append(GetUserFriendlySize(Convert.ToDouble(driveInfo.TotalSize))).Append(' ');
-            switch (driveInfo.DriveType)
-            {
-                case DriveType.CDRom:
-                    sb.Append(" (Optiline)");
-                    break;
-                case DriveType.Fixed:
-                    sb.Append(" (Sisemine)");
-                    break;
-                case DriveType.Removable:
-                    sb.Append(" (Eemaldatav)");
-                    break;
-                case DriveType.Network:
-                    sb.Append(" (Võrk)");
-                    break;
-                case DriveType.Ram:
-                    sb.Append(" (Mäluketas)");
-                    break;
-                default:
-                    sb.Append(" (Muu)");
-                    break;
+            try {
+	            StringBuilder sb = new();
+	            sb.Append(driveInfo.RootDirectory.FullName.Replace("\\", "/")).Append(" - ");
+	            sb.Append(GetUserFriendlySize(Convert.ToDouble(driveInfo.TotalSize))).Append(' ');
+	            switch (driveInfo.DriveType)
+	            {
+	                case DriveType.CDRom:
+	                    sb.Append(" (Optiline)");
+	                    break;
+	                case DriveType.Fixed:
+	                    sb.Append(" (Sisemine)");
+	                    break;
+	                case DriveType.Removable:
+	                    sb.Append(" (Eemaldatav)");
+	                    break;
+	                case DriveType.Network:
+	                    sb.Append(" (Võrk)");
+	                    break;
+	                case DriveType.Ram:
+	                    sb.Append(" (Mäluketas)");
+	                    break;
+	                default:
+	                    sb.Append(" (Muu)");
+	                    break;
+	            }
+	            DriveList.Items.Add(sb.ToString());
+            } catch {
+
             }
-            DriveList.Items.Add(sb.ToString());
         }
         DrivesButton.IsVisible = false;
         DriveList.IsVisible = true;
