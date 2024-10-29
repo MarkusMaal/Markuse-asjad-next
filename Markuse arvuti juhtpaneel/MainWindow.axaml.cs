@@ -52,6 +52,8 @@ namespace Markuse_arvuti_juhtpaneel
             else if (OperatingSystem.IsLinux())
             {
                 Process.Start("konsole", "-e htop");
+            } else if (OperatingSystem.IsMacOS()) {
+                Process.Start("open", "\"/System/Applications/Utilities/Activity Monitor.app\"");
             }
         }
 
@@ -63,6 +65,9 @@ namespace Markuse_arvuti_juhtpaneel
             } else if (OperatingSystem.IsLinux())
             {
                 Process.Start("konsole");
+            } else if (OperatingSystem.IsMacOS()) {
+                Process.Start("open", "/System/Applications/Utilities/Terminal.app");
+
             }
         }
 
@@ -75,6 +80,9 @@ namespace Markuse_arvuti_juhtpaneel
             else if (OperatingSystem.IsLinux())
             {
                 Process.Start("hardinfo2");
+            } else if (OperatingSystem.IsMacOS())
+            {
+                Process.Start("open", "\"/System/Applications/Utilities/System Information.app\"");
             }
         }
 
@@ -140,8 +148,8 @@ namespace Markuse_arvuti_juhtpaneel
         {
             if (OperatingSystem.IsWindows())
             {
-                Process p = new Process();
-                p.StartInfo.FileName = masRoot + "/remas.bat";
+                Process p = new();
+                p.StartInfo.FileName = masRoot + "/remas.bat"; // here be dragons
                 p.StartInfo.CreateNoWindow = true;
                 p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 p.Start();
@@ -158,8 +166,22 @@ namespace Markuse_arvuti_juhtpaneel
                 // Restart KDE Plasma
                 Console.WriteLine("restart plasma");
                 RunCommand("bash", masRoot + "/restart_plasma.sh");
-            } else
+            } else if (OperatingSystem.IsMacOS()) {
+                string packageName = "Markuse arvuti integratsioonitarkvara"; // TODO: some way of using dynamic naming in case it's ever renamed in the future ;)
+                RunCommand("killall", "\"" + packageName + "\"");
+                string appPath = "/Applications/" + packageName + ".app";
+                if (!Directory.Exists(appPath)) {
+                    // fallback in case integration app is not installed to /Applications
+                    appPath = masRoot + "/Markuse asjad/" + packageName;
+                    RunCommand("open", "\"" + appPath + "\"");
+                } else {
+                    RunCommand("open", "-a \"" + packageName + "\"");
+                }
+                // maia and native shell restart currently unsupported :(
+            }
+            else
             {
+                // Unsupported OS, display an error message
                 NotWindows();
             }
         }
@@ -184,6 +206,7 @@ namespace Markuse_arvuti_juhtpaneel
                 hints["Taaskäivita Markuse asjad"] = "Taaskäivitab " + devPrefix + " integratsiooniprogrammi.";
             }
             hints["Tegumihaldur"] = "Käivitab Windowsi tegumihalduri, millega saate vaadata avatud tegumeid, neid sulgeda, muuta nende prioriteeti ja resursside kasutust, samuti saate vaadata aktiivseid teenuseid (taustaprogramme) (taskmgr, valikuline administraator).";
+            hints["Tegevuse monitor"] = "Võimaldab peatada mittereageerivaid rakendusi ja jälgida riistvara koormust.";
             hints["Käsuviip"] = "Käivitab tarviku käsuviip (cmd, administraator).";
             hints["Seadmehaldur"] = "Käivitab seadmehalduri, millega saate vaadata seadmesse paigaldatud riistvara ning installida/uuendada draivereid (devmgmt.msc, valikuline administraator).";
             hints["Start menüü"] = "Avab Windowsi start menüü (Ctrl + Esc).";
@@ -193,6 +216,7 @@ namespace Markuse_arvuti_juhtpaneel
             hints["Protsessid"] = "Käivitab protsesside ülevaate (htop).";
             hints["Riistvara info"] = "Kuvab info riistvara kohta (hardinfo2).";
             hints["Käsurea utilliidid"] = "Käivitab käsurea põhise juhtpaneeli (" + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/scripts/Tools.sh).";
+            hints["Terminal"] = "Käivitab terminali (terminal)";
             this.InfoTextBlock.Text = hints[(string?)((Button)e.Source).Content];
         }
 
@@ -210,6 +234,7 @@ namespace Markuse_arvuti_juhtpaneel
             string filename = "Screenshot_" + currentDate + "_" + currentTime + ".png";
             if (OperatingSystem.IsLinux())
             {
+                // Must have spectacle installed on KDE Plasma, other DEs and WMs not supported
                 RunCommand("spectacle", "-f -b -o \"" + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Pildid/Screenshots/" + filename + "\"", false);
             } else if (OperatingSystem.IsWindows())
             {
@@ -222,6 +247,9 @@ namespace Markuse_arvuti_juhtpaneel
                 p.Start();
                 p.WaitForExit();
                 MessageBoxShow("Kuvatõmmis salvestati edukalt", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success);
+            } else if (OperatingSystem.IsMacOS()) {
+                // 1 second delay, because we want to wait for the button to exit the "pressed" state
+                RunCommand("screencapture", "-T 1 \"" + Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/" + filename + "\"", false);
             }
         }
 
@@ -261,6 +289,9 @@ namespace Markuse_arvuti_juhtpaneel
                 else if (OperatingSystem.IsLinux())
                 {
                     RunCommand("spectacle", "-f -b -o \"" + filename + "\"", false);
+                } else if (OperatingSystem.IsMacOS()) {
+                    // 1 second delay to wait for the save as dialog to close
+                    RunCommand("screencapture", "-T 1 \"" + filename + "\"", false);
                 }
         
             }
@@ -531,6 +562,12 @@ namespace Markuse_arvuti_juhtpaneel
                 WinUtilsLabel.Content = "Linuxi tarvikud";
             } else if (OperatingSystem.IsWindows()) {
                 return;
+            } else if (OperatingSystem.IsMacOS()) {
+                this.RegeditButton.IsVisible = false;
+                this.CommandButton.Content = "Terminal";
+                this.CompManButton.IsVisible = false;
+                WinUtilsLabel.Content = "macOS tarvikud";
+                Console.WriteLine("Hoiatus: Kõik funktsioonid ei ole saadaval macOS-is");
             } else {
                 Console.WriteLine("Hoiatus: Operatsioonsüsteemi ei toetata!");
             }
@@ -1190,6 +1227,8 @@ namespace Markuse_arvuti_juhtpaneel
             } else if (OperatingSystem.IsLinux())
             {
                 Process.Start("kinfocenter");
+            } else if (OperatingSystem.IsMacOS()) {
+                RunCommand("open", "-a \"About This Mac\"");
             }
         }
 
@@ -1215,9 +1254,15 @@ namespace Markuse_arvuti_juhtpaneel
                 MessageBoxShow("Juurutamine selles Markuse arvuti asjade versioonis on võimalik ainult Windowsis", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
             }
         }
+
+        private static bool IsAppleSilicon() {
+            return OperatingSystem.IsMacOS() && (System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.Arm64);
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             InitTimers();
+            TabMarkuStation.IsVisible = !IsAppleSilicon(); // LibVLC is currently unsupported on Apple Silicon, so any Markus' stuff that leverages it (incl. MarkuStation 2) will not work.
         }
     }
 }

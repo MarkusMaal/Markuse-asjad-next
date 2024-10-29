@@ -43,7 +43,7 @@
         </StackPanel>
       </TabItem>
 <!--MarkuStation-->
-      <TabItem Header="MarkuStation" Loaded="MarkuStationTabLoad">
+      <TabItem Name="TabMarkuStation" Header="MarkuStation" Loaded="MarkuStationTabLoad">
         <StackPanel>
           <Label Classes="H1">MarkuStation</Label>
           <Label>Mängud</Label>
