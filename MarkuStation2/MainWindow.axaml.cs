@@ -125,6 +125,15 @@ namespace MarkuStation2
                             Dot2.RenderTransform = new RotateTransform(angle2, 200, 0);
                             Dot3.RenderTransform = new RotateTransform(angle3, 200, 0);
                             Dot4.RenderTransform = new RotateTransform(angle4, 200, 0);
+                            if (this.Width > 2560) // the user has an ultra-wide monitor, add some padding to left and right to make the corner text more accessible
+                            {
+                                int offsetX = (int)(this.Width / 4);
+                                MenuHotkeys.Margin = new Thickness(0,0,15 + offsetX,10);
+                                BottomRightText1.Margin = new Thickness(0,0,15 + offsetX,10);
+                                BottomRightText2.Margin = new Thickness(0,0,15 + offsetX,10);
+                                GameName.Margin = new Thickness(20,20,15 + offsetX,20);
+                                BrowserTitle.Margin = new Thickness(20 + offsetX,20,20,20);
+                            }
                         }
                         break;
                     case "enter":
