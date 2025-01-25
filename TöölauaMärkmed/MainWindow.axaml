@@ -8,6 +8,7 @@
         Background="PaleGoldenrod"
         Foreground="Black"
         ExtendClientAreaTitleBarHeightHint="-1"
+        SystemDecorations="BorderOnly"
         IsHitTestVisible="True" BorderThickness="0"
         Title="TöölauaMärkmed" ShowInTaskbar="False">
   <StackPanel>
