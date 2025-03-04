@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="800" Height="450"
+        x:Class="DesktopIcons.MainWindow"
+        xmlns:local="using:DesktopIcons"
+        x:DataType="local:MainWindowModel"
+        Title="Töölauaikoonid"
+        Loaded="Control_OnLoaded"
+        Closing="Window_OnClosing"
+        
+        TransparencyLevelHint="Blur"
+        Foreground="White" PointerPressed="Form_OnPointerPressed">
+    <Grid>
+    <Grid Margin="0">
+        
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Folders}" Name="FolderView1">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        
+                            <Grid Width="78" PointerPressed="InputElement_OnPointerPressed" DoubleTapped="InputElement_OnDoubleTapped" Background="{Binding Selected}">
+                                <Grid>
+                                    <StackPanel Margin="10">
+                                        <Image Source="{Binding Image}"/>
+                                        <TextBlock Margin="5 0" FontWeight="SemiLight" FontFamily="Segoe UI"
+                                                TextAlignment="Center" TextWrapping="Wrap"
+                                                Text="{Binding Name}"/>
+                                        
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.Styles>
+                    <Style Selector="Grid:pointerover">
+                        <Setter Property="Background" Value="#500000ff" />
+                    </Style>
+                </ItemsControl.Styles>
+            </ItemsControl>
+        </ScrollViewer>
+        <Label Name="SomethingSel" Content="False" VerticalAlignment="Bottom" IsVisible="False" />
+    </Grid>
+    </Grid>
+</Window>

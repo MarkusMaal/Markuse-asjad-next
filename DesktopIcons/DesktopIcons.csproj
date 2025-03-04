@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.2.3" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Resources\apps.png" />
+        <AvaloniaResource Include="Resources\disc.png" />
+        <AvaloniaResource Include="Resources\disk.png" />
+        <AvaloniaResource Include="Resources\folder.png" />
+        <AvaloniaResource Include="Resources\hdd.png" />
+        <AvaloniaResource Include="Resources\help.png" />
+        <AvaloniaResource Include="Resources\mas_general.png" />
+        <AvaloniaResource Include="Resources\mas_its_symmetric.png" />
+        <AvaloniaResource Include="Resources\noteicon.png" />
+        <AvaloniaResource Include="Resources\ots_thumbnail.png" />
+        <AvaloniaResource Include="Resources\play.png" />
+        <AvaloniaResource Include="Resources\setting.png" />
+        <AvaloniaResource Include="Resources\Unknown.bmp" />
+        <AvaloniaResource Include="Resources\topicons\apps.png" />
+        <AvaloniaResource Include="Resources\topicons\excel.png" />
+        <AvaloniaResource Include="Resources\topicons\folder.png" />
+        <AvaloniaResource Include="Resources\topicons\games.png" />
+        <AvaloniaResource Include="Resources\topicons\maia.png" />
+        <AvaloniaResource Include="Resources\topicons\player.png" />
+        <AvaloniaResource Include="Resources\topicons\powerpoint.png" />
+        <AvaloniaResource Include="Resources\topicons\word.png" />
+        <AvaloniaResource Include="Resources\topicons\www.png" />
+    </ItemGroup>
+</Project>
