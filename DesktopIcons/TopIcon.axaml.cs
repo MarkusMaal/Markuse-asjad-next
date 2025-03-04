@@ -51,6 +51,10 @@ public partial class TopIcon : Window
                 }
                 Process p = new();
                 p.StartInfo.FileName = action;
+                if (OperatingSystem.IsWindows())
+                {
+                    p.StartInfo.FileName = p.StartInfo.FileName.Replace("/", "\\");
+                }
                 p.StartInfo.Arguments = args;
                 p.StartInfo.UseShellExecute = true;
                 p.Start();   

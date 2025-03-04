@@ -5,6 +5,7 @@
         mc:Ignorable="d" Width="350" Height="350"
         x:Class="DesktopIcons.TopIcon"
         ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1"
         SystemDecorations="BorderOnly"
         TransparencyLevelHint="Blur"
