@@ -28,6 +28,13 @@ public partial class TopIcon : Window
         
         ShowInTaskbar = false;
         WindowStartupLocation = WindowStartupLocation.Manual;
+        // prevent window borders from being rendered if not in a Linux DE
+        if (!OperatingSystem.IsLinux())
+        {
+            Console.WriteLine("Windows/Mac paranduste aktiveerimine...");
+            this.ExtendClientAreaToDecorationsHint = false;
+            this.SystemDecorations = SystemDecorations.None;
+        }
     }
 
     
@@ -118,6 +125,8 @@ public partial class TopIcon : Window
         this.Pic.Height = this.Height;
         this.Pic.BackgroundSizing = BackgroundSizing.InnerBorderEdge;
         this.Pic.Background = new ImageBrush(GetResource("TopIcon" + icon));
+        ShowInTaskbar = true;
+        ShowInTaskbar = false;
     }
 
     public void ReplaceIcon(string name)
