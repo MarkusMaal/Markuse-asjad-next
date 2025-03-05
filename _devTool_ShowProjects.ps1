@@ -1,6 +1,6 @@
 & "$(Split-Path $MyInvocation.MyCommand.Path)/_devTool_Logo.ps1"
 Write-Output "Available projects:"
-Get-ChildItem . -Directory -Exclude ".vscode","out" | Foreach-Object {
+Get-ChildItem . -Directory -Exclude ".vscode","out","UniplatformTest" | Foreach-Object {
 	# this stores just the directory name, not the full path
 	$pn = $_.Name
 	$in = $pn

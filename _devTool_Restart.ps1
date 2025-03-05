@@ -11,8 +11,11 @@ Write-Output "Stage 1: Stopping any existing processes..."
 & "$(Split-Path $MyInvocation.MyCommand.Path)/_devTool_KillAll.ps1"
 Write-Output "Stage 2: Restarting integration program..."
 $mit_path = $mas_root + "/Markuse asjad/Markuse arvuti integratsioonitarkvara"
+$di_path = $mas_root + "/Markuse asjad/DesktopIcons"
 # append .exe if we're running this script under Windows
 if ($platform -eq "Win32NT") {
 	$mit_path = $mit_path + ".exe"
+	$di_path = $di_path + ".exe"
 }
 Start-Process -FilePath $mit_path
+Start-Process -FilePath $di_path
