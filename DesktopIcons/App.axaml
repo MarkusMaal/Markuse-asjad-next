@@ -36,6 +36,7 @@
              <Image x:Key="TopIconWww" Source="/Resources/topicons/www.png" />
              <Image x:Key="TopIconEyeA" Source="/Resources/topicons/eye_a.png" />
              <Image x:Key="TopIconEyeB" Source="/Resources/topicons/eye_b.png" />
+             <Image x:Key="TopIconMas" Source="/Resources/mas_general.png" />
          </ResourceDictionary>
      </Application.Resources>
 </Application>

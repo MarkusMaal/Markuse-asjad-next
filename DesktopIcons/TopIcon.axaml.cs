@@ -19,6 +19,7 @@ public partial class TopIcon : Window
     internal string action = string.Empty;
     internal string icon = "Apps";
     internal MainWindow myparent = null;
+    private double opacity = 0;
     
     
     public TopIcon()
@@ -48,6 +49,12 @@ public partial class TopIcon : Window
     {
         bool special_icon = (action != "special:apps" && action.StartsWith("special:"));
         if (!myparent.locked && !special_icon) this.BeginMoveDrag(e);
+        if (action == "special:apps" || (!action.StartsWith("special:")))
+        {
+            opacity = this.Pic.Opacity;
+            this.Pic.Opacity = 0.75;
+        }
+
         if ((e.ClickCount == 2) || (e.ClickCount == 1 && special_icon))
         {
             if (!action.StartsWith("special:"))
@@ -94,6 +101,10 @@ public partial class TopIcon : Window
     private void InputElement_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         down = false;
+        if (action == "special:apps" || (!action.StartsWith("special:")))
+        {
+            this.Pic.Opacity = opacity;
+        }
     }
 
     private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
@@ -122,5 +133,32 @@ public partial class TopIcon : Window
                     or WindowCloseReason.OwnerWindowClosing);
         }
         e.Cancel = !canClose;
+    }
+
+    private void SetOpacity(double o)
+    {
+        this.BgCol.Background = new SolidColorBrush(Color.Parse("#a0" + myparent.theme.R.ToString("X").PadLeft(2, '0') +
+                                                          myparent.theme.G.ToString("X").PadLeft(2, '0') +
+                                                          myparent.theme.B.ToString("X").PadLeft(2, '0')))
+            { Opacity = o };
+    }
+    
+    private void InputElement_OnPointerEntered(object? sender, PointerEventArgs e)
+    {
+        opacity = Pic.Opacity;
+        Pic.Opacity = 1;
+        if (this.BgCol.Background.Opacity != 0)
+        {
+            SetOpacity(this.BgCol.Background.Opacity + 0.25);
+        }
+    }
+
+    private void InputElement_OnPointerExited(object? sender, PointerEventArgs e)
+    {
+        Pic.Opacity = opacity;
+        if (this.BgCol.Background.Opacity != 0)
+        {
+            SetOpacity(this.BgCol.Background.Opacity - 0.25);
+        }
     }
 }

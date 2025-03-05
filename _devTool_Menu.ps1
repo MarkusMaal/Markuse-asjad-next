@@ -62,9 +62,9 @@ function Main {  # main function
 	Write-Host "$esc[?25l" -NoNewLine  # hide caret
 	while ($false -eq [bool]@(0)) {    # always true
         & "./_devTool_Logo.ps1" # header
-		$menuitems = @('Kill processes', 'Restart processes', 'Show projects', 'Update binaries', 'Git changes', 'Git commit', "Change colors: $cidx", "Verbose mode: $verbose", 'Exit')  # displayable menu items
-	    $actions = @('Run-Script _devTool_KillAll.ps1', 'Run-Script _devTool_Restart.ps1', 'Run-Script _devTool_ShowProjects.ps1', 'Run-Script _devTool_UpdateAll.ps1 -Verbose $verbose', 'Get-GitStatus', 'Perform-GitCommit', '$cidx++', '$verbose = !$verbose', 'Exit-Now')  # actions, which are related to menuitems
-        $hints = @('Ends all Markuse asjad processes, which may not conflict with new binaries              ', 'Restarts Markuse asjad processes for maintenance purposes                               ', 'Displays all available projects on this solution                                        ', 'Upgrades all executables in .mas/Markuse asjad directory                                ', 'Runs "git status" command                                                               ', 'Allows you to commit and push git changes                                               ', 'Changes color scheme in this script                                                     ', 'When updating binaries, while this option is enabled, all copied files will be displayed', 'Exits the script                                                                        ')
+		$menuitems = @('Kill processes', 'Restart processes', 'Show projects', 'Update binaries', 'Build solution', 'Git commit', "Change colors: $cidx", "Verbose mode: $verbose", 'Exit')  # displayable menu items
+	    $actions = @('Run-Script _devTool_KillAll.ps1', 'Run-Script _devTool_Restart.ps1', 'Run-Script _devTool_ShowProjects.ps1', 'Run-Script _devTool_UpdateAll.ps1 -Verbose $verbose', 'Run-Script _devTool_PublishProjects.ps1', 'Perform-GitCommit', '$cidx++', '$verbose = !$verbose', 'Exit-Now')  # actions, which are related to menuitems
+        $hints = @('Ends all Markuse asjad processes, which may not conflict with new binaries              ', 'Restarts Markuse asjad processes for maintenance purposes                               ', 'Displays all available projects on this solution                                        ', 'Upgrades all executables in .mas/Markuse asjad directory                                ', 'Attempts to build all projects for the current platform                                 ', 'Allows you to commit and push git changes                                               ', 'Changes color scheme in this script                                                     ', 'When updating binaries, while this option is enabled, all copied files will be displayed', 'Exits the script                                                                        ')
 	    $i = 1
 			foreach ($item in $menuitems) {  # display all menu items and highlight the selected one
 			if ($sel -eq $i) {
@@ -76,7 +76,7 @@ function Main {  # main function
 		}
         # footer
         $hint = $hints[$sel-1]
-        Write-Host "`r`nDevTool v1.1`r`n`r`n$hint"
+        Write-Host "`r`nDevTool v1.2`r`n`r`n$hint"
 		Write-Host "${setCursorTop}" -NoNewLine
 		$KE = [System.Console]::ReadKey()               # wait for user to press a key, then save that as an object
 		Write-Host "${setCursorTop}" -NoNewLine

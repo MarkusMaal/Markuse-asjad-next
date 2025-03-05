@@ -33,12 +33,13 @@ public partial class MainWindow : Window
     private string cd = "";
     private bool SomethingSelected = false;
     private Window[] iconWindows = [];
-    private Color theme;
+    public Color theme;
     public bool locked = true;
     private const int grid_items_x = 3;
     private const int grid_items_y = 3;
     private const int grid_padding = 25;
     private const int icon_size = 200;
+    private bool generate_hidden_children = false;
     public MainWindow()
     {
         DataContext = new MainWindowModel();
@@ -61,9 +62,37 @@ public partial class MainWindow : Window
 
         GenerateChildren();
         GenerateSpecialChildren();
+        GenerateMasLogo();
         InitializeComponent();
     }
 
+    private void GenerateMasLogo()
+    {
+        int size = 100;
+        TopIcon tI = new TopIcon
+        {
+            BgCol =
+            {
+                Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') +
+                                                             theme.G.ToString("X").PadLeft(2, '0') +
+                                                             theme.B.ToString("X").PadLeft(2, '0')))
+                    { Opacity = 0 }
+            },
+            WindowStartupLocation = WindowStartupLocation.Manual,
+            Position = new PixelPoint((int)(0.25 * size), Screens.Primary.Bounds.Height - (int)(size * 1.5) - (int)(size * 0.25)),
+            Width = size,
+            Height = size,
+            icon = "Mas",
+            action = "special:mas",
+            myparent = this,
+            Pic =
+            {
+                Opacity = 0.25
+            }
+        };
+        tI.Show();
+    }
+    
     private void GenerateSpecialChildren()
     {
         const int special_count = 3;
@@ -76,19 +105,27 @@ public partial class MainWindow : Window
         int offset_top = Screens.Primary.Bounds.Height - height * 2;
         for (int i = 0; i < special_count; i++)
         {
-            TopIcon tI = new TopIcon();
-            tI.BgCol.Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') +
-                                                                  theme.G.ToString("X").PadLeft(2, '0') +
-                                                                  theme.B.ToString("X").PadLeft(2, '0')))
-                { Opacity = 0.5 };
-            tI.WindowStartupLocation = WindowStartupLocation.Manual;
-            tI.Position = new PixelPoint(offset_left, offset_top);
-            tI.Width = width;
-            tI.Height = height;
-            tI.icon = special_icons[i];
-            tI.action = "special:" + special_actions[i];
-            tI.myparent = this;
-            tI.Pic.Opacity = 0.75;
+            TopIcon tI = new TopIcon
+            {
+                BgCol =
+                {
+                    Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') +
+                                                                 theme.G.ToString("X").PadLeft(2, '0') +
+                                                                 theme.B.ToString("X").PadLeft(2, '0')))
+                        { Opacity = 0.5 }
+                },
+                WindowStartupLocation = WindowStartupLocation.Manual,
+                Position = new PixelPoint(offset_left, offset_top),
+                Width = width,
+                Height = height,
+                icon = special_icons[i],
+                action = "special:" + special_actions[i],
+                myparent = this,
+                Pic =
+                {
+                    Opacity = 0.75
+                }
+            };
             tI.Show();
             offset_left += width + (grid_padding / 2);
         }
@@ -139,7 +176,11 @@ public partial class MainWindow : Window
                 tI.action = actions[i];
                 tI.myparent = this;
                 iconWindows[i] = tI;
-                iconWindows[i].Show();
+                if (!generate_hidden_children)
+                {
+                    iconWindows[i].Show();
+                }
+
                 offset_left += icon_size + grid_padding;
                 i++;
             }
@@ -179,6 +220,7 @@ public partial class MainWindow : Window
     // reset positions of icons
     public void ResetChildren()
     {
+        generate_hidden_children = !iconWindows[0].IsVisible;
         foreach (var w in iconWindows)
         {
             ((TopIcon)w).canClose = true;

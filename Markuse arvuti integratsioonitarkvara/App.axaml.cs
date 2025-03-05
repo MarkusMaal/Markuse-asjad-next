@@ -233,9 +233,9 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 Process.Start(mas_root + "/Markuse asjad/Markuse arvuti juhtpaneel.exe");
             } else
             {
-                Process p = new Process();
+                var p = new Process();
                 p.StartInfo.UseShellExecute = true;
-                p.StartInfo.FileName = mas_root + "/Markuse asjad/Markuse arvuti juhtpaneel/Markuse arvuti juhtpaneel";
+                p.StartInfo.FileName = mas_root + "/Markuse asjad/Markuse arvuti juhtpaneel";
                 p.Start();
             }
         }

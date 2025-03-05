@@ -17,9 +17,11 @@
         PointerPressed="InputElement_OnPointerPressed"
         PointerReleased="InputElement_OnPointerReleased"
         PointerMoved="InputElement_OnPointerMoved"
+        PointerEntered="InputElement_OnPointerEntered"
+        PointerExited="InputElement_OnPointerExited"
         >
     <Border CornerRadius="100" Name="BgCol" >
-        <Label Name="Pic">
+        <Label Name="Pic" Classes="Pic">
             <Label.Background>Red</Label.Background>
         </Label>
     </Border>
