@@ -26,11 +26,16 @@
              <Image x:Key="TopIconExcel" Source="/Resources/topicons/excel.png" />
              <Image x:Key="TopIconFolder" Source="/Resources/topicons/folder.png" />
              <Image x:Key="TopIconGames" Source="/Resources/topicons/games.png" />
+             <Image x:Key="TopIconLockA" Source="/Resources/topicons/lock_a.png" />
+             <Image x:Key="TopIconLockB" Source="/Resources/topicons/lock_b.png" />
              <Image x:Key="TopIconMaia" Source="/Resources/topicons/maia.png" />
              <Image x:Key="TopIconPlayer" Source="/Resources/topicons/player.png" />
              <Image x:Key="TopIconPowerPoint" Source="/Resources/topicons/powerpoint.png" />
+             <Image x:Key="TopIconReset" Source="/Resources/topicons/reset.png" />
              <Image x:Key="TopIconWord" Source="/Resources/topicons/word.png" />
              <Image x:Key="TopIconWww" Source="/Resources/topicons/www.png" />
+             <Image x:Key="TopIconEyeA" Source="/Resources/topicons/eye_a.png" />
+             <Image x:Key="TopIconEyeB" Source="/Resources/topicons/eye_b.png" />
          </ResourceDictionary>
      </Application.Resources>
 </Application>

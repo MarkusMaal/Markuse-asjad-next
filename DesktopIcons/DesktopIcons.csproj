@@ -35,11 +35,16 @@
         <AvaloniaResource Include="Resources\Unknown.bmp" />
         <AvaloniaResource Include="Resources\topicons\apps.png" />
         <AvaloniaResource Include="Resources\topicons\excel.png" />
+        <AvaloniaResource Include="Resources\topicons\eye_a.png" />
+        <AvaloniaResource Include="Resources\topicons\eye_b.png" />
         <AvaloniaResource Include="Resources\topicons\folder.png" />
         <AvaloniaResource Include="Resources\topicons\games.png" />
+        <AvaloniaResource Include="Resources\topicons\lock_a.png" />
+        <AvaloniaResource Include="Resources\topicons\lock_b.png" />
         <AvaloniaResource Include="Resources\topicons\maia.png" />
         <AvaloniaResource Include="Resources\topicons\player.png" />
         <AvaloniaResource Include="Resources\topicons\powerpoint.png" />
+        <AvaloniaResource Include="Resources\topicons\reset.png" />
         <AvaloniaResource Include="Resources\topicons\word.png" />
         <AvaloniaResource Include="Resources\topicons\www.png" />
     </ItemGroup>

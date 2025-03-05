@@ -33,6 +33,12 @@ public partial class MainWindow : Window
     private string cd = "";
     private bool SomethingSelected = false;
     private Window[] iconWindows = [];
+    private Color theme;
+    public bool locked = true;
+    private const int grid_items_x = 3;
+    private const int grid_items_y = 3;
+    private const int grid_padding = 25;
+    private const int icon_size = 200;
     public MainWindow()
     {
         DataContext = new MainWindowModel();
@@ -50,22 +56,55 @@ public partial class MainWindow : Window
             Console.WriteLine("INFO: Verifile korras");
         }
 
-        Color theme = LoadTheme()[0];
+        theme = LoadTheme()[0];
         this.Background = Brush.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') + theme.G.ToString("X").PadLeft(2, '0') + theme.B.ToString("X").PadLeft(2, '0'));
 
-        int grid_items_x = 3;
-        int grid_items_y = 3;
+        GenerateChildren();
+        GenerateSpecialChildren();
+        InitializeComponent();
+    }
+
+    private void GenerateSpecialChildren()
+    {
+        const int special_count = 3;
+        string[] special_icons = ["EyeB", "LockB", "Reset"];
+        // ReSharper disable once StringLiteralTypo
+        string[] special_actions = ["showhide", "lockunlock", "reset"];
+        int width = icon_size / 3;
+        int height = icon_size / 3;
+        int offset_left = Screens.Primary.Bounds.Width / 2 -  (width + grid_padding / 4) * special_count / 2;
+        int offset_top = Screens.Primary.Bounds.Height - height * 2;
+        for (int i = 0; i < special_count; i++)
+        {
+            TopIcon tI = new TopIcon();
+            tI.BgCol.Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') +
+                                                                  theme.G.ToString("X").PadLeft(2, '0') +
+                                                                  theme.B.ToString("X").PadLeft(2, '0')))
+                { Opacity = 0.5 };
+            tI.WindowStartupLocation = WindowStartupLocation.Manual;
+            tI.Position = new PixelPoint(offset_left, offset_top);
+            tI.Width = width;
+            tI.Height = height;
+            tI.icon = special_icons[i];
+            tI.action = "special:" + special_actions[i];
+            tI.myparent = this;
+            tI.Pic.Opacity = 0.75;
+            tI.Show();
+            offset_left += width + (grid_padding / 2);
+        }
+
+    }
+
+    // generate icons
+    private void GenerateChildren()
+    {
         iconWindows = new Window[grid_items_x * grid_items_y];
         
-        int grid_padding = 25;
-        int icon_size = 200;
         int grid_width = (grid_items_x - 1) * grid_padding + icon_size * grid_items_x;
         int grid_height = (grid_items_y - 1) * grid_padding + icon_size * grid_items_y;
 
         int offset_left = Screens.Primary.Bounds.Width / 2 - grid_width / 2;
         int offset_top = Screens.Primary.Bounds.Height / 2 - grid_height / 2;
-        
-        InitializeComponent();
 
         string[] icons = ["Games", "Word", "Www", "Player", "Excel", "Folder", "Maia", "PowerPoint", "Apps"];
         string[] actions =
@@ -91,7 +130,7 @@ public partial class MainWindow : Window
             {
                 
                 TopIcon tI = new TopIcon();
-                tI.Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') + theme.G.ToString("X").PadLeft(2, '0') + theme.B.ToString("X").PadLeft(2, '0'))) { Opacity = 0.5 };
+                tI.BgCol.Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') + theme.G.ToString("X").PadLeft(2, '0') + theme.B.ToString("X").PadLeft(2, '0'))) { Opacity = 0.5 };
                 tI.WindowStartupLocation = WindowStartupLocation.Manual;
                 tI.Position = new PixelPoint(offset_left, offset_top);
                 tI.Width = icon_size;
@@ -108,7 +147,45 @@ public partial class MainWindow : Window
             offset_top += icon_size + grid_padding;
         }
     }
-    
+
+    // show/hide icons
+    public void ToggleChildren(TopIcon invoker)
+    {
+        bool isVisible = false;
+        foreach (var w in iconWindows)
+        {
+            if (w.IsVisible)
+            {
+                isVisible = true;
+                w.Hide();
+            }
+            else
+            {
+                w.Show();
+                w.ShowInTaskbar = true;
+                w.ShowInTaskbar = false;
+            }
+        }
+        invoker.ReplaceIcon(isVisible ? "EyeA" : "EyeB");
+    }
+
+    // toggles movement lock
+    public void ToggleChildLock(TopIcon invoker)
+    {
+        locked = !locked;
+        invoker.ReplaceIcon(locked ? "LockB" : "LockA");
+    }
+
+    // reset positions of icons
+    public void ResetChildren()
+    {
+        foreach (var w in iconWindows)
+        {
+            ((TopIcon)w).canClose = true;
+            w.Close();
+        }
+        GenerateChildren();
+    }
     
     private void CheckVerifileTamper()
     {

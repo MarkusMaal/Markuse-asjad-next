@@ -8,15 +8,19 @@
         ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1"
         SystemDecorations="BorderOnly"
-        TransparencyLevelHint="Blur"
+        TransparencyLevelHint="Transparent"
         ShowInTaskbar="False"
         Title="TopIcon"
+        Background="Transparent"
         Loaded="Control_OnLoaded"
         Closing="Window_OnClosing"
         PointerPressed="InputElement_OnPointerPressed"
         PointerReleased="InputElement_OnPointerReleased"
-        PointerMoved="InputElement_OnPointerMoved">
-    <Label Name="Pic">
-        <Label.Background>Red</Label.Background>
-    </Label>
+        PointerMoved="InputElement_OnPointerMoved"
+        >
+    <Border CornerRadius="100" Name="BgCol" >
+        <Label Name="Pic">
+            <Label.Background>Red</Label.Background>
+        </Label>
+    </Border>
 </Window>
