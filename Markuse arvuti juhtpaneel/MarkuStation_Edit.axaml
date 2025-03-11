@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Width="450" Height="180"
         x:Class="Markuse_arvuti_juhtpaneel.MarkuStation_Edit"
-        Title="MarkuStation_Edit">
+        Title="MarkuStation üksuse muutmine">
   <Panel Margin="20">
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Top">
         <Grid.ColumnDefinitions>

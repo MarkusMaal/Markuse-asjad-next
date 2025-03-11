@@ -5,18 +5,26 @@
         mc:Ignorable="d" d:DesignWidth="929" d:DesignHeight="681"
         x:Class="Markuse_arvuti_juhtpaneel.MainWindow"
         Title="Info kogumine..."
-        Width="929" Height="681" Loaded="Window_Loaded" IsVisible="False">
+        Width="929" Height="681" Loaded="Window_Loaded" IsVisible="False" Closing="Window_OnClosing">
   <Grid Name="ErtGrid" SizeChanged="Grid_SizeChanged">
     <Grid.RowDefinitions>
       <RowDefinition Height="120"></RowDefinition>
       <RowDefinition/>
     </Grid.RowDefinitions>
-    <StackPanel>
+    <StackPanel Name="Header1" IsVisible="False">
       <Image DoubleTapped="Image_DoubleTapped" Margin="0,10,0,0" Name="Logo" Height="64" Width="64"/>
       <TextBlock Name="TopLabel" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" FontSize="23" Margin="0,10,0,0" Text="markuse arvuti juhtpaneel">
       </TextBlock>
     </StackPanel>
-    <TabControl Name="TabsControl" Grid.Row="1" FontSize="12" IsEnabled="False">
+    <StackPanel Margin="0,-120,0,0" Orientation="Vertical" Name="CheckSysLabel" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+      <Image Name="LoaderLogo" IsVisible="True" Source="Assets/mas_web.png" Margin="0,10,0,20" Height="64" Width="64"/>
+      <Image Name="FailGif" IsVisible="False" Source="Assets/failure.gif" Margin="0,10,0,20" Height="64" Width="64"/>
+      <Label Name="InfoCollectLabel" Classes="H1" HorizontalAlignment="Center">Info kogumine...</Label>
+      <TextBlock Margin="0,10,0,0" Name="ProgressStatusLabel" HorizontalAlignment="Stretch" TextAlignment="Center">Ettevalmistamine...</TextBlock>
+      <ProgressBar Foreground="White" Name="CollectProgress" Margin="0,10,0,0" ></ProgressBar>
+      <Button HorizontalAlignment="Center" IsVisible="False" Name="ErrorExitButton" Click="ErrorExitButton_OnClick">Sulge programm</Button>
+    </StackPanel>
+    <TabControl Name="TabsControl" Grid.Row="1" FontSize="12" IsEnabled="False" IsVisible="False">
 <!--Avaleht-->
       <TabItem Header="Avaleht">
         <StackPanel>
@@ -27,6 +35,7 @@
             <Button Name="FlashDriveButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="FindFlash">Markuse mälupulk</Button>
             <Button Name="QuickNotesButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="QuickNotes">Kiirmärkmik</Button>
             <Button Name="RestartMasButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="RestartMas">Taaskäivita Markuse asjad</Button>
+            <Button Name="ReloadInfo" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="ReloadInfo_OnClick">Laadi andmed uuesti</Button>
           </WrapPanel>
           <Label Name="WinUtilsLabel">Windowsi tarvikud</Label>
           <WrapPanel Classes="Left">
@@ -121,6 +130,37 @@
           </WrapPanel>
         </StackPanel>
       </TabItem>
+<!--Töölaud-->
+      <TabItem Name="DesktopTab" Header="Töölaud" Loaded="DesktopTab_Loaded" IsEnabled="False">
+        <StackPanel Orientation="Horizontal">
+          <StackPanel>
+          <Label Classes="H1" Margin="0,10">Ikoonid</Label>
+          <StackPanel Orientation="Horizontal">
+            <Label Margin="-3, 3, 10, 3">Ikoonide arv</Label>
+            <TextBox Name="DesktopIconCountX" TextChanged="DesktopIconCountX_OnSelectionChanged">
+            </TextBox><Label Margin="5,5,5,0">x</Label>
+            <TextBox Name="DesktopIconCountY" TextChanged="DesktopIconCountY_OnSelectionChanged">
+            </TextBox>
+          </StackPanel>
+          <CheckBox Name="DesktopLockedCheck" IsChecked="True" IsCheckedChanged="Locked_IsCheckedChanged">Lukusta ikoonid</CheckBox>
+          <Label Classes="H1" Margin="0,10">Varia</Label>
+          <CheckBox Name="DesktopIconsCheck" IsChecked="True" IsCheckedChanged="ShowIcons_IsCheckedChanged">Kuva töölauaikoonid</CheckBox>
+          <CheckBox Name="DesktopLogoCheck" IsChecked="True" IsCheckedChanged="ShowLogo_IsCheckedChanged">Kuva Markuse asjad logo</CheckBox>
+          <CheckBox Name="DesktopActionCheck" IsChecked="True" IsCheckedChanged="ShowActions_IsCheckedChanged">Kuva juhtnupud</CheckBox>
+          </StackPanel>
+          <StackPanel Margin="100,0,0,0">
+            <Label Classes="H1" Margin="0,0,0,10">Rakendused</Label>
+            <ListBox Name="DesktopApps" MaxHeight="300" Width="450" MinWidth="450" MaxWidth="450" DoubleTapped="DesktopApps_OnPointerPressed">
+            </ListBox>
+            <StackPanel Orientation="Horizontal">
+              <Button Name="DesktopJsonEditButton" Click="DesktopJSONEditButton_OnClick">JSON redigeerimine</Button>
+              <Button Name="DesktopIconsRestart" Click="DesktopIconsRestart_OnClick">Taaskäivita</Button>
+              <Button Name="DesktopIconsResetDefaults" Click="DesktopIconsResetDefaults_OnClick">Taasta vaikesätted</Button>
+              <Button Name="DesktopIconsAddButton" Click="DesktopIconsAddButton_OnClick">Lisa</Button>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </TabItem>
 <!--Teave-->
       <TabItem Header="Teave">
         <Grid>
@@ -134,7 +174,7 @@
               <Label Classes="H1">Markuse arvuti juhtpaneel</Label>
               <Label Name="CpanelVersionLabel">versioon X.XX</Label>
               <Label Margin="0,10,0,0">kasutab Avalonia UI raamistikku</Label>
-              <Label>Markuse tarkvara ©2024</Label>
+              <Label>Markuse tarkvara ©2025</Label>
               <Panel Margin="0,10">
                 <StackPanel>
                   <StackPanel Orientation="Horizontal" Margin="0,20,0,0">

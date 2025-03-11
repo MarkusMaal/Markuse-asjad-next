@@ -20,8 +20,14 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Controls.Presenters;
+using Avalonia.Layout;
+using DesktopIcons;
+using MsBox.Avalonia.Enums;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Markuse_arvuti_juhtpaneel
 {
@@ -32,9 +38,15 @@ namespace Markuse_arvuti_juhtpaneel
         int rotation = 0;
         string[] locations;
         bool freezeTimer = false;
-        DispatcherTimer dispatcherTimer2 = new DispatcherTimer();
-        DispatcherTimer rotateLogo = new DispatcherTimer();
-        readonly string whatNew = "+ Linuxi tugi\n+ Kuvatõmmise tegemine Spectacle abiga (Linux)\n- Eemaldatud kuvatõmmise nupud Windowsi versioonist";
+        private bool preventWrites = true;
+        DispatcherTimer dispatcherTimer2 = new();
+        DispatcherTimer rotateLogo = new();
+        readonly string whatNew = "+ Töölauaikoonide kohandamine\n+ Laadimisekraan info kogumise ajal";
+        private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true, TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default};
+        private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = CommandSourceGenerationContext.Default};
+        private List<string> desktopIcons = [];
+        DesktopLayout? desktopLayout;
+        private bool LaunchError = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -154,19 +166,27 @@ namespace Markuse_arvuti_juhtpaneel
                 p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 p.Start();
             } else if (OperatingSystem.IsLinux()) {
+                StopIcons();
                // stop existing Python processes
                 Console.WriteLine("kill Python");
                 RunCommand("pkill", "python");
                 RunCommand("pkill", "python3");
-               // Restart integration software and maia server
+                foreach (var p in Process.GetProcessesByName("Markuse arvuti integratsioonitarkvara"))
+                {
+                    p.Kill();
+                }
+                // Restart integration software and maia server
                 Console.WriteLine("start maia server");
                 RunCommand("bash", masRoot + "/maia_autostart.sh");
                 Console.WriteLine("start integration software");
+                StartIntegrationSoftware();
                 RunCommand("bash", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/markuseasjad/maswelcome.sh", false);
                 // Restart KDE Plasma
                 Console.WriteLine("restart plasma");
                 RunCommand("bash", masRoot + "/restart_plasma.sh");
+                ShowIcons();
             } else if (OperatingSystem.IsMacOS()) {
+                StopIcons();
                 string packageName = "Markuse arvuti integratsioonitarkvara"; // TODO: some way of using dynamic naming in case it's ever renamed in the future ;)
                 RunCommand("killall", "\"" + packageName + "\"");
                 string appPath = "/Applications/" + packageName + ".app";
@@ -178,6 +198,7 @@ namespace Markuse_arvuti_juhtpaneel
                     RunCommand("open", "-a \"" + packageName + "\"");
                 }
                 // maia and native shell restart currently unsupported :(
+                ShowIcons();
             }
             else
             {
@@ -186,12 +207,22 @@ namespace Markuse_arvuti_juhtpaneel
             }
         }
 
+        private bool IsAndroid()
+        {
+            return File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/Android.lnk")
+                || File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "/sta/sta.exe");
+        }
+        
         private void InfoText(object? sender, PointerEventArgs e)
         {
             string devPrefix = "Markuse arvuti asjade";
             if (Directory.Exists(masRoot + "/.masv"))
             {
                 devPrefix = "Markuse virtuaalarvuti asjade";
+            }
+            else if (IsAndroid()) // check for Android shortcut on the desktop to determine that it's actually a tablet
+            {
+                devPrefix = "Markuse tahvelarvuti asjade";
             }
             Dictionary<string, string> hints = new Dictionary<string, string>();
             hints["Loo kuvatõmmis ja salvesta nim."] = "Teeb praegusest ekraanist kuvatõmmise ja kuvab salvestamise dialoogi, kus saate valida kausta kuhu salvestada, faili nime ja formaadi.";
@@ -217,6 +248,7 @@ namespace Markuse_arvuti_juhtpaneel
             hints["Riistvara info"] = "Kuvab info riistvara kohta (hardinfo2).";
             hints["Käsurea utilliidid"] = "Käivitab käsurea põhise juhtpaneeli (" + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/scripts/Tools.sh).";
             hints["Terminal"] = "Käivitab terminali (terminal)";
+            hints["Laadi andmed uuesti"] = "Laadib seadistused uuesti, juhul, kui need peaksid olema muutunud";
             this.InfoTextBlock.Text = hints[(string?)((Button)e.Source).Content];
         }
 
@@ -422,6 +454,11 @@ namespace Markuse_arvuti_juhtpaneel
             }
         }
 
+        private void StopThread(Thread th)
+        {
+            th.Interrupt();
+            th.Join();
+        }
 
         private string Verifile2()
         {
@@ -449,42 +486,102 @@ namespace Markuse_arvuti_juhtpaneel
 
         private bool Verifile()
         {
-            return Verifile2() == "VERIFIED";
+            return Verifile2() == "VERIFIED" ||  Verifile2() == "BYPASS";
         }
 
         private void InitTimers()
         {
-            DispatcherTimer dispatcherTimer = new DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(CheckTheme);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
-            dispatcherTimer.Start();
-            dispatcherTimer2.Tick += new EventHandler(CollectInfo);
-            dispatcherTimer2.Interval = new TimeSpan(0, 0, 0);
-            dispatcherTimer2.Start();
+            LaunchError = Program.Launcherror;
+            if (LaunchError)
+            {
+                string devPrefix = "Markuse arvuti";
+                if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv")) { devPrefix = "Markuse virtuaalarvuti"; }
+                else if (IsAndroid()) { devPrefix = "Markuse tahvelarvuti"; }
+                SetCollectProgress(-2, "Püsivuskontroll ei ole usaldusväärne, sest Verifile 2.0 räsi ei ole sobiv. Palun uuendage " + devPrefix  + " juhtpaneeli ja/või Verifile 2.0 tarkvara kataloogis\n\"" + masRoot + "\". Täpsem info standardväljundis.");
+                this.Title = devPrefix + " juhtpaneel";
+                return;
+            }
+            ThreadStart ts = CollectInfo;
+            var t = new Thread(ts)
+            {
+                IsBackground = true
+            };
+            t.Start();
             rotateLogo.Tick += new EventHandler(RotateLogo);
             rotateLogo.Interval = new TimeSpan(0, 0, 0, 0, 16);
         }
-
-        private void CollectInfo(object sender, EventArgs e)
+        
+        private void SetCollectProgress(int value, String status)
         {
-            dispatcherTimer2.Stop();
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (value == -2)
+                {
+                    CollectProgress.Value = 0;
+                    LoaderLogo.IsVisible = false;
+                    FailGif.IsVisible = true;
+                    ProgressStatusLabel.HorizontalAlignment = HorizontalAlignment.Center;
+                    ProgressStatusLabel.TextWrapping = TextWrapping.Wrap;
+                    ProgressStatusLabel.MaxWidth = this.Width / 2;
+                    CollectProgress.IsVisible = false;
+                    InfoCollectLabel.Content = "Programmi laadimine nurjus";
+                    this.Title = "Markuse asjad";
+                    if (status.Contains("VF_BYPASS"))
+                    {
+                        ErrorExitButton.Content = "Ignoreeri";
+                        ErrorExitButton.Click -= ErrorExitButton_OnClick;
+                        ErrorExitButton.Click += (_, _) =>
+                        {
+                            Header1.IsVisible = true;
+                            CheckSysLabel.IsVisible = false;
+                            TabsControl.IsVisible = true;
+                            TabsControl.IsEnabled = true;
+                        };
+                    }
+
+                    ErrorExitButton.IsVisible = true;
+                }
+                if (value != -1)
+                {
+                    CollectProgress.Value = value;
+                }
+                else
+                {
+                    CollectProgress.Value += 1;
+                }
+                ProgressStatusLabel.Text = status;
+            });
+        }
+
+        private void CollectInfo()
+        {
+            SetCollectProgress(0, "Seadme tüübi tuvastamine...");
             string devPrefix = "Markuse arvuti asjade";
             if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
             {
                 devPrefix = "Markuse virtuaalarvuti asjade";
             }
+            else if (IsAndroid())
+            {
+                devPrefix = "Markuse tahvelarvuti asjade";
+            }
+            SetCollectProgress(1, "Konfiguratsiooni laadimine...");
             if (File.Exists(masRoot + "/mas.cnf"))
             {
                 string[] cnfs = File.ReadAllText(masRoot + "/mas.cnf").Split(';');
-                ShowMasLogoCheck.IsChecked = cnfs[0].ToString() == "true";                  // Kuva Markuse asjade logo integratsioonitarkvara käivitumisel
-                AllowScheduledTasksCheck.IsChecked = cnfs[1].ToString() == "true";          // Käivita töölauamärkmed arvuti käivitumisel
-                StartDesktopNotesCheck.IsChecked = cnfs[2].ToString() == "true";            // Käivita töölauamärkmed arvuti käivitumisel
+                Dispatcher.UIThread.Post(() =>
+                {
+                    ShowMasLogoCheck.IsChecked = cnfs[0] == "true";                  // Kuva Markuse asjade logo integratsioonitarkvara käivitumisel
+                    AllowScheduledTasksCheck.IsChecked = cnfs[1] == "true";          // Käivita töölauamärkmed arvuti käivitumisel
+                    StartDesktopNotesCheck.IsChecked = cnfs[2] == "true";            // Käivita töölauamärkmed arvuti käivitumisel 
+                });
             }
             else
             {
-                MessageBoxShow(devPrefix + " tarkvara ei ole juurutatud. Palun juurutage seade kasutades juurutamise tööriista.", "Markuse asjade tarkvara pole paigaldatud", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
-                this.Close();
+                SetCollectProgress(-2, devPrefix + " tarkvara ei ole juurutatud. Palun juurutage seade kasutades juurutamise tööriista.");
+                return;
             }
+            SetCollectProgress(10, "Väljaande info kogumine...");
             if (File.Exists(masRoot + "/edition.txt"))
             {
 
@@ -493,47 +590,99 @@ namespace Markuse_arvuti_juhtpaneel
                     case "VERIFIED":
                         break;
                     case "FOREIGN":
-                        Console.WriteLine("See programm töötab ainult Markuse arvutis.\nVeakood: VF_FOREIGN");
-                        this.Close();
+                        SetCollectProgress(-2, "See programm töötab ainult Markuse arvutis.\nVeakood: VF_FOREIGN");
                         return;
                     case "FAILED":
-                        Console.WriteLine("Verifile püsivuskontrolli läbimine nurjus.\nVeakood: VF_FAILED");
-                        this.Close();
+                        SetCollectProgress(-2, "Verifile püsivuskontrolli läbimine nurjus.\nVeakood: VF_FAILED");
                         return;
                     case "TAMPERED":
-                        Console.WriteLine("See arvuti pole õigesti juurutatud. Seda võis põhjustada hiljutine riistvaramuudatus. Palun kasutage juurutamiseks Markuse asjade juurutamistööriista.\nVeakood: VF_TAMPERED");
-                        this.Close();
+                        SetCollectProgress(-2, "See arvuti pole õigesti juurutatud. Seda võis põhjustada hiljutine riistvaramuudatus. Palun kasutage juurutamiseks Markuse asjade juurutamistööriista.\nVeakood: VF_TAMPERED");
                         return;
                     case "LEGACY":
-                        Console.WriteLine("See arvuti on juurutatud vana juurutamistööriistaga. Palun juurutage arvuti uuesti uue juurutamistarkvaraga.\nVeakood: VF_LEGACY");
-                        this.Close();
+                        SetCollectProgress(-2, "See arvuti on juurutatud vana juurutamistööriistaga. Palun juurutage arvuti uuesti uue juurutamistarkvaraga.\nVeakood: VF_LEGACY.");
+                        return;
+                    case "BYPASS":
+                        SetCollectProgress(-2, "Veakood: VF_BYPASS");
+                        Program.Launcherror = true;
                         return;
                 }
+                SetCollectProgress(25, "Verifile OK");
                 if (Verifile())
                 {
+                    SetCollectProgress(30, "Teema laadimine...");
                     scheme = LoadTheme();
-                    ApplyTheme();
-                    this.IsVisible = true;
-                    GetEditionInfo();
+                    SetCollectProgress(50, "Töölauaikooni seadete laadimine...");
+                    LoadDesktopSettings();
+                    SetCollectProgress(55, "Kogun infot töölauaikoonide kohta...");
 
-                    this.Title = "Markuse arvuti juhtpaneel";
-                    if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
+                    var proc = new Process
                     {
-                        TopLabel.Text = "markuse virtuaalarvuti juhtpaneel";
-                        this.Title = "Markuse virtuaalarvuti juhtpaneel";
-                    }
-                    if (File.Exists(masRoot + "/irunning.log"))
+                        StartInfo = new()
+                        {
+                            FileName = masRoot + "/Markuse asjad/DesktopIcons" +
+                                       (OperatingSystem.IsWindows() ? ".exe" : ""),
+                            Arguments = "--icons",
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true,
+                            CreateNoWindow = true,
+                        }
+                    };
+                    proc.Start();
+                    while (!proc.StandardOutput.EndOfStream)
                     {
-                        // Projekt ITS aktiivne
-                        WindowState = WindowState.FullScreen;
+                        var line = proc.StandardOutput.ReadLine();
+                        if (!string.IsNullOrEmpty(line)) {
+                            Dispatcher.UIThread.Post(() => desktopIcons.Add(line));
+                            SetCollectProgress(-1, "Tuvastatud ikoon: " + line);
+                        }
                     }
-                    TabsControl.IsEnabled = true;
+                    SetCollectProgress(80, "UI ettevalmistamine...");
+
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        ApplyTheme();
+                        this.IsVisible = true;
+                        GetEditionInfo();
+                        this.Title = "Markuse arvuti juhtpaneel";
+                        if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
+                        {
+                            TopLabel.Text = "markuse virtuaalarvuti juhtpaneel";
+                            this.Title = "Markuse virtuaalarvuti juhtpaneel";
+                        }
+                        else if (IsAndroid())
+                        {
+                            TopLabel.Text = "markuse tahvelarvuti juhtpaneel";
+                            this.Title = "Markuse tahvelarvuti juhtpaneel";
+                        }
+                        if (File.Exists(masRoot + "/irunning.log"))
+                        {
+                            // Projekt ITS aktiivne
+                            WindowState = WindowState.FullScreen;
+                        }
+                        CollectProgress.Value = 100;
+                        if (Verifile2() != "BYPASS")
+                        {
+                            CheckSysLabel.IsVisible = false;
+                            TabsControl.IsEnabled = true;
+                            TabsControl.IsVisible = true;
+                            Header1.IsVisible = true;
+                        }
+                        else
+                        {
+                            SetCollectProgress(-2, "Veakood: VF_BYPASS");
+                            Program.Launcherror = true;
+                        }
+                    });
+                    SetCollectProgress(100, "Valmis!");
+                    var me = Thread.CurrentThread;
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        StopThread(me);
+                    });
                 }
                 else
                 {
-                    Console.WriteLine(devPrefix + " tarkvara ei ole õigesti juurutatud. Palun juurutage seade kasutades juurutamise tööriista.");
-                    this.Close();
-                    return;
+                    SetCollectProgress(-2, devPrefix + " tarkvara ei ole õigesti juurutatud. Palun juurutage seade kasutades juurutamise tööriista.");
                 }
             }
         }
@@ -592,7 +741,7 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 rotateLogo.Stop();
             }
-            TransformGroup tg = new TransformGroup();
+            var tg = new TransformGroup();
             tg.Children.Add(new RotateTransform(rotation));
             Logo.RenderTransform = tg;
         }
@@ -723,9 +872,17 @@ namespace Markuse_arvuti_juhtpaneel
                 }
                 string GameLocation = locations[GameList.SelectedIndex];
                 GameLocation = GameLocation.Substring(0, GameLocation.Length - 1);
-                MarkuStation_Edit mse = new MarkuStation_Edit();
-                mse.NameBox.Text = SelectedGame;
-                mse.LocationBox.Text = GameLocation;
+                var mse = new MarkuStation_Edit
+                {
+                    NameBox =
+                    {
+                        Text = SelectedGame
+                    },
+                    LocationBox =
+                    {
+                        Text = GameLocation
+                    }
+                };
                 await mse.ShowDialog(this).WaitAsync(new CancellationToken(false));
                 if (mse.DialogResult && (mse.LocationBox.Text == ";") && (mse.NameBox.Text == ";"))
                 {
@@ -786,11 +943,11 @@ namespace Markuse_arvuti_juhtpaneel
                 {
                     val = lvi.ToString();
                 }
-                if ((val != "") && (val != null))
-                    {
-                        builder.Append(val);
-                        builder.Append("\n");
-                    }
+                if (!string.IsNullOrEmpty(val))
+                {
+                    builder.Append(val);
+                    builder.Append("\n");
+                }
             }
             string temp = builder.ToString();
             temp += "\n";
@@ -827,14 +984,15 @@ namespace Markuse_arvuti_juhtpaneel
         private void ConfigCheck(object? sender, RoutedEventArgs e)
         {
             string saveprog = "";
-            saveprog += (bool)ShowMasLogoCheck.IsChecked ? "true;" : "false;";
-            saveprog += (bool)AllowScheduledTasksCheck.IsChecked ? "true;" : "false;";
-            saveprog += (bool)StartDesktopNotesCheck.IsChecked ? "true;" : "false;";
+            saveprog += (bool)ShowMasLogoCheck.IsChecked! ? "true;" : "false;";
+            saveprog += (bool)AllowScheduledTasksCheck.IsChecked! ? "true;" : "false;";
+            saveprog += (bool)StartDesktopNotesCheck.IsChecked! ? "true;" : "false;";
             File.WriteAllText(masRoot + "/mas.cnf", saveprog);
         }
 
         private void ReloadThumbs()
         {
+            if (Program.Launcherror) return; // avoid further errors in case something went wrong
             ThumbDesktop.Source = new Bitmap(masRoot + "/bg_desktop.png");
             ThumbLockscreen.Source = new Bitmap(masRoot + "/bg_login.png");
             ThumbMiniversion.Source = new Bitmap(masRoot + "/bg_uncommon.png");
@@ -857,7 +1015,7 @@ namespace Markuse_arvuti_juhtpaneel
 
         private async void DesktopFunction()
         {
-            var topLevel = TopLevel.GetTopLevel(this);
+            var topLevel = GetTopLevel(this);
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = "Markuse arvuti juhtpaneel",
@@ -1088,24 +1246,47 @@ namespace Markuse_arvuti_juhtpaneel
             }
         }
 
+        private void SendDesktopIconCommand(string type, string args = "")
+        {
+            if (preventWrites)
+            {
+                return;
+            }
+            Command cmd = new()
+            {
+                Arguments = args,
+                Type = type
+            };
+            var jsonData = JsonSerializer.Serialize(cmd, _cmdSerializerOptions);
+            File.WriteAllText(masRoot + "/DesktopIconsCommand.json", jsonData);
+        }
+
         private async void EditBg(object sender, RoutedEventArgs e)
         {
-            ColorPickerDialog cpd = new ColorPickerDialog();
-            cpd.Color.Color = scheme[0];
+            if (Program.Launcherror) return;
+            ColorPickerDialog cpd = new ColorPickerDialog
+            {
+                Color =
+                {
+                    Color = scheme[0]
+                }
+            };
             await cpd.ShowDialog(this);
             this.scheme[0] = cpd.Color.Color;
             if (cpd.result)
             {
                 freezeTimer = true;
-                File.WriteAllText(masRoot + "/scheme.cfg", cpd.Color.Color.R.ToString() + ":" + cpd.Color.Color.G.ToString() + ":" + cpd.Color.Color.B.ToString() + ":;" + this.scheme[1].R + ":" + this.scheme[1].G + ":" + this.scheme[1].B + ":;");
+                await File.WriteAllTextAsync(masRoot + "/scheme.cfg", cpd.Color.Color.R.ToString() + ":" + cpd.Color.Color.G.ToString() + ":" + cpd.Color.Color.B.ToString() + ":;" + this.scheme[1].R + ":" + this.scheme[1].G + ":" + this.scheme[1].B + ":;");
                 freezeTimer = false;
                 LoadTheme();
                 ApplyTheme();
+                SendDesktopIconCommand("ReloadTheme");
             }
         }
 
         private async void EditFg(object sender, RoutedEventArgs e)
         {
+            if (Program.Launcherror) return;
             ColorPickerDialog cpd = new ColorPickerDialog();
             cpd.Color.Color = scheme[1];
             await cpd.ShowDialog(this);
@@ -1113,10 +1294,11 @@ namespace Markuse_arvuti_juhtpaneel
             if (cpd.result)
             {
                 freezeTimer = true;
-                File.WriteAllText(masRoot + "/scheme.cfg", this.scheme[0].R.ToString() + ":" + this.scheme[0].G.ToString() + ":" + this.scheme[0].B.ToString() + ":;" + cpd.Color.Color.R + ":" + cpd.Color.Color.G + ":" + cpd.Color.Color.B + ":;");
+                await File.WriteAllTextAsync(masRoot + "/scheme.cfg", this.scheme[0].R.ToString() + ":" + this.scheme[0].G.ToString() + ":" + this.scheme[0].B.ToString() + ":;" + cpd.Color.Color.R + ":" + cpd.Color.Color.G + ":" + cpd.Color.Color.B + ":;");
                 freezeTimer = false;
                 LoadTheme();
                 ApplyTheme();
+                SendDesktopIconCommand("ReloadTheme");
             }
         }
 
@@ -1124,6 +1306,10 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void GetEditionInfo()
         {
+            if (!Verifile())
+            {
+                return;
+            }
             Bitmap cross;
             Bitmap check;
             using (var ms = new MemoryStream(Properties.Resources.failure))
@@ -1263,6 +1449,270 @@ namespace Markuse_arvuti_juhtpaneel
         {
             InitTimers();
             TabMarkuStation.IsVisible = !IsAppleSilicon(); // LibVLC is currently unsupported on Apple Silicon, so any Markus' stuff that leverages it (incl. MarkuStation 2) will not work.
+        }
+
+        private void Locked_IsCheckedChanged(object? sender, RoutedEventArgs e)
+        {
+            SendDesktopIconCommand("Lock", ((CheckBox?)e.Source).IsChecked ?? false ? "true" : "false");
+        }
+
+        private void ShowIcons_IsCheckedChanged(object? sender, RoutedEventArgs e)
+        {
+            SendDesktopIconCommand("IsIconVisible", ((CheckBox?)e.Source).IsChecked ?? false ? "true" : "false");
+        }
+
+        private void ShowLogo_IsCheckedChanged(object? sender, RoutedEventArgs e)
+        {
+            SendDesktopIconCommand("IsLogoVisible", ((CheckBox?)e.Source).IsChecked ?? false ? "true" : "false");
+        }
+
+        private void ShowActions_IsCheckedChanged(object? sender, RoutedEventArgs e)
+        {
+            SendDesktopIconCommand("IsActionVisible", ((CheckBox?)e.Source).IsChecked ?? false ? "true" : "false");
+        }
+
+        private void DesktopIconCountX_OnSelectionChanged(object? sender, TextChangedEventArgs e)
+        {
+            if (preventWrites) return;
+            var cb = (TextBox?)e.Source;
+            if (!int.TryParse(cb.Text, out var n)) return;
+            LoadDesktopSettings();
+            desktopLayout.IconCountX = n;
+            SaveDesktopSettings();
+            SendDesktopIconCommand("Restart", "true");
+        }
+
+        private void DesktopIconCountY_OnSelectionChanged(object? sender, TextChangedEventArgs e)
+        {
+            if (preventWrites) return;
+            var cb = (TextBox?)e.Source;
+            if (!int.TryParse(cb.Text, out var n)) return;
+            LoadDesktopSettings();
+            desktopLayout.IconCountY = Convert.ToInt32(n);
+            SaveDesktopSettings();
+            SendDesktopIconCommand("Restart", "true");
+        }
+
+        private void SaveDesktopSettings()
+        {
+            if (preventWrites) return;
+            var jsonData = JsonSerializer.Serialize(desktopLayout, _serializerOptions);
+            File.WriteAllText(masRoot + "/DesktopIcons.json", jsonData, encoding: Encoding.UTF8);
+        }
+
+        private void LoadDesktopSettings()
+        {
+            desktopLayout = JsonSerializer.Deserialize<DesktopLayout>(File.ReadAllText(masRoot + "/DesktopIcons.json"));
+        }
+
+        private void DesktopTab_Loaded(object? sender, RoutedEventArgs e)
+        {
+            RefreshDesktopIcons();
+        }
+
+        private void RefreshDesktopIcons()
+        {
+            preventWrites = true;
+            LoadDesktopSettings();
+            DesktopIconCountX.Text = desktopLayout.IconCountX.ToString();
+            DesktopIconCountY.Text = desktopLayout.IconCountY.ToString();
+            DesktopLockedCheck.IsChecked = desktopLayout.LockIcons;
+            DesktopActionCheck.IsChecked = desktopLayout.ShowActions;
+            DesktopLogoCheck.IsChecked = desktopLayout.ShowLogo;
+            DesktopApps.Items.Clear();
+            foreach (var di in desktopLayout.Children)
+            {
+                DesktopApps.Items.Add(di.Icon + ": " + di.Executable);
+            }
+            new Thread(() =>
+            {
+                Thread.Sleep(200);
+                Dispatcher.UIThread.Post(() => { DesktopTab.IsEnabled = true;});
+                preventWrites = false;
+            }) {IsBackground = true}.Start();   
+        }
+
+        private async void DesktopApps_OnPointerPressed(object? sender, TappedEventArgs tappedEventArgs)
+        {
+            var li = tappedEventArgs.Source switch
+            {
+                TextBlock textBlock => textBlock.Parent as ContentPresenter,
+                ContentPresenter cp => cp,
+                _ => null
+            };
+            if (li is null)
+            {
+                return;
+            }
+            var dEdit = new DesktopIcon_Edit();
+            var icon = li.Content?.ToString().Split(": ")[0];
+            var uri = li.Content?.ToString().Split(": ")[1];
+            foreach (var s in desktopIcons)
+            {
+                dEdit.NameBox.Items.Add(s);   
+            }
+            dEdit.NameBox.SelectedItem = dEdit.NameBox.Items[desktopIcons.IndexOf(icon)];
+            dEdit.LocationBox.Text = uri;
+            await dEdit.ShowDialog(this).WaitAsync(new CancellationToken(false));
+            if (!dEdit.DialogResult) return;
+            if (dEdit.NameBox.SelectedIndex != -1)
+            {
+                desktopLayout.Children[DesktopApps.SelectedIndex].Icon = dEdit.NameBox.SelectedItem.ToString()!;
+                desktopLayout.Children[DesktopApps.SelectedIndex].Executable = dEdit.LocationBox.Text;
+            }
+            else
+            {
+                desktopLayout.Children = desktopLayout.Children.Where(w => w != desktopLayout.Children[DesktopApps.SelectedIndex]).ToArray();
+            }
+            SaveDesktopSettings();
+            SendDesktopIconCommand("Reset", "true");
+            RefreshDesktopIcons();
+        }
+
+        private void DesktopJSONEditButton_OnClick(object? sender, RoutedEventArgs e)
+        {
+            var p = new Process
+            {
+                StartInfo =
+                {
+                    UseShellExecute = true,
+                    FileName = masRoot + "/DesktopIcons.json",
+                }
+            };
+            p.Start();
+        }
+
+        private void DesktopIconsRestart_OnClick(object? sender, RoutedEventArgs e)
+        {
+            StopIcons();
+            ShowIcons();
+        }
+
+        private void StopIcons()
+        {
+            foreach (var process in Process.GetProcessesByName("DesktopIcons" +
+                                                               (OperatingSystem.IsWindows() ? ".exe" : "")))
+            {
+                process.Kill();
+            }
+        }
+
+        private void ShowIcons()
+        {
+            var p = new Process
+            {
+                StartInfo = {
+                    UseShellExecute = true,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    FileName = masRoot + "/Markuse asjad/DesktopIcons" + (OperatingSystem.IsWindows() ? ".exe" : ""),
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    RedirectStandardInput = false,
+                    
+                }
+            };
+            // some additional nonsense is required if we're not in Windows 
+            if (!OperatingSystem.IsWindows())
+            {
+                p.StartInfo.Arguments = "-c \"nohup '" + p.StartInfo.FileName + "' > /dev/null 2>&1 &\"";
+                p.StartInfo.FileName = "bash";
+            }
+            p.Start();
+        }
+
+        private void StartIntegrationSoftware()
+        {
+            var p = new Process
+            {
+                StartInfo = {
+                    UseShellExecute = true,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    FileName = masRoot + "/Markuse asjad/Markuse arvuti integratsioonitarkvara" + (OperatingSystem.IsWindows() ? ".exe" : ""),
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    RedirectStandardInput = false,
+                    
+                }
+            };
+            // some additional nonsense is required if we're not in Windows 
+            if (!OperatingSystem.IsWindows())
+            {
+                p.StartInfo.Arguments = "-c \"nohup '" + p.StartInfo.FileName + "' > /dev/null 2>&1 &\"";
+                p.StartInfo.FileName = "bash";
+            }
+            p.Start();
+        }
+
+        private void DesktopIconsResetDefaults_OnClick(object? sender, RoutedEventArgs e)
+        {
+            if (File.Exists(masRoot + "/DesktopIcons.json"))
+            {
+                File.Delete(masRoot + "/DesktopIcons.json");
+            }
+            if (File.Exists(masRoot + "/DesktopIconsCommand.json"))
+            {
+                File.Delete(masRoot + "/DesktopIconsCommand.json");
+            }
+
+            DesktopIconsRestart_OnClick(sender, e);
+        }
+
+        private void Window_OnClosing(object? sender, WindowClosingEventArgs e)
+        {
+            if (!Debugger.IsAttached)
+            {
+                Environment.Exit(Environment.ExitCode);
+            }
+        }
+
+        private void ReloadInfo_OnClick(object? sender, RoutedEventArgs e)
+        {
+            WhatNewLabel.Text = "Mis on uut?";
+            TabsControl.IsEnabled = false;
+            TabsControl.IsVisible = false;
+            Header1.IsVisible = false;
+            CheckSysLabel.IsVisible = true;
+            ThreadStart ts = CollectInfo;
+            var t = new Thread(ts)
+            {
+                IsBackground = true
+            };
+            t.Start();
+        }
+
+        private void ErrorExitButton_OnClick(object? sender, RoutedEventArgs e)
+        {
+            Environment.Exit(Environment.ExitCode);
+        }
+
+        private async void DesktopIconsAddButton_OnClick(object? sender, RoutedEventArgs e)
+        {
+            var dEdit = new DesktopIcon_Edit();
+            foreach (var s in desktopIcons)
+            {
+                dEdit.NameBox.Items.Add(s);   
+            }
+
+            dEdit.DeleteButton.IsVisible = false;
+            await dEdit.ShowDialog(this).WaitAsync(new CancellationToken(false));
+            if (!dEdit.DialogResult) return;
+            try
+            {
+                desktopLayout.Children = desktopLayout.Children.Append(new DesktopIcon
+                {
+                    Icon = dEdit.NameBox.SelectedItem.ToString()!,
+                    Executable = dEdit.LocationBox.Text!,
+                    LocationX = -1,
+                    LocationY = -1
+                }).ToArray();
+                SaveDesktopSettings();
+                SendDesktopIconCommand("Reset", "true");
+                RefreshDesktopIcons();
+            }
+            catch (Exception ex)
+            {
+                MessageBoxShow(ex.Message, "Viga", ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+            }
         }
     }
 }

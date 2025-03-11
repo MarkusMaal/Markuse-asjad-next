@@ -17,7 +17,7 @@ namespace Markuse_arvuti_juhtpaneel
         {
             if (!CheckVerifileTamper())
             {
-                return;
+                Program.Launcherror = true;
             }
             AvaloniaXamlLoader.Load(this);
         }

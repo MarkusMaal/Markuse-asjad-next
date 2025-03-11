@@ -8,7 +8,9 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationIcon>mas.ico</ApplicationIcon>
     <Company>$(Authors)</Company>
-    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <AssemblyVersion>2.3.0.0</AssemblyVersion>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="mas.ico" />
@@ -43,5 +45,9 @@
 
   <ItemGroup>
     <UpToDateCheckInput Remove="MarkuStation_Edit.axaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\mas_web.png" />
+    <AvaloniaResource Include="Assets\failure.gif" />
   </ItemGroup>
 </Project>

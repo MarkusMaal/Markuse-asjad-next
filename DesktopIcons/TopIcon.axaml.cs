@@ -18,6 +18,8 @@ public partial class TopIcon : Window
     public bool canClose = false;
     internal string action = string.Empty;
     internal string icon = "Apps";
+    internal string alt_icon = "";
+    
     internal MainWindow myparent = null;
     private double opacity = 0;
     
@@ -54,7 +56,7 @@ public partial class TopIcon : Window
 
     private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        bool special_icon = (action != "special:apps" && action.StartsWith("special:"));
+        bool special_icon = alt_icon != "";
         if (!myparent.locked && !special_icon) this.BeginMoveDrag(e);
         if (action == "special:apps" || (!action.StartsWith("special:")))
         {
@@ -87,7 +89,12 @@ public partial class TopIcon : Window
                 switch (action.Replace("special:", "").ToLower())
                 {
                     case "apps":
-                        myparent.Show();
+                        if (!myparent.IsVisible)
+                        {
+                            myparent.Position = new PixelPoint(0, 0);
+                            myparent.Show();
+                        }
+                        else { myparent.Hide(); }
                         break;
                     case "showhide":
                         myparent.ToggleChildren(this);
@@ -111,6 +118,11 @@ public partial class TopIcon : Window
         if (action == "special:apps" || (!action.StartsWith("special:")))
         {
             this.Pic.Opacity = opacity;
+        }
+
+        if (!myparent.locked)
+        {
+            myparent.UpdatePositions();
         }
     }
 
