@@ -164,6 +164,7 @@ namespace Markuse_arvuti_juhtpaneel
                 p.StartInfo.FileName = masRoot + "/remas.bat"; // here be dragons
                 p.StartInfo.CreateNoWindow = true;
                 p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                p.StartInfo.UseShellExecute = true;
                 p.Start();
             } else if (OperatingSystem.IsLinux()) {
                 StopIcons();
@@ -637,8 +638,10 @@ namespace Markuse_arvuti_juhtpaneel
                             SetCollectProgress(-1, "Tuvastatud ikoon: " + line);
                         }
                     }
-                    SetCollectProgress(80, "UI ettevalmistamine...");
 
+                    SetCollectProgress(75, "Oleku kontrollimine...");
+                    string VF_STATUS = Verifile2();
+                    SetCollectProgress(80, "UI ettevalmistamine...");
                     Dispatcher.UIThread.Post(() =>
                     {
                         ApplyTheme();
@@ -655,13 +658,15 @@ namespace Markuse_arvuti_juhtpaneel
                             TopLabel.Text = "markuse tahvelarvuti juhtpaneel";
                             this.Title = "Markuse tahvelarvuti juhtpaneel";
                         }
+                        DeviceCpanelLabel.Content = this.Title;
+                        MasName.Content = devPrefix[..^1];
                         if (File.Exists(masRoot + "/irunning.log"))
                         {
                             // Projekt ITS aktiivne
                             WindowState = WindowState.FullScreen;
                         }
                         CollectProgress.Value = 100;
-                        if (Verifile2() != "BYPASS")
+                        if (VF_STATUS != "BYPASS")
                         {
                             CheckSysLabel.IsVisible = false;
                             TabsControl.IsEnabled = true;
