@@ -147,6 +147,7 @@ public partial class MainWindow : Window
             Command? command = null;
             if (e.ChangeType is WatcherChangeTypes.Changed or WatcherChangeTypes.Created) // ignore if deleted
             {
+                if (!File.Exists(e.FullPath)) { return; }
                 command = JsonSerializer.Deserialize<Command>(File.ReadAllText(e.FullPath), _cmdSerializerOptions);
                 Console.WriteLine("Serialize OK");
 
@@ -695,6 +696,12 @@ public partial class MainWindow : Window
         cd = desktopLayout.DesktopDir;
         NavigateDirectory(cd);
 
+        if (!OperatingSystem.IsLinux())
+        {
+            //Console.WriteLine("Windows/Mac paranduste aktiveerimine...");
+            this.ExtendClientAreaToDecorationsHint = false;
+            this.SystemDecorations = SystemDecorations.None;
+        }
         this.Hide();
     }
     

@@ -33,7 +33,7 @@ public partial class TopIcon : Window
         // prevent window borders from being rendered if not in a Linux DE
         if (!OperatingSystem.IsLinux())
         {
-            Console.WriteLine("Windows/Mac paranduste aktiveerimine...");
+            //Console.WriteLine("Windows/Mac paranduste aktiveerimine...");
             this.ExtendClientAreaToDecorationsHint = false;
             this.SystemDecorations = SystemDecorations.None;
         }

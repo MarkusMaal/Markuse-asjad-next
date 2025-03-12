@@ -628,11 +628,12 @@ namespace Markuse_arvuti_juhtpaneel
                         }
                     };
                     proc.Start();
+                    desktopIcons.Clear();
                     while (!proc.StandardOutput.EndOfStream)
                     {
                         var line = proc.StandardOutput.ReadLine();
                         if (!string.IsNullOrEmpty(line)) {
-                            Dispatcher.UIThread.Post(() => desktopIcons.Add(line));
+                            desktopIcons.Add(line);
                             SetCollectProgress(-1, "Tuvastatud ikoon: " + line);
                         }
                     }

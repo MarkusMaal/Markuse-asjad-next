@@ -8,6 +8,7 @@
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+        <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
     </PropertyGroup>
 
     <ItemGroup>
