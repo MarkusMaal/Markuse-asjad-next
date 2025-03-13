@@ -11,6 +11,7 @@ namespace DesktopIcons;
 public class App : Application
 {
     private static bool _exiting;
+    public static IClassicDesktopStyleApplicationLifetime desktop;
     public override void Initialize()
     {
         if (!_exiting)

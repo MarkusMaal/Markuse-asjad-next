@@ -31,8 +31,8 @@ public partial class MainWindow : Window
         "A0B93B23301FC596789F83249A99F507A9DA5CBA9D636E4D4F88676F530224CB",
         "B08AABB1ED294D8292FDCB2626D4B77C0A53CB4754F3234D8E761E413289057F",
         "8076CF7C156D44472420C1225B9F6ADB661E3B095E29E52E3D4E8598BB399A8F"];
-    string ATTESTATION_STATE = "BYPASS";
-    private string mas_root = "C:\\mas";
+    public string ATTESTATION_STATE = "BYPASS";
+    public string mas_root = "C:\\mas";
     private string cd = "";
     private bool SomethingSelected;
     private Window?[] iconWindows = [];
@@ -66,10 +66,11 @@ public partial class MainWindow : Window
         GetMasRoot();
         ATTESTATION_STATE = Verifile2();
         CheckVerifileTamper();
-        if (ATTESTATION_STATE != "VERIFIED")
+        if ((ATTESTATION_STATE != "VERIFIED") && (ATTESTATION_STATE != "BYPASS"))
         {
             Console.Error.WriteLine("Verifile kontroll nurjus!");
-            Environment.Exit(Array.IndexOf(VERIFILE_FLAGS, ATTESTATION_STATE));
+            new VerifileFail().Show();
+            InitializeComponent();
             return;
         }
 
@@ -693,6 +694,11 @@ public partial class MainWindow : Window
 
     private void Control_OnLoaded(object? sender, RoutedEventArgs e)
     {
+        if (ATTESTATION_STATE != "VERIFIED")
+        {
+            this.Close();
+            return;
+        }
         cd = desktopLayout.DesktopDir;
         NavigateDirectory(cd);
 

@@ -24,13 +24,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
         public string fmount = "";
         public string FlashEnabled { get; set; } = "False";
         public bool showsplash = true;
-        public string[] specialevents = new string[1];
+        public string[]? specialevents = new string[1];
+        internal string attestation = "BYPASS";
+        static bool bad = false;
         public override void Initialize()
         {
-            if (!CheckVerifileTamper())
-            {
-                return;
-            }
             AvaloniaXamlLoader.Load(this);
             this.DataContext = this;
             fmount = GetMount();
@@ -42,13 +40,24 @@ namespace Markuse_arvuti_integratsioonitarkvara
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = new MainWindow();
+                if (!CheckVerifileTamper())
+                {
+                    bad = true;
+                    attestation = "CHECK_TAMPER";
+                    desktop.MainWindow = null;
+                } else if (!File.Exists(mas_root + "/edition.txt"))
+                {
+                    attestation = "FOREIGN";
+                    desktop.MainWindow = null;
+                }
                 if (desktop?.Args?.Length > 0)
                 {
                     string[] args = desktop.Args;
                     if (args.Contains("/root"))
                     {
                         Console.WriteLine("Selle programmiga ei saa arvutit nullist juurutada. Palun kasutage /reroot parameetrit, et arvuti uuesti juurutada.");
-                    } else if (args.Contains("/reroot"))
+                    }
+                    else if (args.Contains("/reroot"))
                     {
                         foreach (Process p in Process.GetProcesses())
                         {
@@ -62,32 +71,33 @@ namespace Markuse_arvuti_integratsioonitarkvara
                             Console.WriteLine("Juurutamiseks kasutage taasjuurutamise tööriista. Ilma taasjuurutamise tööriistata juurutamine võib põhjustada Verifile sertifikaadi riknemist.");
                         }
                     }
-                } else
+                }
+                else
                 {
-                    if (File.Exists(mas_root + "/edition.txt"))
+                    if (File.Exists(mas_root + "/edition.txt") && !bad)
                     {
-
-                        switch (Verifile2())
+                        attestation = Verifile2();
+                        switch (attestation)
                         {
                             case "VERIFIED":
                                 break;
                             case "FOREIGN":
                                 Console.WriteLine("See programm töötab ainult Markuse arvutis.\nVeakood: VF_FOREIGN");
-                                return;
+                                break;
                             case "FAILED":
                                 Console.WriteLine("Verifile püsivuskontrolli läbimine nurjus.\nVeakood: VF_FAILED");
-                                return;
+                                break;
                             case "TAMPERED":
                                 Console.WriteLine("See arvuti pole õigesti juurutatud. Seda võis põhjustada hiljutine riistvaramuudatus. Palun kasutage juurutamiseks Markuse asjade juurutamistööriista.\nVeakood: VF_TAMPERED");
-                                return;
+                                break;
                             case "LEGACY":
                                 Console.WriteLine("See arvuti on juurutatud vana juurutamistööriistaga. Palun juurutage arvuti uuesti uue juurutamistarkvaraga.\nVeakood: VF_LEGACY");
-                                return;
+                                break;
                         }
                         if (!Verifile())
                         {
                             Console.WriteLine("Markuse asjad tarkvara ei ole õigesti juurutatud. Palun juurutage seade kasutades juurutamise tööriista.");
-                            return;
+                            desktop.MainWindow = null;
                         }
                     }
                 }
@@ -183,20 +193,30 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 string fcont = File.ReadAllText(mas_root + "\\events.txt");
                 specialevents = fcont.Split(';');
             }
-            if (File.Exists(mas_root + "/mas.cnf"))
+            if (File.Exists(mas_root + "/Config.json"))
             {
+                Program.config.Load(mas_root);
+            }
+            else if (File.Exists(mas_root + "/mas.cnf"))
+            {
+                // teisenda uueks formaadiks
                 string[] incontent = File.ReadAllText(mas_root + "/mas.cnf").Split(';');
-                //kas lubada avateade
-                showsplash = Convert.ToBoolean(incontent[0].ToString());
-                //kas lubada erisündmused
-                if (incontent[1].ToString() == "false")
-                {
-                    specialevents = null;
-                }
+                Program.config.ShowLogo = incontent[0] == "true";
+                Program.config.AllowScheduledTasks = incontent[1] == "true";
+                Program.config.AutostartNotes = incontent[2] == "true";
+                Program.config.PollRate = 5000;
+                Program.config.Save(mas_root);
+            }
+            //kas lubada avateade
+            showsplash = Program.config.ShowLogo;
+            //kas lubada erisündmused
+            if (!Program.config.AllowScheduledTasks)
+            {
+                specialevents = null;
             }
             if (OperatingSystem.IsWindows())
             {
-                Process p = new Process();
+                Process p = new();
                 p.StartInfo.WorkingDirectory = mas_root;
                 p.StartInfo.FileName = mas_root + "\\ChangeWallpaper.exe";
                 p.StartInfo.Arguments = mas_root + "\\bg_desktop.png";

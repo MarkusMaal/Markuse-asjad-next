@@ -59,7 +59,8 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 rf.Show();
             } else
             {
-                Environment.Exit(255);
+                new VerifileFail().Show();
+                this.Close();
                 return;
             }
         }
@@ -129,9 +130,10 @@ namespace Markuse_arvuti_integratsioonitarkvara
         private void GeneralTimer(object? sender, EventArgs e)
         {
             initialized = true;
+            Program.config.Load(app.mas_root);
             if (dispatcherTimer.Interval < new TimeSpan(0, 0, 5))
             {
-                dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
+                dispatcherTimer.Interval = TimeSpan.FromMilliseconds(Program.config.PollRate);
             }
             this.IsVisible = false;
             if (OperatingSystem.IsMacOS()) {

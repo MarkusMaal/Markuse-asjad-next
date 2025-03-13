@@ -1,23 +1,17 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
-using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.OpenGL;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using MsBox.Avalonia;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -27,7 +21,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Layout;
 using DesktopIcons;
 using MsBox.Avalonia.Enums;
-using System.Diagnostics.CodeAnalysis;
+using Markuse_arvuti_juhtpaneel.IntegrationSoftware;
 
 namespace Markuse_arvuti_juhtpaneel
 {
@@ -43,9 +37,10 @@ namespace Markuse_arvuti_juhtpaneel
         DispatcherTimer rotateLogo = new();
         readonly string whatNew = "+ Töölauaikoonide kohandamine\n+ Laadimisekraan info kogumise ajal";
         private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true, TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default};
-        private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = CommandSourceGenerationContext.Default};
+        private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = CommandSourceGenerationContext.Default };
         private List<string> desktopIcons = [];
         DesktopLayout? desktopLayout;
+        MasConfig config = new();
         private bool LaunchError = false;
         public MainWindow()
         {
@@ -567,7 +562,18 @@ namespace Markuse_arvuti_juhtpaneel
                 devPrefix = "Markuse tahvelarvuti asjade";
             }
             SetCollectProgress(1, "Konfiguratsiooni laadimine...");
-            if (File.Exists(masRoot + "/mas.cnf"))
+            if (File.Exists(masRoot + "/Config.json"))
+            {
+                config.Load(masRoot);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    ShowMasLogoCheck.IsChecked = config.ShowLogo;
+                    AllowScheduledTasksCheck.IsChecked = config.AllowScheduledTasks;
+                    StartDesktopNotesCheck.IsChecked = config.AutostartNotes;
+                    IntegrationPollrate.Text = config.PollRate.ToString();
+                });
+            }
+            else if (File.Exists(masRoot + "/mas.cnf"))
             {
                 string[] cnfs = File.ReadAllText(masRoot + "/mas.cnf").Split(';');
                 Dispatcher.UIThread.Post(() =>
@@ -575,6 +581,14 @@ namespace Markuse_arvuti_juhtpaneel
                     ShowMasLogoCheck.IsChecked = cnfs[0] == "true";                  // Kuva Markuse asjade logo integratsioonitarkvara käivitumisel
                     AllowScheduledTasksCheck.IsChecked = cnfs[1] == "true";          // Käivita töölauamärkmed arvuti käivitumisel
                     StartDesktopNotesCheck.IsChecked = cnfs[2] == "true";            // Käivita töölauamärkmed arvuti käivitumisel 
+                    IntegrationPollrate.Text = "5000";                               // Pollimise sagedus (ms)
+                    config = new()
+                    {
+                        ShowLogo = cnfs[0] == "true",
+                        AllowScheduledTasks = cnfs[1] == "true",
+                        AutostartNotes = cnfs[2] == "true",
+                        PollRate = 5000
+                    };
                 });
             }
             else
@@ -989,11 +1003,25 @@ namespace Markuse_arvuti_juhtpaneel
         /* Konfiguratsioon */
         private void ConfigCheck(object? sender, RoutedEventArgs e)
         {
+            // check if poll rate is numeric
+            if (!int.TryParse(IntegrationPollrate.Text ?? "", out int pollRate)) return;
+
+            // backwards compatibility
             string saveprog = "";
             saveprog += (bool)ShowMasLogoCheck.IsChecked! ? "true;" : "false;";
             saveprog += (bool)AllowScheduledTasksCheck.IsChecked! ? "true;" : "false;";
             saveprog += (bool)StartDesktopNotesCheck.IsChecked! ? "true;" : "false;";
             File.WriteAllText(masRoot + "/mas.cnf", saveprog);
+            
+            // new method
+            config = new()
+            {
+                AllowScheduledTasks = AllowScheduledTasksCheck.IsChecked ?? false,
+                AutostartNotes = StartDesktopNotesCheck.IsChecked ?? false,
+                ShowLogo = ShowMasLogoCheck.IsChecked ?? false,
+                PollRate = pollRate,
+            };
+            config.Save(masRoot);
         }
 
         private void ReloadThumbs()
@@ -1524,6 +1552,8 @@ namespace Markuse_arvuti_juhtpaneel
             DesktopIconCountY.Text = desktopLayout.IconCountY.ToString();
             DesktopLockedCheck.IsChecked = desktopLayout.LockIcons;
             DesktopActionCheck.IsChecked = desktopLayout.ShowActions;
+            DesktopIconPadding.Text = desktopLayout.IconPadding.ToString();
+            DesktopIconSize.Text = desktopLayout.IconSize.ToString();
             DesktopLogoCheck.IsChecked = desktopLayout.ShowLogo;
             DesktopApps.Items.Clear();
             foreach (var di in desktopLayout.Children)
@@ -1596,10 +1626,12 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void StopIcons()
         {
-            foreach (var process in Process.GetProcessesByName("DesktopIcons" +
-                                                               (OperatingSystem.IsWindows() ? ".exe" : "")))
+            foreach (var process in Process.GetProcesses())
             {
-                process.Kill();
+                if (process.ProcessName.StartsWith("DesktopIcons"))
+                {
+                    process.Kill();
+                }
             }
         }
 
@@ -1663,12 +1695,13 @@ namespace Markuse_arvuti_juhtpaneel
             DesktopIconsRestart_OnClick(sender, e);
         }
 
-        private void Window_OnClosing(object? sender, WindowClosingEventArgs e)
+        private async void Window_OnClosing(object? sender, WindowClosingEventArgs e)
         {
-            if (!Debugger.IsAttached)
+            if (Debugger.IsAttached)
             {
-                Environment.Exit(Environment.ExitCode);
+                await MessageBoxShow("Lõpetan siluri", "Markuse arvuti juhtpaneel", ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning);
             }
+            Environment.Exit(Environment.ExitCode);
         }
 
         private void ReloadInfo_OnClick(object? sender, RoutedEventArgs e)
@@ -1719,6 +1752,35 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 MessageBoxShow(ex.Message, "Viga", ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
             }
+        }
+
+        private void DesktopIconPadding_TextChanged(object? sender, TextChangedEventArgs e)
+        {
+            if (preventWrites) return;
+            var cb = (TextBox?)e.Source;
+            if (!int.TryParse(cb.Text, out var n)) return;
+            LoadDesktopSettings();
+            desktopLayout.IconPadding = n;
+            SaveDesktopSettings();
+            StopIcons();
+            ShowIcons();
+        }
+
+        private void DesktopIconSize_TextChanged(object? sender, TextChangedEventArgs e)
+        {
+            if (preventWrites) return;
+            var cb = (TextBox?)e.Source;
+            if (!int.TryParse(cb.Text, out var n)) return;
+            LoadDesktopSettings();
+            desktopLayout.IconSize = n;
+            SaveDesktopSettings();
+            StopIcons();
+            ShowIcons();
+        }
+
+        private void IntegrationPollrate_TextChanged(object? sender, TextChangedEventArgs e)
+        {
+            ConfigCheck(sender, e);
         }
     }
 }

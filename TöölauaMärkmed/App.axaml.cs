@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using System;
 using System.IO;
 using System.Linq;
+using TöölauaMärkmed.IntegrationSoftware;
 
 namespace TöölauaMärkmed
 {
@@ -11,6 +12,10 @@ namespace TöölauaMärkmed
     {
         public int activeindex = 1;
         public readonly string masRoot = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas";
+        readonly MasConfig config = new()
+        {
+            AutostartNotes = false,
+        };
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
@@ -20,23 +25,19 @@ namespace TöölauaMärkmed
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                if (!(desktop.Args.Contains("-s")))
+                config.Load(masRoot);
+                if (!desktop.Args.Contains("-s"))
                 {
                     desktop.MainWindow = new MainWindow();
                 } else
                 {
-                    string[] configs = File.ReadAllText(masRoot + "/mas.cnf").Split(';');
-                    if (configs.Length > 2)
+                    if (config.AutostartNotes) { 
+                        File.WriteAllText(masRoot + "/noteopen.txt", "");
+                        desktop.MainWindow = new MainWindow();
+                    }
+                    else
                     {
-                        if (configs[2] == "true")
-                        {
-                            File.WriteAllText(masRoot + "/noteopen.txt", "");
-                            desktop.MainWindow = new MainWindow();
-                        }
-                        else
-                        {
-                            return;
-                        }
+                        return;
                     }
                 }
             }
