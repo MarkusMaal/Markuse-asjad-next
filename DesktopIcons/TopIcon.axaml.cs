@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -39,7 +41,40 @@ public partial class TopIcon : Window
         }
     }
 
-    
+    private IntPtr GetNativeWindowHandle()
+    {
+        var platformHandle = this.TryGetPlatformHandle();
+        return platformHandle?.Handle ?? IntPtr.Zero;
+    }
+
+    private enum NSWindowLevel
+    {
+        Normal = 0,
+        Desktop = -1,
+        BelowDesktop = -2
+    }
+
+    private void SetWindowProperties()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            var handle = GetNativeWindowHandle();
+            if (handle != IntPtr.Zero)
+            {
+                // Set the window level to desktop, behind all other windows
+                MacOSInterop.SetWindowLevel(handle, (int)NSWindowLevel.BelowDesktop);
+
+                // Make the window ignore mouse events to prevent it from coming to the foreground
+                MacOSInterop.SetIgnoresMouseEvents(handle, true);
+
+                // Set collection behavior to stick the window to the desktop
+                const int NSWindowCollectionBehaviorCanJoinAllSpaces = 1 << 0;
+                const int NSWindowCollectionBehaviorStationary = 1 << 4;
+                MacOSInterop.SetCollectionBehavior(handle, NSWindowCollectionBehaviorCanJoinAllSpaces | NSWindowCollectionBehaviorStationary);
+            }
+        }
+    }
+
     public static Bitmap GetResource(string name)
     {
         object? resource = App.Current?.Resources[name];
@@ -181,5 +216,12 @@ public partial class TopIcon : Window
         {
             SetOpacity(this.BgCol.Background.Opacity - 0.25);
         }
+    }
+
+    private void Window_Opened(object? sender, EventArgs e)
+    {
+        if (OperatingSystem.IsMacOS()) SetWindowProperties(); // Specific for Mac users, uses native macOS APIs
+                                                              // Linux users, please use your window manager's rules (e.g. if you use KDE Plasma, set relevant KWin rules in plasma-settings)
+                                                              // Windows users, use AHK scripts for this
     }
 }

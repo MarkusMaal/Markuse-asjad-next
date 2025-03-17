@@ -85,8 +85,15 @@ public partial class MainWindow : Window
             watcher = new FileSystemWatcher(mas_root);
             Rewatch();
         }
-
         InitializeComponent();
+        new Thread(() =>
+        {
+            while (true)
+            {
+                Dispatcher.UIThread.Post(() => { this.ZIndex -= 1; });
+                Thread.Sleep(500);
+            }
+        }).Start();
     }
 
     public void ZOrderFix()

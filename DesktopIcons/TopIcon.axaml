@@ -15,6 +15,7 @@
         Background="Transparent"
         Loaded="Control_OnLoaded"
         Closing="Window_OnClosing"
+        Opened="Window_Opened"
         PointerPressed="InputElement_OnPointerPressed"
         PointerReleased="InputElement_OnPointerReleased"
         PointerMoved="InputElement_OnPointerMoved"
