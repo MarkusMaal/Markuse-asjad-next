@@ -411,9 +411,9 @@ public partial class MainWindow : Window
 
     private void GenerateMasLogo()
     {
-        int size = icon_size / 2;
-        SpecialIcon me = desktopLayout.Logo;
-        TopIcon tI = new TopIcon
+        var size = icon_size / 2;
+        var me = desktopLayout.Logo;
+        var tI = new TopIcon
         {
             BgCol =
             {
@@ -435,6 +435,7 @@ public partial class MainWindow : Window
             }
         };
         logoWindow = tI;
+        if (!desktopLayout.ShowLogo) return;
         logoWindow.Show();
     }
     
