@@ -65,7 +65,7 @@ public partial class TopIcon : Window
                 MacOSInterop.SetWindowLevel(handle, (int)NSWindowLevel.BelowDesktop);
 
                 // Make the window ignore mouse events to prevent it from coming to the foreground
-                MacOSInterop.SetIgnoresMouseEvents(handle, true);
+                MacOSInterop.SetIgnoresMouseEvents(handle, false);
 
                 // Set collection behavior to stick the window to the desktop
                 const int NSWindowCollectionBehaviorCanJoinAllSpaces = 1 << 0;
