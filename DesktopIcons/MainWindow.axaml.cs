@@ -86,14 +86,12 @@ public partial class MainWindow : Window
             Rewatch();
         }
         InitializeComponent();
-        new Thread(() =>
+        if (OperatingSystem.IsWindows())
         {
-            while (true)
-            {
-                Dispatcher.UIThread.Post(() => { this.ZIndex -= 1; });
-                Thread.Sleep(500);
-            }
-        }).Start();
+            // prevents maximizing the window, because the dumb Windows tablet mode tries to do that no matter what
+            var handle = Win32Interop.GetWindowHandle(this);
+            Win32Interop.SetWindowLongPtr(handle, Win32Interop.GWL_STYLE, Win32Interop.GetWindowLongPtr(handle, Win32Interop.GWL_STYLE) & ~Win32Interop.WS_MAXIMIZEBOX);
+        }
     }
 
     public void ZOrderFix()
@@ -867,5 +865,11 @@ public partial class MainWindow : Window
             this.Hide();
         }
         e.Cancel = cancel;
+    }
+
+    private void Window_Opened(object? sender, System.EventArgs e)
+    {
+        if (OperatingSystem.IsMacOS()) MacOSInterop.SetWindowProperties(this); // Specific for Mac users, uses native macOS APIs                        
+        else if (OperatingSystem.IsWindows()) new Win32Interop().KeepWindowAtBottom(this); // Specific for Windows
     }
 }

@@ -13,6 +13,7 @@
         Title="Töölauaikoonid"
         Loaded="Control_OnLoaded"
         Closing="Window_OnClosing"
+        Opened="Window_Opened"
         WindowState="Normal"
         
         TransparencyLevelHint="Transparent"

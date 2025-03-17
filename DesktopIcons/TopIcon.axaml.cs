@@ -39,39 +39,11 @@ public partial class TopIcon : Window
             this.ExtendClientAreaToDecorationsHint = false;
             this.SystemDecorations = SystemDecorations.None;
         }
-    }
-
-    private IntPtr GetNativeWindowHandle()
-    {
-        var platformHandle = this.TryGetPlatformHandle();
-        return platformHandle?.Handle ?? IntPtr.Zero;
-    }
-
-    private enum NSWindowLevel
-    {
-        Normal = 0,
-        Desktop = -1,
-        BelowDesktop = -2
-    }
-
-    private void SetWindowProperties()
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        if (OperatingSystem.IsWindows())
         {
-            var handle = GetNativeWindowHandle();
-            if (handle != IntPtr.Zero)
-            {
-                // Set the window level to desktop, behind all other windows
-                MacOSInterop.SetWindowLevel(handle, (int)NSWindowLevel.BelowDesktop);
-
-                // Make the window ignore mouse events to prevent it from coming to the foreground
-                MacOSInterop.SetIgnoresMouseEvents(handle, false);
-
-                // Set collection behavior to stick the window to the desktop
-                const int NSWindowCollectionBehaviorCanJoinAllSpaces = 1 << 0;
-                const int NSWindowCollectionBehaviorStationary = 1 << 4;
-                MacOSInterop.SetCollectionBehavior(handle, NSWindowCollectionBehaviorCanJoinAllSpaces | NSWindowCollectionBehaviorStationary);
-            }
+            // prevents maximizing the window, because the dumb Windows tablet mode tries to do that no matter what
+            var handle = Win32Interop.GetWindowHandle(this);
+            Win32Interop.SetWindowLongPtr(handle, Win32Interop.GWL_STYLE, Win32Interop.GetWindowLongPtr(handle, Win32Interop.GWL_STYLE) & ~Win32Interop.WS_MAXIMIZEBOX);
         }
     }
 
@@ -220,8 +192,12 @@ public partial class TopIcon : Window
 
     private void Window_Opened(object? sender, EventArgs e)
     {
-        if (OperatingSystem.IsMacOS()) SetWindowProperties(); // Specific for Mac users, uses native macOS APIs
-                                                              // Linux users, please use your window manager's rules (e.g. if you use KDE Plasma, set relevant KWin rules in plasma-settings)
-                                                              // Windows users, use AHK scripts for this
+        if (OperatingSystem.IsMacOS()) MacOSInterop.SetWindowProperties(this); // Specific for Mac users, uses native macOS APIs                        
+        else if (OperatingSystem.IsWindows()) new Win32Interop().KeepWindowAtBottom(this); // Specific for Windows
+
+        // since Linux uses many different window managers, they should use the rules for their specific window manager
+        // (e.g. if you use KDE Plasma, set relevant KWin rules in plasma-settings)
+
+        // the code here doesn't deal with it unfortunately...
     }
 }

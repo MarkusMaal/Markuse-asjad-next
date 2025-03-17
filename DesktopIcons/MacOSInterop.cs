@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Avalonia.Controls;
+using System;
 using System.Runtime.InteropServices;
 
 namespace DesktopIcons
@@ -32,5 +33,41 @@ namespace DesktopIcons
             IntPtr setCollectionBehaviorSelector = sel_registerName("setCollectionBehavior:");
             objc_msgSend(nsWindow, setCollectionBehaviorSelector, (IntPtr)behavior);
         }
+
+
+        private static IntPtr GetNativeWindowHandle(Window w)
+        {
+            var platformHandle = w.TryGetPlatformHandle();
+            return platformHandle?.Handle ?? IntPtr.Zero;
+        }
+
+        private enum NSWindowLevel
+        {
+            Normal = 0,       // just a normal window
+            Desktop = -1,     // will only show on current workspace
+            BelowDesktop = -2 // will show on all workspaces
+        }
+
+        public static void SetWindowProperties(Window w)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                var handle = GetNativeWindowHandle(w);
+                if (handle != IntPtr.Zero)
+                {
+                    // Set the window level to desktop, behind all other windows
+                    MacOSInterop.SetWindowLevel(handle, (int)NSWindowLevel.BelowDesktop);
+
+                    // Make the window ignore mouse events to prevent it from coming to the foreground
+                    MacOSInterop.SetIgnoresMouseEvents(handle, false);
+
+                    // Set collection behavior to stick the window to the desktop
+                    const int NSWindowCollectionBehaviorCanJoinAllSpaces = 1 << 0;
+                    const int NSWindowCollectionBehaviorStationary = 1 << 4;
+                    MacOSInterop.SetCollectionBehavior(handle, NSWindowCollectionBehaviorCanJoinAllSpaces | NSWindowCollectionBehaviorStationary);
+                }
+            }
+        }
+
     }
 }
