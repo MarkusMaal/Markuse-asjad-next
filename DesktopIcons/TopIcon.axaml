@@ -11,6 +11,7 @@
         TransparencyLevelHint="Transparent"
         ShowInTaskbar="False"
         Title="TopIcon"
+        CanResize="False"
         Background="Transparent"
         Loaded="Control_OnLoaded"
         Closing="Window_OnClosing"
