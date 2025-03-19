@@ -313,7 +313,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                     case "Käivita virtuaalarvuti":
                         if (!initialized)
                         {
-                            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas/vpc"))
+                            if (OperatingSystem.IsWindows() && !Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas/vpc"))
                             {
                                 toRemove.Add(n);
                             }

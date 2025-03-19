@@ -43,10 +43,10 @@
             <NativeMenuItem Header="Tarkvara paigaldamise režiim" Icon="Resources/unknown.png"/>
             <NativeMenuItem Header="Värviskeem" Icon="Resources/theming.png">
               <NativeMenu>
-                <NativeMenuItem x:Class="White" Header="Valge"></NativeMenuItem>
-                <NativeMenuItem x:Class="Black" Header="Öörežiim"></NativeMenuItem>
-                <NativeMenuItem x:Class="Blue" Header="Sinine"></NativeMenuItem>
-                <NativeMenuItem x:Class="Xmas" Header="Jõulud"></NativeMenuItem>
+                <NativeMenuItem Header="Valge"></NativeMenuItem>
+                <NativeMenuItem Header="Öörežiim"></NativeMenuItem>
+                <NativeMenuItem Header="Sinine"></NativeMenuItem>
+                <NativeMenuItem Header="Jõulud"></NativeMenuItem>
                 <NativeMenuItem Header="Süsteemi värviskeem"></NativeMenuItem>
                 <NativeMenuItem Header="Kohandatud"></NativeMenuItem>
               </NativeMenu>

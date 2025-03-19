@@ -543,7 +543,21 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 svm.ForeColor = avaMarkuseKaustadToolStripMenuItem.ForeColor;
                 svm.ShowDialog();
                 svm.Dispose();*/
+            } else if (OperatingSystem.IsLinux())
+            {
+                new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "sudo",
+                        Arguments = "/usr/bin/virsh start win10",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        WindowStyle = ProcessWindowStyle.Hidden
+                    }
+                }.Start();
             } else {
+
                 ((NativeMenuItem)sender).IsEnabled = false;
             }
         }
