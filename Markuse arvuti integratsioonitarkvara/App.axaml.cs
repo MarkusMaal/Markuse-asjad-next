@@ -256,7 +256,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
             } else
             {
                 var p = new Process();
-                p.StartInfo.UseShellExecute = true;
+                p.StartInfo.UseShellExecute = !OperatingSystem.IsMacOS() ;
                 p.StartInfo.FileName = mas_root + "/Markuse asjad/Markuse arvuti juhtpaneel";
                 p.Start();
             }

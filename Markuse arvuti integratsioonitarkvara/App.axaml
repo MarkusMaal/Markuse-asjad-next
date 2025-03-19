@@ -1,7 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Markuse_arvuti_integratsioonitarkvara.App"
-             RequestedThemeVariant="Dark"
+             RequestedThemeVariant="Dark" Name="Markuse arvuti integratsioonitarkvara"
              xmlns:local="using:Markuse_arvuti_integratsioonitarkvara"
              xmlns:r="clr-namespace:Markuse_arvuti_integratsioonitarkvara.Properties">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -40,7 +40,6 @@
                 <NativeMenuItem Header="Peata" Icon="Resources/failure.gif"/>
               </NativeMenu>
             </NativeMenuItem>
-            <NativeMenuItem Header="Sünkroniseeri versioon" Icon="Resources/mas_sync.png"/>
             <NativeMenuItem Header="Tarkvara paigaldamise režiim" Icon="Resources/unknown.png"/>
             <NativeMenuItem Header="Värviskeem" Icon="Resources/theming.png">
               <NativeMenu>
