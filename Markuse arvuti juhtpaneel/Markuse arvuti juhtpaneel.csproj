@@ -12,10 +12,8 @@
     <AssemblyVersion>2.4.1.0</AssemblyVersion>
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     <PublishTrimmed>true</PublishTrimmed>
+    <ApplicationIcon>Assets/mas.ico</ApplicationIcon>
   </PropertyGroup>
-  <ItemGroup>
-    <Content Include="mas.ico" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.10" />
@@ -50,5 +48,8 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\mas_web.png" />
     <AvaloniaResource Include="Assets\failure.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="mas.ico" />
   </ItemGroup>
 </Project>

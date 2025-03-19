@@ -165,6 +165,13 @@ public partial class MainWindow : Window
                                       (command.Arguments != "" ? " (args: " + command.Arguments + ")" : " (no args)"));
                     switch (command.Type)
                     {
+                        case "IsDesktopIconsVisible":
+                            Dispatcher.UIThread.Post(() =>
+                            {
+                                Position = new PixelPoint(0, 0);
+                                IsVisible = command.Arguments.Equals("true", StringComparison.CurrentCultureIgnoreCase);
+                            });
+                            break;
                         case "IsIconVisible":
                             desktopLayout.ShowIcons =
                                 command.Arguments.Equals("true", StringComparison.CurrentCultureIgnoreCase);

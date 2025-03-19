@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
@@ -26,6 +27,12 @@ namespace Markuse_arvuti_integratsioonitarkvara
         public MainWindow()
         {
             InitializeComponent();
+            if (!OperatingSystem.IsLinux())
+            {
+                //Console.WriteLine("Windows/Mac paranduste aktiveerimine...");
+                this.ExtendClientAreaToDecorationsHint = false;
+                this.SystemDecorations = SystemDecorations.None;
+            }
             app = (App)Application.Current;
             if (app.Verifile() && !app.croot)
             {
@@ -198,6 +205,9 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 NativeMenuItem n = (NativeMenuItem)nmi;
                 switch (n.Header)
                 {
+                    case "Käivita MarkuStation":
+                        n.IsEnabled = !OperatingSystem.IsMacOS() || System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X86;
+                        break;
                     case "Markuse mälupulk":
                     case "Ühtegi mälupulka pole sisestatud":
                         if (app.fmount != "")
@@ -212,6 +222,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         break;
                     case "Lülita mälupulga lukustus sisse":
                     case "Lülita mälupulga lukustus välja":
+                        n.IsEnabled = !OperatingSystem.IsMacOS();
                         bool flashLocked = File.Exists(app.mas_root + "/flash_unlock_is_enabled.log");
                         n.Header = flashLocked ? "Lülita mälupulga lukustus välja" : "Lülita mälupulga lukustus sisse";
                         if (!initialized) {
@@ -421,19 +432,21 @@ namespace Markuse_arvuti_integratsioonitarkvara
             }
         }
 
-        private void Window_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private void Window_Loaded(object? sender, RoutedEventArgs e)
         {
             ApplyTheme();
             ti.IsVisible = true;
-            if (OperatingSystem.IsMacOS())
+            if (OperatingSystem.IsMacOS() && !Debugger.IsAttached)
             {
-                new Process()
+                if (Process.GetProcesses().Any(p => p.ProcessName.Contains("DesktopIcons"))) return;
+                new Process
                 {
                     StartInfo =
-                {
-                    FileName = app.mas_root + "/Markuse asjad/DesktopIcons",
-                    UseShellExecute = false,
-                }
+                    {
+                        FileName = "open",
+                        Arguments = "-a \"" + app.mas_root + "/Markuse asjad/DesktopIcons.app\"",
+                        UseShellExecute = false,
+                    }
                 }.Start();
             }
             ReloadMenu();

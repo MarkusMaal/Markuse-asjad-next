@@ -452,7 +452,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
             {
                 Process p = new Process();
                 p.StartInfo.FileName = mas_root + "/Markuse asjad/MarkuStation2";
-                p.StartInfo.UseShellExecute = true;
+                p.StartInfo.UseShellExecute = !OperatingSystem.IsMacOS();
                 if (OperatingSystem.IsWindows())
                 {
                     p.StartInfo.FileName += ".exe";
@@ -466,7 +466,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
                     Process p = new Process();
                     p.StartInfo.FileName = mas_root + "/MarkuStation.exe";
-                    p.StartInfo.UseShellExecute = true;
+                    p.StartInfo.UseShellExecute = !OperatingSystem.IsMacOS();
                     p.StartInfo.Verb = "runas";
                     p.Start();
                 }
@@ -475,7 +475,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void LockWorkstation_Click(object? sender, EventArgs e)
         {
-            Process p = new Process();
+            var p = new Process();
             if (OperatingSystem.IsWindows()) {
                 p.StartInfo.FileName = mas_root + "/Markuse asjad/Markuse arvuti lukustamissüsteem";
                 if (OperatingSystem.IsWindows())
@@ -487,6 +487,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
             } else if (OperatingSystem.IsLinux()) {
                 p.StartInfo.FileName = "loginctl";
                 p.StartInfo.Arguments = "lock-session";
+                p.Start();
+            } else if (OperatingSystem.IsMacOS())
+            {
+                p.StartInfo.FileName = "pmset";
+                p.StartInfo.Arguments = "displaysleepnow";
                 p.Start();
             }
         }

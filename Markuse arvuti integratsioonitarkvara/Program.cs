@@ -28,7 +28,8 @@ namespace Markuse_arvuti_integratsioonitarkvara
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
-                .LogToTrace();
+                .LogToTrace()
+                .With(new MacOSPlatformOptions { ShowInDock = false});
 
     }
 }

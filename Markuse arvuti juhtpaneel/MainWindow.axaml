@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="929" d:DesignHeight="681"
         x:Class="Markuse_arvuti_juhtpaneel.MainWindow"
-        Title="Info kogumine..."
+        Title="Info kogumine..." Icon="Assets/mas_web.png"
         Width="929" Height="681" Loaded="Window_Loaded" IsVisible="False" Closing="Window_OnClosing">
   <Grid Name="ErtGrid" SizeChanged="Grid_SizeChanged">
     <Grid.RowDefinitions>

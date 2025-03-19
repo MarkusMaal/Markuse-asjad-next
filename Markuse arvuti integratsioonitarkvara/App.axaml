@@ -53,7 +53,6 @@
             </NativeMenuItem>
             <NativeMenuItem Header="Markuse arvuti juhtpaneel" Icon="Resources/mas_general.png" Click="Cpanel_Clicked"/>
             <NativeMenuItem Header="Sulge see menüü" Icon="Resources/failure.gif"/>
-            <NativeMenuItem Header="Juurutamine" Icon="Resources/mas_sync.png"/>
           </NativeMenu>
         </TrayIcon.Menu>
       </TrayIcon>

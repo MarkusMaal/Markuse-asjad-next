@@ -735,9 +735,9 @@ namespace Markuse_arvuti_juhtpaneel
 
                     var proc = new Process
                     {
-                        StartInfo = new()
+                        StartInfo = new ProcessStartInfo
                         {
-                            FileName = masRoot + "/Markuse asjad/DesktopIcons" +
+                            FileName = masRoot + "/Markuse asjad/DesktopIcons" + (OperatingSystem.IsMacOS() ? ".app/Contents/MacOS/DesktopIcons" : "") +
                                        (OperatingSystem.IsWindows() ? ".exe" : ""),
                             Arguments = "--icons",
                             UseShellExecute = false,
@@ -750,14 +750,13 @@ namespace Markuse_arvuti_juhtpaneel
                     while (!proc.StandardOutput.EndOfStream)
                     {
                         var line = proc.StandardOutput.ReadLine();
-                        if (!string.IsNullOrEmpty(line)) {
-                            desktopIcons.Add(line);
-                            SetCollectProgress(-1, "Tuvastatud ikoon: " + line);
-                        }
+                        if (string.IsNullOrEmpty(line)) continue;
+                        desktopIcons.Add(line);
+                        SetCollectProgress(-1, "Tuvastatud ikoon: " + line);
                     }
 
                     SetCollectProgress(75, "Oleku kontrollimine...");
-                    string VF_STATUS = Verifile2();
+                    var VF_STATUS = Verifile2();
                     SetCollectProgress(80, "UI ettevalmistamine...");
                     Dispatcher.UIThread.Post(() =>
                     {

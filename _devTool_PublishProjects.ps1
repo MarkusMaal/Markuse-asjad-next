@@ -7,7 +7,7 @@ Get-ChildItem . -Directory -Exclude ".vscode",".vs",".idea",".git","out","Unipla
 	$pn = $_.Name
 	Write-Output "- Compiling $pn ..."
 	if ($IsMacOS) {
-	    dotnet publish $pn -c Release -o out/$pn -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
+	    dotnet publish $pn -c Release -o out/$pn.d -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
 	} else {
 	    dotnet publish $pn -c Release -o out -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
 	}
