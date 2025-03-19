@@ -424,7 +424,13 @@ public partial class MainWindow : Window
     private void GenerateMasLogo()
     {
         var size = icon_size / 2;
-        var me = desktopLayout.Logo;
+        var me = desktopLayout.Logo; 
+        var aspect = (double)Screens.Primary.Bounds.Width / (double)Screens.Primary.Bounds.Height;
+        var padx = (int)(0.25 * size) ;
+        if (aspect > 3.0) // super ultra-wide
+        {
+            padx = Screens.Primary.Bounds.Width / 4;
+        }
         var tI = new TopIcon
         {
             BgCol =
@@ -435,7 +441,7 @@ public partial class MainWindow : Window
                     { Opacity = 0 }
             },
             WindowStartupLocation = WindowStartupLocation.Manual,
-            Position = new PixelPoint((me.LocationX > 0) ? me.LocationX : (int)(0.25 * size), me.LocationY > 0 ? me.LocationY : Screens.Primary.Bounds.Height - (int)(size * 1.5) - (int)(size * 0.25)),
+            Position = new PixelPoint((me.LocationX > 0) ? me.LocationX : padx, me.LocationY > 0 ? me.LocationY : Screens.Primary.Bounds.Height - (int)(size * 1.5) - (int)(size * 0.25)),
             Width = size,
             Height = size,
             icon = me.IconA,
