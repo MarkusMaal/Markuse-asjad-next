@@ -425,6 +425,17 @@ namespace Markuse_arvuti_integratsioonitarkvara
         {
             ApplyTheme();
             ti.IsVisible = true;
+            if (OperatingSystem.IsMacOS())
+            {
+                new Process()
+                {
+                    StartInfo =
+                {
+                    FileName = app.mas_root + "/Markuse asjad/DesktopIcons",
+                    UseShellExecute = false,
+                }
+                }.Start();
+            }
             ReloadMenu();
         }
 
