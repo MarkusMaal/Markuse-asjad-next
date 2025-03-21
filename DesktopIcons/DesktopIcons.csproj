@@ -9,6 +9,7 @@
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
         <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+        <ApplicationIcon>desktop.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -50,5 +51,9 @@
         <AvaloniaResource Include="Resources\topicons\reset.png" />
         <AvaloniaResource Include="Resources\topicons\word.png" />
         <AvaloniaResource Include="Resources\topicons\www.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="desktop.ico" />
     </ItemGroup>
 </Project>

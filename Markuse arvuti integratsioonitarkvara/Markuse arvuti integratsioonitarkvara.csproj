@@ -7,6 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <ApplicationIcon>mas_computers.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\br.png" />
@@ -62,6 +63,9 @@
     <EmbeddedResource Include="Resources\user_black.png" />
     <EmbeddedResource Include="Resources\user_blue.png" />
     <AvaloniaResource Include="Resources\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="mas_computers.ico" />
   </ItemGroup>
 
   <ItemGroup>

@@ -38,12 +38,12 @@ do
     echo '      <key>CFBundlePackageType</key>' >> "${APP_DIR}/Contents/Info.plist"
     echo "      <string>APPL</string>" >> "${APP_DIR}/Contents/Info.plist"
     echo '      <key>CFBundleIconFile</key>' >> "${APP_DIR}/Contents/Info.plist"
-    echo "      <string>Mas</string>" >> "${APP_DIR}/Contents/Info.plist"
+    echo "      <string>AppIcon</string>" >> "${APP_DIR}/Contents/Info.plist"
     echo '      <key>LSMinimumSystemVersion</key>' >> "${APP_DIR}/Contents/Info.plist"
     echo "      <string>10.13</string>" >> "${APP_DIR}/Contents/Info.plist"
     echo '  </dict>' >> "${APP_DIR}/Contents/Info.plist"
     echo '  </plist>' >> "${APP_DIR}/Contents/Info.plist"
-    cp "${SOLUTION_DIR}/Mas.icns" "${APP_DIR}/Contents/Resources/Mas.icns"
+    cp "${SOLUTION_DIR}/${APP_NAME}.icns" "${APP_DIR}/Contents/Resources/AppIcon.icns"
     mv "$APP_DIR" "$SOLUTION_DIR/out/$APP_DIR"
    popd >/dev/null || exit
 done

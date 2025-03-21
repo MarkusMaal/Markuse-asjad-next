@@ -7,6 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <ApplicationIcon>ms2.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\MarkuStation_ambient.wav" />
@@ -39,6 +40,7 @@
     <AvaloniaResource Include="Resources\MarkuStation_startup.wav" />
     <AvaloniaResource Include="Resources\MarkuStation_startup_video.MP4" />
     <AvaloniaResource Include="Resources\s.png" />
+    <AvaloniaResource Include="ms2.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,5 +68,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="mas.ico" />
+    <Content Include="ms2.ico" />
   </ItemGroup>
 </Project>

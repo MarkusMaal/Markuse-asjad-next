@@ -7,6 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <ApplicationIcon>its.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\aken.jpg" />
@@ -125,5 +126,9 @@
 
   <ItemGroup>
     <UpToDateCheckInput Remove="Run.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="its.ico" />
   </ItemGroup>
 </Project>

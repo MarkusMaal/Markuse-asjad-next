@@ -7,6 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <ApplicationIcon>pidu.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\Goa-Party.jpg" />
@@ -17,6 +18,9 @@
     <AvaloniaResource Include="Resources\Goa-Party.jpg" />
     <AvaloniaResource Include="Resources\Party-Wallpapers.jpg" />
     <AvaloniaResource Include="Resources\Party-Wallpapers_small.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="pidu.ico" />
   </ItemGroup>
 
   <ItemGroup>
