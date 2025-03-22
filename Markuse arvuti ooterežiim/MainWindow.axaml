@@ -4,10 +4,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Markuse_arvuti_ooterežiim.MainWindow"
-        Title="Markuse_arvuti_ooterežiim" Background="Black"
+        xmlns:markuseArvutiOoterežiim="clr-namespace:Markuse_arvuti_ooterežiim"
+        x:DataType="markuseArvutiOoterežiim:MainWindowModel"
+        Title="Markuse_arvuti_ooterežiim" Background="Black" ShowInTaskbar="False"
         WindowState="FullScreen" KeyDown="Window_KeyDown" PointerMoved="Window_PointerMoved" Loaded="Window_Loaded">
   <Grid>
-    <Image Name="LogoImage" Classes="LogoImage" Source="resm:Avalonia.Skia.Assets.NoiseAsset_256X256_PNG.png?assembly=Avalonia.Skia" Width="128" Height="128" HorizontalAlignment="Left" VerticalAlignment="Top">
+    <Image Name="LogoImage" Classes="LogoImage" Source="resm:Avalonia.Skia.Assets.NoiseAsset_256X256_PNG.png?assembly=Avalonia.Skia" Width="128" Height="128" HorizontalAlignment="Left" VerticalAlignment="Top" RenderOptions.BitmapInterpolationMode="MediumQuality">
     </Image>
   </Grid>
 
@@ -22,16 +24,19 @@
     </Style>
     <Style Selector="Image.LogoImage">
       <Setter Property="Margin" Value="10,10"></Setter>
-      <Style.Animations>
-        <Animation Duration="0:0:3" IterationCount="Infinite">
-          <KeyFrame Cue="0%">
-            <Setter Property="Margin" Value="0,0"/>
-          </KeyFrame>
-          <KeyFrame Cue="100%">
-            <Setter Property="Margin" Value="770,770"/>
-          </KeyFrame>
-        </Animation>
-      </Style.Animations>
     </Style>
   </Window.Styles>
+  <Window.Resources>
+    <Animation Duration="0:0:3" x:Key="LogoAnimation" Easing="ExponentialEaseInOut"
+               x:SetterTargetType="Image" PlaybackDirection="Normal" FillMode="Forward">
+      <KeyFrame Cue="0%">
+        <Setter Property="Margin" Value="{Binding StartingPoint}"/>
+        <Setter Property="RotateTransform.Angle" Value="0"></Setter>
+      </KeyFrame>
+      <KeyFrame Cue="100%">
+        <Setter Property="Margin" Value="{Binding ScreenDimensions}"/>
+        <Setter Property="RotateTransform.Angle" Value="{Binding Rotation}"></Setter>
+      </KeyFrame>
+    </Animation>
+  </Window.Resources>
 </Window>
