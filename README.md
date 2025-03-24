@@ -49,3 +49,16 @@ Kompileerimiseks valige `5. Build solution`. See kompileerib kõik rakendused te
 Et näha millised rakendused on edukalt kompileeritud, kasutage menüüvalikut `3. Show projects`. Iga edukalt kompileeritud rakenduse taga peaks olema kiri `[Build OK]`.
 
 Binraaride uuendamiseks valige menüüst `4. Update binaries`. See sulgeb kõik avatud rakendused automaatselt ning avab need pärast uute binraaride kopeerimist ka uuesti.
+
+# macOS .app konteinerite loomine
+
+1. Kustutage enne alustamist out/ kataloogi sisu
+2. Ehitage lahendus _devTool_publish.ps1 skriptiga (PowerShellis)
+3. Genereerige .app konteinerid käivitades bashis _devTool_CreateMacBundles.sh (NB: see skript üritab ka kopeerida binraarid automaatselt "/home/$USER/.mas/Markuse asjad" kataloogi)
+4. Ärge kasutage _devTool_UpdateAll.ps1 skripti või _devTool_Menu.ps1-s "Update binaries" valikut macOSis!!!
+5. Käivita _devTool_KillAll.ps1 skript, et peatada jooksvad Markuse asjade rakendused
+6. Kui avate nüüd out/ kataloogi Finderiga, näete seal genereeritud konteinereid, mida saate avada või liigutada Applications kausta
+7. Kuna need binraarid ei ole märgistatud Apple poolt, siis peate iga rakenduse esimesel käivitamisel tegema järgnevat:
+   1. Lockdown peab sätetes olema välja lülitatud
+   2. Tuleb valida "Open anyway" sätete rakenduses "Privacy and Security" alt
+8. Käivita _devTool_Restart.ps1 skript, et Markuse arvuti asjade tarkvara taaskäivitada
