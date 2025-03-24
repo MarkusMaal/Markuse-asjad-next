@@ -50,7 +50,7 @@ Et näha millised rakendused on edukalt kompileeritud, kasutage menüüvalikut `
 
 Binraaride uuendamiseks valige menüüst `4. Update binaries`. See sulgeb kõik avatud rakendused automaatselt ning avab need pärast uute binraaride kopeerimist ka uuesti.
 
-# macOS .app konteinerite loomine
+## macOS .app konteinerite loomine
 
 1. Kustutage enne alustamist out/ kataloogi sisu
 2. Ehitage lahendus _devTool_publish.ps1 skriptiga (PowerShellis)
