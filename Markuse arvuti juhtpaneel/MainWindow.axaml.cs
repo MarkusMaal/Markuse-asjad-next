@@ -799,6 +799,10 @@ namespace Markuse_arvuti_juhtpaneel
                     var me = Thread.CurrentThread;
                     Dispatcher.UIThread.Post(() =>
                     {
+                        if (LaunchError)
+                        {
+                            MessageBoxShow("Programmi laadimisel ilmnes vigu. Programm ei pruugi õigesti toimida.", "Markuse arvuti juhtpaneel", ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+                        }
                         StopThread(me);
                     });
                 }
@@ -1113,17 +1117,30 @@ namespace Markuse_arvuti_juhtpaneel
             saveprog += (bool)ShowMasLogoCheck.IsChecked! ? "true;" : "false;";
             saveprog += (bool)AllowScheduledTasksCheck.IsChecked! ? "true;" : "false;";
             saveprog += (bool)StartDesktopNotesCheck.IsChecked! ? "true;" : "false;";
-            File.WriteAllText(masRoot + "/mas.cnf", saveprog);
-            
-            // new method
-            config = new()
+            try
             {
-                AllowScheduledTasks = AllowScheduledTasksCheck.IsChecked ?? false,
-                AutostartNotes = StartDesktopNotesCheck.IsChecked ?? false,
-                ShowLogo = ShowMasLogoCheck.IsChecked ?? false,
-                PollRate = pollRate,
-            };
-            config.Save(masRoot);
+                File.WriteAllText(masRoot + "/mas.cnf", saveprog);
+
+                // new method
+                config = new()
+                {
+                    AllowScheduledTasks = AllowScheduledTasksCheck.IsChecked ?? false,
+                    AutostartNotes = StartDesktopNotesCheck.IsChecked ?? false,
+                    ShowLogo = ShowMasLogoCheck.IsChecked ?? false,
+                    PollRate = pollRate,
+                };
+                config.Save(masRoot);
+            }
+            catch
+            {
+                AllowScheduledTasksCheck.IsEnabled = false;
+                StartDesktopNotesCheck.IsEnabled = false;
+                ShowMasLogoCheck.IsEnabled = false;
+                IntegrationPollrate.IsEnabled = false;
+                ConfigNoticeLabel.Content = "Neid sätteid ei saa hetkel muuta. Olge kindlad, et kirjutamise ligipääs failidele mas.cnf ja Config.json oleks saadaval.";
+                LaunchError = true;
+                return;
+            }
         }
 
         private void ReloadThumbs()
@@ -1566,15 +1583,46 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void ReRootClicked(object sender, RoutedEventArgs e)
         {
-            if (OperatingSystem.IsWindows())
+            var fName = masRoot + "/Markuse asjade juurutamise tööriist" +
+                           (OperatingSystem.IsWindows() ? ".exe" : "");
+            if (!File.Exists(fName))
             {
-                Process.Start(masRoot + "/Markuse asjad/JTR.exe");
-                this.Close();
+                MessageBoxShow("Palun kopeerige Markuse asjade juurutamise tööriist " +
+                               (OperatingSystem.IsWindows() ? "kausta" : "kataloogi") + $" \"{masRoot}\"");
+                return;
             }
-            else
+            var ps = WindowState;
+            new Thread(() =>
             {
-                MessageBoxShow("Juurutamine selles Markuse arvuti asjade versioonis on võimalik ainult Windowsis", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
-            }
+                Process p = new()
+                {
+                    StartInfo =
+                    {
+                        FileName = fName,
+                        UseShellExecute = true,
+                    }
+                };
+                p.Start();
+                Dispatcher.UIThread.Post(() =>
+                {
+                    ErtGrid.IsEnabled = false;
+                    WindowState = WindowState.Minimized;
+                    IsVisible = false;
+                });
+                p.WaitForExit();
+                Dispatcher.UIThread.Post(() =>
+                {
+                    ErtGrid.IsEnabled = true;
+                    WindowState = ps;
+                    IsVisible = true;
+                    WhatNewLabel.Text = "Mis on uut?";
+                    TabsControl.IsEnabled = false;
+                    TabsControl.IsVisible = false;
+                    Header1.IsVisible = false;
+                    CheckSysLabel.IsVisible = true;
+                });
+                CollectInfo();
+            }).Start();
         }
 
         private static bool IsAppleSilicon() {
@@ -1633,7 +1681,17 @@ namespace Markuse_arvuti_juhtpaneel
         {
             if (preventWrites) return;
             var jsonData = JsonSerializer.Serialize(desktopLayout, _serializerOptions);
-            File.WriteAllText(masRoot + "/DesktopIcons.json", jsonData, encoding: Encoding.UTF8);
+            try
+            {
+                File.WriteAllText(masRoot + "/DesktopIcons.json", jsonData, encoding: Encoding.UTF8);
+            }
+            catch
+            {
+                DesktopTab.IsEnabled = false;
+                DesktopTab.IsSelected = false;
+                TabPrimary.IsSelected = true;
+                MessageBoxShow("Sätete salvestamine nurjus. Olge kindlad, et teil oleks kirjutamise ligipääs failile \"DesktopIcons.json\".", "Markuse arvuti juhtpaneel", ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+            }
         }
 
         private void LoadDesktopSettings()

@@ -7,9 +7,10 @@
         xmlns:markuseArvutiOoterežiim="clr-namespace:Markuse_arvuti_ooterežiim"
         x:DataType="markuseArvutiOoterežiim:MainWindowModel"
         Title="Markuse_arvuti_ooterežiim" Background="Black" ShowInTaskbar="False"
-        WindowState="FullScreen" KeyDown="Window_KeyDown" PointerMoved="Window_PointerMoved" Loaded="Window_Loaded">
+        WindowState="Normal" KeyDown="Window_KeyDown" PointerMoved="Window_PointerMoved" Loaded="Window_Loaded">
   <Grid>
-    <Image Name="LogoImage" Classes="LogoImage" Source="resm:Avalonia.Skia.Assets.NoiseAsset_256X256_PNG.png?assembly=Avalonia.Skia" Width="128" Height="128" HorizontalAlignment="Left" VerticalAlignment="Top" RenderOptions.BitmapInterpolationMode="MediumQuality">
+    <Image Name="LogoImageR" Classes="LogoImage" Source="resm:Avalonia.Skia.Assets.NoiseAsset_256X256_PNG.png?assembly=Avalonia.Skia" Width="128" Height="128"
+           HorizontalAlignment="Left" VerticalAlignment="Top" RenderOptions.BitmapInterpolationMode="MediumQuality">
     </Image>
   </Grid>
 
@@ -28,7 +29,7 @@
   </Window.Styles>
   <Window.Resources>
     <Animation Duration="0:0:3" x:Key="LogoAnimation" Easing="ExponentialEaseInOut"
-               x:SetterTargetType="Image" PlaybackDirection="Normal" FillMode="Forward">
+               x:SetterTargetType="Grid" PlaybackDirection="Normal" FillMode="Forward">
       <KeyFrame Cue="0%">
         <Setter Property="Margin" Value="{Binding StartingPoint}"/>
         <Setter Property="RotateTransform.Angle" Value="0"></Setter>

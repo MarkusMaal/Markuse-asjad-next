@@ -26,7 +26,7 @@
     </StackPanel>
     <TabControl Name="TabsControl" Grid.Row="1" FontSize="12" IsEnabled="False" IsVisible="False">
 <!--Avaleht-->
-      <TabItem Header="Avaleht">
+      <TabItem Name="TabPrimary" Header="Avaleht">
         <StackPanel>
           <Label>Integratsioonimenüü</Label>
           <WrapPanel Classes="Left">
@@ -104,7 +104,7 @@
       <TabItem Header="Konfiguratsioon">
         <StackPanel>
           <Label Classes="H1" Margin="0,10">Integratsioon</Label>
-          <Label>Muudatused rakendatakse pärast Markuse asjade taaskäivitamist</Label>
+          <Label Name="ConfigNoticeLabel">Muudatused rakendatakse pärast Markuse asjade taaskäivitamist</Label>
           <CheckBox Name="ShowMasLogoCheck" Click="ConfigCheck">Kuva Markuse asjade logo integratsioonitarkvara käivitumisel</CheckBox>
           <CheckBox Name="AllowScheduledTasksCheck" Click="ConfigCheck">Luba ajastatud sündmused</CheckBox>
           <CheckBox Name="StartDesktopNotesCheck" Click="ConfigCheck">Käivita töölauamärkmed käivitumisel</CheckBox>
