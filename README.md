@@ -1,3 +1,4 @@
+![Markuse asjad logo](logo.png)
 # Markuse asjad next
 
 ## Süsteemnõuded
