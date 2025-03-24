@@ -3,10 +3,11 @@
 
 ## Süsteemnõuded
 
-* Markuse asjad nõuetele vastav süsteem kehtiva Verifile 2.0 räsiga
+* Markuse asjad nõuetele vastav süsteem kehtiva Verifile 2.0 räsiga. Räsi genereerimiseks peate kasutama [juurutamise tööriista](https://github.com/MarkusMaal/mas-juurariist).
 * dotnet-sdk-8.0 või muu ühilduv lahendus kompileerimiseks
 * Microsoft Powershell devToolide kasutamiseks
 * Avalonia UI pluginad vastava IDE jaoks (Microsoft Visual Studio või JetBrains Rider)
+* Operatsioonsüsteem: Windows, macOS või Linux (muid süsteeme ei toetata)
 
 
 ## PowerShell paigaldamine
@@ -23,9 +24,9 @@ Kõik rakendused on järjest võimalik kompileerida, kasutades devTool menüüd.
 Seejärel peaks avama järgmine menüü:
 
 ```
-         ●
-        ● ●   markuse arvuti asjad
-         ●
+          🔴
+        🟡  🟢   markuse arvuti asjad
+          🔵
 
 1. Kill processes
 2. Restart processes
