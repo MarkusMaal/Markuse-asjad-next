@@ -64,3 +64,16 @@ Binraaride uuendamiseks valige menüüst `4. Update binaries`. See sulgeb kõik 
    3. Mõnikord peate ligipääsu andma ka teatud kaustadele, et rakendus toimiks õigesti
    4. **MarkuStation2** ja **Pidu!** ei toimi macOS-is Apple Silicon seadmetes, kuna LibVLC ei toeta veel seda platvormi, selle asemel peate kasutama [Asahi Linuxit](https://asahilinux.org/). Võite ruumi säästmiseks need konteinerid macOSis kustutada.
 8. Käivita _devTool_Restart.ps1 skript, et Markuse arvuti asjade tarkvara taaskäivitada (`pwsh _devTool_Restart.ps1`)
+
+## Aknareeglid Linuxi jaoks
+
+Kui kasutate DesktopIcons rakendust Linuxis, siis võite märgata, et need ikoonid ei püsi akende taga. Selleks, et seda parandada, peate konfigureerima enda aknahalduri vastavate reeglitega.
+
+* Rakenduse klass: DesktopIcons
+* Akna päised: TopIcon, Töölauaikoonid
+
+KWini reegleid saab muuta, kui avada `plasma-open-settings` rakendus ja sealt leida "Aknareeglid". Siin on soovitatavad aknareeglid:
+
+![KWin reeglid](kwin_rules.png)
+
+Kui pärast nende sätete muutmist nüüd DesktopIcons uuesti käivitada, peaksid ikoonid püsima kõigi teiste akende taga ning samuti kaduma Alt+Tab menüüst ja tegumiribalt.
