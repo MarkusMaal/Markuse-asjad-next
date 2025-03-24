@@ -52,13 +52,15 @@ Binraaride uuendamiseks valige menüüst `4. Update binaries`. See sulgeb kõik 
 
 ## macOS .app konteinerite loomine
 
-1. Kustutage enne alustamist out/ kataloogi sisu
-2. Ehitage lahendus _devTool_publish.ps1 skriptiga (PowerShellis)
-3. Genereerige .app konteinerid käivitades bashis _devTool_CreateMacBundles.sh (NB: see skript üritab ka kopeerida binraarid automaatselt "/home/$USER/.mas/Markuse asjad" kataloogi)
-4. Ärge kasutage _devTool_UpdateAll.ps1 skripti või _devTool_Menu.ps1-s "Update binaries" valikut macOSis!!!
-5. Käivita _devTool_KillAll.ps1 skript, et peatada jooksvad Markuse asjade rakendused
-6. Kui avate nüüd out/ kataloogi Finderiga, näete seal genereeritud konteinereid, mida saate avada või liigutada Applications kausta
+1. Kustutage enne alustamist out/ kataloogi sisu (`rm -rf out/`)
+2. Ehitage lahendus _devTool_PublishProjects.ps1 skriptiga (`pwsh _devTool_PublishProjects.ps1`)
+3. Käivita _devTool_KillAll.ps1 skript, et peatada jooksvad Markuse asjade rakendused (`pwsh _devTool_KillAll.ps1`)
+4. Genereerige .app konteinerid käivitades `bash ./_devTool_CreateMacBundles.sh` (NB: see skript üritab ka kopeerida binraarid automaatselt "/home/$USER/.mas/Markuse asjad" kataloogi)
+5. Ärge kasutage _devTool_UpdateAll.ps1 skripti või _devTool_Menu.ps1-s "Update binaries" valikut macOSis!!!
+6. Kui avate nüüd `out/` kataloogi Finderiga, näete seal genereeritud konteinereid, mida saate avada või liigutada Applications kausta (soovitame luua aliase, päriselt liigutamise asemel, sest siis on rakendusemenüüs alati ajakohane versioon)
 7. Kuna need binraarid ei ole märgistatud Apple poolt, siis peate iga rakenduse esimesel käivitamisel tegema järgnevat:
    1. Lockdown peab sätetes olema välja lülitatud
    2. Tuleb valida "Open anyway" sätete rakenduses "Privacy and Security" alt
-8. Käivita _devTool_Restart.ps1 skript, et Markuse arvuti asjade tarkvara taaskäivitada
+   3. Mõnikord peate ligipääsu andma ka teatud kaustadele, et rakendus toimiks õigesti
+   4. **MarkuStation2** ja **Pidu!** ei toimi macOS-is Apple Silicon seadmetes, kuna LibVLC ei toeta veel seda platvormi, selle asemel peate kasutama [Asahi Linuxit](https://asahilinux.org/). Võite ruumi säästmiseks need konteinerid macOSis kustutada.
+8. Käivita _devTool_Restart.ps1 skript, et Markuse arvuti asjade tarkvara taaskäivitada (`pwsh _devTool_Restart.ps1`)
