@@ -6,7 +6,7 @@
         x:Class="Markuse_arvuti_ooterežiim.MainWindow"
         xmlns:markuseArvutiOoterežiim="clr-namespace:Markuse_arvuti_ooterežiim"
         x:DataType="markuseArvutiOoterežiim:MainWindowModel"
-        Title="Markuse_arvuti_ooterežiim" Background="Black" ShowInTaskbar="False"
+        Title="Markuse_arvuti_ooterežiim" Background="Black" ShowInTaskbar="False" Closing="Window_Closing"
         WindowState="Normal" KeyDown="Window_KeyDown" PointerMoved="Window_PointerMoved" Loaded="Window_Loaded">
   <Grid>
     <Image Name="LogoImageR" Classes="LogoImage" Source="resm:Avalonia.Skia.Assets.NoiseAsset_256X256_PNG.png?assembly=Avalonia.Skia" Width="128" Height="128"

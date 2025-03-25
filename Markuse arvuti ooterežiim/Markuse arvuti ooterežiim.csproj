@@ -10,6 +10,12 @@
     <ApplicationIcon>mas.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\mas_general.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Resources\mas_general.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="mas.ico" />
   </ItemGroup>
 

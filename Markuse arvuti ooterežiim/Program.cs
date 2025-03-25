@@ -5,6 +5,9 @@ namespace Markuse_arvuti_ooterežiim
 {
     internal class Program
     {
+        public static int monitors = 1;
+        public static int settingsid = 0;
+
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.

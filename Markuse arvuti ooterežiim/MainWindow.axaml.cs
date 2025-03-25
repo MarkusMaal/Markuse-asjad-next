@@ -10,6 +10,7 @@ using System;
 using System.IO;
 using Avalonia;
 using Avalonia.Platform;
+using System.Threading;
 
 namespace Markuse_arvuti_ooterežiim
 {
@@ -24,12 +25,16 @@ namespace Markuse_arvuti_ooterežiim
         /// <summary>
         /// If first value true, move down, else move up. If second value true, move right, else move left.
         /// </summary>
-        private bool[] DownRight = [true, true];
+        internal bool[] DownRight = [true, true];
         
         private PixelPoint CurrentPosition = new (-1, -1);
-        
+
+        private MainWindow child;
+
+        private bool EnableBg = false;
         
         Bitmap background;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -39,13 +44,29 @@ namespace Markuse_arvuti_ooterežiim
             {
                 using var ms = new FileStream(commonBg, FileMode.Open, FileAccess.Read);
                 background = new Bitmap(ms);
-                this.Background = new ImageBrush(background) { Stretch = Stretch.UniformToFill, Transform = new ScaleTransform(1+r.NextDouble()*2, 1+r.NextDouble()*2) };
+                if (EnableBg) this.Background = new ImageBrush(background) { Stretch = Stretch.UniformToFill, Transform = new ScaleTransform(1+r.NextDouble()*2, 1+r.NextDouble()*2) };
             }
-
             this.Icon = new WindowIcon(GetResource(Properties.Resources.mas_general));
             this.LogoImageR.Source = GetResource(Properties.Resources.mas_general);
 
             DataContext = mwm;
+            if (Screens.All.Count > Program.monitors)
+            {
+                Program.monitors++;
+                child = new MainWindow
+                {
+                    WindowStartupLocation = WindowStartupLocation.Manual,
+                    Position = new PixelPoint(Screens.All[Program.monitors - 1].WorkingArea.TopLeft.X, Screens.All[Program.monitors - 1].WorkingArea.TopLeft.Y),
+                    DownRight = [r.Next(0, 1) == 1, r.Next(0, 1) == 1]
+                };
+                child.Show();
+            }
+            // make sure first window is on the first monitor (neccessary when window is opened from a secondary display)
+            if (this.WindowStartupLocation != WindowStartupLocation.Manual)
+            {
+                this.WindowStartupLocation = WindowStartupLocation.Manual;
+                this.Position = new PixelPoint(Screens.All[0].WorkingArea.TopLeft.X, Screens.All[0].WorkingArea.TopLeft.Y);
+            }
         }
 
         private static Bitmap GetResource(byte[] resource)
@@ -126,10 +147,23 @@ namespace Markuse_arvuti_ooterežiim
             timer.Tick += (_, _) =>
             { 
                 MoveNow();
-                this.Background = new ImageBrush(background) { Stretch = Stretch.UniformToFill, Transform = new ScaleTransform(1+r.NextDouble()*2, 1+r.NextDouble()*2), Opacity = r.NextDouble() };
+                if (EnableBg) this.Background = new ImageBrush(background) { Stretch = Stretch.UniformToFill, Transform = new ScaleTransform(1+r.NextDouble()*2, 1+r.NextDouble()*2) };
             };
             timer.Interval = TimeSpan.FromSeconds(3.03);
             timer.Start();
+
+            // hide mouse cursor
+            new Thread(() =>
+            {
+                Thread.Sleep(1000);
+                Dispatcher.UIThread.Post(() => this.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None));
+            }).Start();
+        }
+
+        private void Window_Closing(object? sender, Avalonia.Controls.WindowClosingEventArgs e)
+        {
+            // just let the app kill itself, it's just a screensaver, no sensitive data is found here
+            Environment.Exit(0);
         }
     }
 }
