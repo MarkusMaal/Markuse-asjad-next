@@ -3,9 +3,11 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.Interactivity;
 using System;
+using System.Threading;
 using LibVLCSharp.Shared;
 using Avalonia.Platform.Storage;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Media.Imaging;
 using MsBox.Avalonia;
 using Avalonia.Logging;
@@ -35,12 +37,20 @@ namespace Pidu_
             volume.Interval = new TimeSpan(0, 0, 0, 0, 20);
             VolumeControl.Value = mp.Volume;
             mp.EncounteredError += Mp_EncounteredError;
+            SizeCheck();
+            // prevent window borders from being rendered if not in a Linux DE
+            if (!OperatingSystem.IsLinux())
+            {
+                //Console.WriteLine("Windows/Mac paranduste aktiveerimine...");
+                this.ExtendClientAreaToDecorationsHint = false;
+                this.SystemDecorations = SystemDecorations.None;
+            }
             timer.Tick += (object? sender, EventArgs e) =>
             {
-                if (this.WindowState != WindowState.Minimized)
+                /*if ((this.WindowState != WindowState.Minimized) && (this.WindowState == WindowState.Normal))
                 {
                     this.WindowState = WindowState.FullScreen;
-                }
+                }*/
 
                 if (mp.Media?.State == VLCState.Ended)
                 {
@@ -139,6 +149,19 @@ namespace Pidu_
             _ = MessageBoxShow(mp.Media?.Statistics.ToString() ?? "Tundmatu rike", "Viga esitamisel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
         }
 
+        private void SizeCheck()
+        {
+            if ((double)this.Width / (double)this.Height > 3.0)
+            {
+                var padding = this.Width / 4;
+                MainGrid.Margin = new Thickness(padding, 0, padding, 0);
+            }
+            else
+            {
+                MainGrid.Margin = new Thickness(0, 0, 0, 0);
+            }
+        }
+        
         private static string NiceTime(long millis)
         {
             int totalSecs = (int)millis / 1000;
@@ -348,10 +371,17 @@ namespace Pidu_
                 TopButtons.IsVisible = !TopButtons.IsVisible;
                 PlayControls.IsVisible = !PlayControls.IsVisible;
                 Overlay.Opacity = (!TopButtons.IsVisible) ? 0 : 0.25;
-                if (!TopButtons.IsVisible && Playlist.IsVisible)
+                new Thread(() =>
                 {
-                    Playlist.IsVisible = false;
-                }
+                    Thread.Sleep(500);
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        if (!TopButtons.IsVisible && Playlist.IsVisible)
+                        {
+                            Playlist.IsVisible = false;
+                        }
+                    });
+                }).Start();
             }
         }
 
@@ -419,7 +449,7 @@ namespace Pidu_
 
         private void About_Click(object? sender, RoutedEventArgs e)
         {
-            _ = MessageBoxShow("Teeme pidu!\nNullist uuesti kirjutatud Avalonia UI ja .NET Core 8.0 raamistikes\nC# keeles.\n\nKasutab LibVLCSharp teeki\nVersioon 2.0 / 31.05.2024\nTegi: Markus Maal\nKogu muusika kuulub nende respektiivsetele omanikele.\nAutoriõiguste rikkumine ei ole lubatud!\n\nMis on uut?\n+ Üleminek Avalonia UI raamistikule\n- Eemaldati klaviatuuritulede nupp\n- Eemaldati visualiseeringu kuvamise nupp\n+ Tausta tumendamine", "Pidu!", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
+            _ = MessageBoxShow("Teeme pidu!\nNullist uuesti kirjutatud Avalonia UI ja .NET Core 8.0 raamistikes\nC# keeles.\n\nKasutab LibVLCSharp teeki\nVersioon 2.1 / 27.03.2025\nTegi: Markus Maal\nKogu muusika kuulub nende respektiivsetele omanikele.\nAutoriõiguste rikkumine ei ole lubatud!\n\nMis on uut?\n+ Ultra-laia ekraani tuvastamine ja kasutajaliidese muutmine vastavalt\n+ Suuremad nupud esitusloendi aknas\n* Jõudluse parandused\n* Parandatud viga, mistõttu \"Näita esitusloendit\" lingile topeltklõpsates\njäi esitusloend nähtavaks samal ajal kui ülejäänud liides kadus ära", "Pidu!", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
         }
 
         // Reimplementation of WinForms MessageBox.Show
@@ -474,6 +504,11 @@ namespace Pidu_
                         break;
                 }
             }
+        }
+
+        private void Control_OnSizeChanged(object? sender, SizeChangedEventArgs e)
+        {
+            SizeCheck();
         }
     }
 }
