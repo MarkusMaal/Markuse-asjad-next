@@ -28,7 +28,7 @@
     </Style>
   </Window.Styles>
   <Window.Resources>
-    <Animation Duration="0:0:3" x:Key="LogoAnimation" Easing="ExponentialEaseInOut"
+    <Animation Duration="{Binding Duration}" x:Key="LogoAnimation" Easing="{Binding Easing}"
                x:SetterTargetType="Grid" PlaybackDirection="Normal" FillMode="Forward">
       <KeyFrame Cue="0%">
         <Setter Property="Margin" Value="{Binding StartingPoint}"/>

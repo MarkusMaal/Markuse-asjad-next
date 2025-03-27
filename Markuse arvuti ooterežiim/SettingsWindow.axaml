@@ -2,13 +2,64 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" Width="600" Height="400" WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d" Width="600" Height="600" WindowStartupLocation="CenterScreen"
         x:Class="Markuse_arvuti_ooterežiim.SettingsWindow" CanResize="False" Loaded="Window_Loaded_1"
         Title="Markuse arvuti ooterežiim" Icon="Resources/mas_general.png">
   <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-    <Image Source="Resources/mas_general.png" Width="128" />
-    <Label HorizontalAlignment="Center" Margin="20" FontSize="30" FontFamily="Segoe UI,NotoSans,sans" FontWeight="SemiLight">markuse arvuti ooterežiim</Label>
-    <TextBlock Name="ContentBox" Margin="50,0" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center">Ooterežiim Markuse asjad seadmete jaoks. Seadete muutmiseks palume kasutada Markuse arvuti juhtpaneeli</TextBlock>
-    <Button HorizontalAlignment="Center" Margin="20" Click="Button_Click">Sulge aken</Button>
+    <Image Source="Resources/mas_general.png" Width="128" Margin="20" />
+    <!--<Label HorizontalAlignment="Center" Margin="20" FontSize="30" FontFamily="Segoe UI,NotoSans,sans" FontWeight="SemiLight">markuse arvuti ooterežiim</Label>-->
+    <StackPanel>
+        <CheckBox Name="BackgroundCheck" IsCheckedChanged="BackgroundCheck_OnIsCheckedChanged">Kuva taustapilt</CheckBox>
+        <Grid Name="BackgroundLocationGrid" IsEnabled="False" ColumnDefinitions="70,*,40">
+            <Label VerticalAlignment="Center">Asukoht</Label>
+            <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Name="BackgroundLocation"></TextBox>
+            <Button Name="BrowseBgButton" Grid.Column="2" Margin="10,0,0,0" Click="BrowseBgButton_OnClick">...</Button>
+        </Grid>
+        <CheckBox Name="ImageCheck" IsCheckedChanged="ImageCheck_OnIsCheckedChanged">Kohandatud ikoon</CheckBox>
+        <Grid Name="CustomIconGrid" IsEnabled="False" ColumnDefinitions="70,*,40">
+            <Label VerticalAlignment="Center">Asukoht</Label>
+            <TextBox Grid.Column="1" HorizontalAlignment="Stretch" Name="IconLocation"></TextBox>
+            <Button Name="BrowseIconButton" Grid.Column="2" Margin="10,0,0,0" Click="BrowseIconButton_OnClick">...</Button>
+        </Grid>
+        <Grid Margin="0,20" ColumnDefinitions="158,*">
+            <Label VerticalAlignment="Center" Margin="0,0,10,0">Animatsiooni interval</Label>
+            <NumericUpDown Name="AnimationIntervalBox" FormatString="0.00" Minimum="0.01" Maximum="999" Increment="0.05" Value="3" Grid.Column="1" HorizontalAlignment="Stretch" ></NumericUpDown>
+        </Grid>
+        <Grid Margin="0,0,0,20" ColumnDefinitions="158,*">
+            <Label VerticalAlignment="Center" Margin="0,0,10,0">Ikooni laius</Label>
+            <NumericUpDown Name="ImageWidthBox" FormatString="0" Minimum="1" Maximum="9999" Increment="8" Value="128" Grid.Column="1" HorizontalAlignment="Stretch" ></NumericUpDown>
+        </Grid>
+        <Grid ColumnDefinitions="158,*">
+            <Label>Animatsiooni valem</Label>
+            <ComboBox Name="AnimationEasingBox" Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="7">
+                <ComboBoxItem>Sõõrjas sisse</ComboBoxItem>
+                <ComboBoxItem>Sõõrjas sisse-välja</ComboBoxItem>
+                <ComboBoxItem>Sõõrjas välja</ComboBoxItem>
+                <ComboBoxItem>Kuup sisse</ComboBoxItem>
+                <ComboBoxItem>Kuup sisse-välja</ComboBoxItem>
+                <ComboBoxItem>Kuup välja</ComboBoxItem>
+                <ComboBoxItem>Eksponent sisse</ComboBoxItem>
+                <ComboBoxItem>Eksponent sisse-välja</ComboBoxItem>
+                <ComboBoxItem>Eksponent välja</ComboBoxItem>
+                <ComboBoxItem>Lineaarne</ComboBoxItem>
+                <ComboBoxItem>Ruut sisse</ComboBoxItem>
+                <ComboBoxItem>Ruut sisse-välja</ComboBoxItem>
+                <ComboBoxItem>Ruut välja</ComboBoxItem>
+                <ComboBoxItem>Neljas aste sisse</ComboBoxItem>
+                <ComboBoxItem>Neljas aste sisse-välja</ComboBoxItem>
+                <ComboBoxItem>Neljas aste välja</ComboBoxItem>
+                <ComboBoxItem>Viies aste sisse</ComboBoxItem>
+                <ComboBoxItem>Viies aste sisse-välja</ComboBoxItem>
+                <ComboBoxItem>Viies aste välja</ComboBoxItem>
+                <ComboBoxItem>Siinus sisse</ComboBoxItem>
+                <ComboBoxItem>Siinus sisse-välja</ComboBoxItem>
+                <ComboBoxItem>Siinus välja</ComboBoxItem>
+            </ComboBox>
+        </Grid>
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Margin="0,20">
+        <Button Name="OKButton" HorizontalAlignment="Center" Click="OKButton_OnClick" Margin="0,0,15,0">OK</Button>
+        <Button HorizontalAlignment="Center" Click="Button_Click">Loobu</Button>
+    </StackPanel>
   </StackPanel>
 </Window>

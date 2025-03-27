@@ -11,11 +11,14 @@ using System.IO;
 using Avalonia;
 using Avalonia.Platform;
 using System.Threading;
+using Avalonia.Animation.Easings;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 
 namespace Markuse_arvuti_ooterežiim
 {
     public partial class MainWindow : Window
     {
+        private ScreensaverOptions scr = new();
         int moves = 0;
         int dx = 5;
         int dy = 5;
@@ -34,20 +37,57 @@ namespace Markuse_arvuti_ooterežiim
         private bool EnableBg = false;
         
         Bitmap background;
+        private string mas_root;
 
         public MainWindow()
         {
+            mas_root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas";
+            if (File.Exists(mas_root + "/ScreensaverConfig.json"))
+            {
+                scr.Load(mas_root);
+            }
+            else
+            {
+                scr = new ScreensaverOptions()
+                {
+                    AnimationEasing = ScreensaverOptions.Easing.ExponentialEaseInOut,
+                    AnimationInterval = 3,
+                    BackgroundPath = mas_root + "/bg_common.png",
+                    CustomImage = false,
+                    DisplayBackground = false,
+                    ImagePath = "",
+                    ImageWidth = 128,
+                };
+                scr.Save(mas_root);
+            }
             InitializeComponent();
+            LogoImageR.Width = scr.ImageWidth;
+            LogoImageR.Height = scr.ImageWidth;
             MoveNow();
-            var commonBg = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas/bg_common.png";
+            
+            var commonBg = $"{mas_root}/bg_common.png";
+            EnableBg = scr.DisplayBackground;
+            if (EnableBg)
+            {
+                commonBg = scr.BackgroundPath;
+            }
             if (File.Exists(commonBg))
             {
                 using var ms = new FileStream(commonBg, FileMode.Open, FileAccess.Read);
                 background = new Bitmap(ms);
                 if (EnableBg) this.Background = new ImageBrush(background) { Stretch = Stretch.UniformToFill, Transform = new ScaleTransform(1+r.NextDouble()*2, 1+r.NextDouble()*2) };
             }
+
+            if (scr.CustomImage && File.Exists(scr.ImagePath))
+            {
+                using var ms = new FileStream(scr.ImagePath, FileMode.Open, FileAccess.Read);
+                this.LogoImageR.Source = new Bitmap(ms);
+            }
+            else
+            {
+                this.LogoImageR.Source = GetResource(Properties.Resources.mas_general);
+            }
             this.Icon = new WindowIcon(GetResource(Properties.Resources.mas_general));
-            this.LogoImageR.Source = GetResource(Properties.Resources.mas_general);
 
             DataContext = mwm;
             if (Screens.All.Count > Program.monitors)
@@ -86,13 +126,20 @@ namespace Markuse_arvuti_ooterežiim
             }
             var PreviousPosition = CurrentPosition;
             FigureOutNextPoint();
+            
+            var type = Type.GetType("Avalonia.Animation.Easings." + scr.AnimationEasing + ", Avalonia.Base");
+            var easing = type != null ? (Easing)Activator.CreateInstance(type)! : new ExponentialEaseInOut();
             mwm = new MainWindowModel
             {
                 StartingPoint = new Thickness(PreviousPosition.X, PreviousPosition.Y, 0, 0),
                 ScreenDimensions = new Thickness(CurrentPosition.X, CurrentPosition.Y, 0, 0),
-                Rotation = 360 * (DownRight[1] ? 1 : -1)
+                Rotation = 360 * (DownRight[1] ? 1 : -1),
+                Duration = TimeSpan.FromSeconds(scr.AnimationInterval),
+                Easing = easing
             };
             this.DataContext = mwm;
+            mwm.Duration = TimeSpan.FromSeconds(scr.AnimationInterval);
+
             var animation = (Animation)this.Resources["LogoAnimation"];
             animation.RunAsync(LogoImageR);
         }
@@ -149,14 +196,18 @@ namespace Markuse_arvuti_ooterežiim
                 MoveNow();
                 if (EnableBg) this.Background = new ImageBrush(background) { Stretch = Stretch.UniformToFill, Transform = new ScaleTransform(1+r.NextDouble()*2, 1+r.NextDouble()*2) };
             };
-            timer.Interval = TimeSpan.FromSeconds(3.03);
+            timer.Interval = TimeSpan.FromSeconds((double)scr.AnimationInterval + 0.03);
             timer.Start();
 
             // hide mouse cursor
             new Thread(() =>
             {
-                Thread.Sleep(1000);
-                Dispatcher.UIThread.Post(() => this.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None));
+                for (int i = 0; i < 10; i++)
+                {
+                    Thread.Sleep(100);
+                    Dispatcher.UIThread.Post(() =>
+                        this.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None));
+                }
             }).Start();
         }
 

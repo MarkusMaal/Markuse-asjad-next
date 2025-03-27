@@ -1,5 +1,7 @@
+using System;
 using System.Linq;
 using Avalonia;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Platform;
 
@@ -11,7 +13,12 @@ public class MainWindowModel
     public Thickness ScreenDimensions {get;set;}
     public double Rotation { get; set; }
     
-    public Thickness StartingPointG { get; set; }
+    public TimeSpan Duration { get; set; }
+    
+    public Easing Easing { get; set; }
+    
+    
+    /*public Thickness StartingPointG { get; set; }
     public Thickness ScreenDimensionsG {get;set;}
     public double RotationG { get; set; }
     
@@ -21,5 +28,5 @@ public class MainWindowModel
     
     public Thickness StartingPointY { get; set; }
     public Thickness ScreenDimensionsY {get;set;}
-    public double RotationY { get; set; }
+    public double RotationY { get; set; }*/
 }
