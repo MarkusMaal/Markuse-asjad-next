@@ -35,6 +35,7 @@
             <Button Name="FlashDriveButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="FindFlash">Markuse mälupulk</Button>
             <Button Name="QuickNotesButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="QuickNotes">Kiirmärkmik</Button>
             <Button Name="RestartMasButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="RestartMas">Taaskäivita Markuse asjad</Button>
+            <Button Name="ScreensaverSettingsButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="ScreensaverSettingsButton_OnClick">Ooterežiimi seaded</Button>
             <Button Name="ReloadInfo" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="ReloadInfo_OnClick">Laadi andmed uuesti</Button>
           </WrapPanel>
           <Label Name="WinUtilsLabel">Windowsi tarvikud</Label>

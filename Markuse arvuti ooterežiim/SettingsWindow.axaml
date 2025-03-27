@@ -2,12 +2,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" Width="600" Height="600" WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d" Width="550" Height="510" WindowStartupLocation="CenterScreen"
         x:Class="Markuse_arvuti_ooterežiim.SettingsWindow" CanResize="False" Loaded="Window_Loaded_1"
         Title="Markuse arvuti ooterežiim" Icon="Resources/mas_general.png">
-  <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-    <Image Source="Resources/mas_general.png" Width="128" Margin="20" />
-    <!--<Label HorizontalAlignment="Center" Margin="20" FontSize="30" FontFamily="Segoe UI,NotoSans,sans" FontWeight="SemiLight">markuse arvuti ooterežiim</Label>-->
+  <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="20">
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15">
+        <Image Source="Resources/mas_general.png" Width="128" />
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,0,0,0" FontSize="30" FontFamily="Segoe UI,NotoSans,sans" FontWeight="SemiLight">markuse arvuti ooterežiim</Label>
+      </StackPanel>
     <StackPanel>
         <CheckBox Name="BackgroundCheck" IsCheckedChanged="BackgroundCheck_OnIsCheckedChanged">Kuva taustapilt</CheckBox>
         <Grid Name="BackgroundLocationGrid" IsEnabled="False" ColumnDefinitions="70,*,40">

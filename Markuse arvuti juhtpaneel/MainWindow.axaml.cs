@@ -245,6 +245,7 @@ namespace Markuse_arvuti_juhtpaneel
             hints["Riistvara info"] = "Kuvab info riistvara kohta (hardinfo2).";
             hints["Käsurea utilliidid"] = "Käivitab käsurea põhise juhtpaneeli (" + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/scripts/Tools.sh).";
             hints["Terminal"] = "Käivitab terminali (terminal)";
+            hints["Ooterežiimi seaded"] = "Avab akna, kus saate kohandada ooterežiimi seadeid";
             hints["Laadi andmed uuesti"] = "Laadib seadistused uuesti, juhul, kui need peaksid olema muutunud";
             this.InfoTextBlock.Text = hints[(string?)((Button)e.Source).Content];
         }
@@ -1554,8 +1555,8 @@ namespace Markuse_arvuti_juhtpaneel
                 }
             }
             WhatNewLabel.Text += "\n" + whatNew;
-            string[] fullVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString().Split(".");
-            CpanelVersionLabel.Content = "versioon " + fullVersion[0] + "." + fullVersion[1];
+            var fullVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString().Split(".");
+            CpanelVersionLabel.Content = fullVersion[2] != "0" ? $"versioon {fullVersion[0]}.{fullVersion[1]}.{fullVersion[2]}" : $"versioon {fullVersion[0]}.{fullVersion[1]}";
         }
 
         private void ComputerInfoClicked(object sender, RoutedEventArgs e)
@@ -1941,6 +1942,45 @@ namespace Markuse_arvuti_juhtpaneel
         private void IntegrationPollrate_TextChanged(object? sender, TextChangedEventArgs e)
         {
             ConfigCheck(sender, e);
+        }
+
+        private void ScreensaverSettingsButton_OnClick(object? sender, RoutedEventArgs e)
+        {
+            if (!File.Exists(masRoot + "/Markuse asjad/Markuse arvuti ooterežiim" +
+                             (OperatingSystem.IsWindows() ? ".scr" : "")))
+            {
+                MessageBoxShow("Ooterežiimi rakendust pole paigaldatud", Title, ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning);
+                return;
+            }
+
+            var ps = WindowState;
+            new Thread(() =>
+            {
+                Process p = new()
+                {
+                    StartInfo =
+                    {
+                        FileName = masRoot + "/Markuse asjad/Markuse arvuti ooterežiim" +
+                                   (OperatingSystem.IsWindows() ? ".scr" : ""),
+                        Arguments = "/c",
+                        UseShellExecute = true,
+                    }
+                };
+                p.Start();
+                Dispatcher.UIThread.Post(() =>
+                {
+                    ErtGrid.IsEnabled = false;
+                    IsVisible = false;
+                    WindowState = WindowState.Minimized;
+                });
+                p.WaitForExit();
+                Dispatcher.UIThread.Post(() =>
+                {
+                    ErtGrid.IsEnabled = true;
+                    WindowState = ps;
+                    IsVisible = true;
+                });
+            }).Start();
         }
     }
 }
