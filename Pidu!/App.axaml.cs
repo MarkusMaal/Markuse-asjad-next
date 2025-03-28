@@ -1,3 +1,4 @@
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -15,6 +16,7 @@ namespace Pidu_
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                Program.streamMode = (desktop.Args ?? []).Contains("/stream");
                 desktop.MainWindow = new MainWindow();
             }
 

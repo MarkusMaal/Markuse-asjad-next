@@ -8,6 +8,7 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <ApplicationIcon>pidu.ico</ApplicationIcon>
+    <AssemblyVersion>2.1.1.0</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\Goa-Party.jpg" />

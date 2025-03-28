@@ -3,6 +3,8 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.Interactivity;
 using System;
+using System.IO;
+using System.Text;
 using System.Threading;
 using LibVLCSharp.Shared;
 using Avalonia.Platform.Storage;
@@ -11,6 +13,7 @@ using Avalonia;
 using Avalonia.Media.Imaging;
 using MsBox.Avalonia;
 using Avalonia.Logging;
+using Avalonia.Platform;
 
 namespace Pidu_
 {
@@ -26,7 +29,7 @@ namespace Pidu_
         readonly DispatcherTimer timer = new();
         readonly DispatcherTimer volume = new();
         bool custMessage = false;
-        readonly string idleString = "Hetkel ei mängi ühtegi pala";
+        private readonly string idleString = "Hetkel ei mängi ühtegi pala";
 
         public MainWindow()
         {
@@ -142,6 +145,18 @@ namespace Pidu_
             };
             timer.Start();
             volume.Start();
+            if (!Program.streamMode) return;
+            this.WindowState = WindowState.Normal;
+            this.ExtendClientAreaToDecorationsHint = false;
+            this.ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.Default;
+            this.SystemDecorations = SystemDecorations.Full;
+            MinimizeButton.Content = "";
+            MinimizeButton.Padding = new Thickness(0,5);
+            MinimizeButton.BorderThickness = new Thickness(0);
+            Width = 1280;
+            Height = 1024;
+            this.Title = "Pidu!";
+            CloseButton.IsVisible = false;
         }
 
         private void Mp_EncounteredError(object? sender, EventArgs e)
@@ -151,6 +166,7 @@ namespace Pidu_
 
         private void SizeCheck()
         {
+            if (Program.streamMode) return;
             if ((double)this.Width / (double)this.Height > 3.0)
             {
                 var padding = this.Width / 4;
@@ -449,7 +465,7 @@ namespace Pidu_
 
         private void About_Click(object? sender, RoutedEventArgs e)
         {
-            _ = MessageBoxShow("Teeme pidu!\nNullist uuesti kirjutatud Avalonia UI ja .NET Core 8.0 raamistikes\nC# keeles.\n\nKasutab LibVLCSharp teeki\nVersioon 2.1 / 27.03.2025\nTegi: Markus Maal\nKogu muusika kuulub nende respektiivsetele omanikele.\nAutoriõiguste rikkumine ei ole lubatud!\n\nMis on uut?\n+ Ultra-laia ekraani tuvastamine ja kasutajaliidese muutmine vastavalt\n+ Suuremad nupud esitusloendi aknas\n* Jõudluse parandused\n* Parandatud viga, mistõttu \"Näita esitusloendit\" lingile topeltklõpsates\njäi esitusloend nähtavaks samal ajal kui ülejäänud liides kadus ära", "Pidu!", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
+            _ = MessageBoxShow("Teeme pidu!\nNullist uuesti kirjutatud Avalonia UI ja .NET Core 8.0 raamistikes\nC# keeles.\n\nKasutab LibVLCSharp teeki\nVersioon 2.1.1 / 28.03.2025\nTegi: Markus Maal\nKogu muusika kuulub nende respektiivsetele omanikele.\nAutoriõiguste rikkumine ei ole lubatud!\n\nMis on uut?\n+ Otseülekande režiim, kui käivitada /stream parameetriga.", "Pidu!", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
         }
 
         // Reimplementation of WinForms MessageBox.Show
@@ -509,6 +525,14 @@ namespace Pidu_
         private void Control_OnSizeChanged(object? sender, SizeChangedEventArgs e)
         {
             SizeCheck();
+        }
+
+        private void BigTitle_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (!Program.streamMode) return;
+            using var fs = new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas/songname.txt", FileMode.Create, FileAccess.Write);
+            fs.Write(Encoding.UTF8.GetBytes(BigTitle?.Content?.ToString().Replace("Hetkel esitusel: ", "") ?? ""));
+            fs.Close();
         }
     }
 }

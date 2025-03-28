@@ -27,7 +27,7 @@
         <Button Click="Help_Click" Background="LightSeaGreen">Spikker</Button>
         <Button Click="About_Click" Background="Goldenrod">Teave programmi kohta</Button>
       </StackPanel>
-      <Label Margin="5,-5" FontSize="20" Name="BigTitle">Hetkel ei mängi ühtegi pala</Label>
+      <Label Margin="5,-5" FontSize="20" Name="BigTitle" PropertyChanged="BigTitle_OnPropertyChanged">Hetkel ei mängi ühtegi pala</Label>
       <TextBlock Classes="LinkLabel" Margin="8" PointerReleased="ShowPlaylist_PointerReleased" PointerPressed="ShowPlaylist_PointerPressed">Näita esitusloendit</TextBlock>
     </StackPanel>
 
@@ -49,8 +49,8 @@
         <Button Click="SeekForward_Click" Background="Teal" Padding="7,0">&gt;&gt;</Button>
         <Button Click="NextTrack_Click" Background="DarkSlateGray" Padding="5,0">&gt;&gt;|</Button>
         <Slider ValueChanged="Slider_ValueChanged" Name="VolumeControl" VerticalAlignment="Center" Margin="7,3" Minimum="0" Maximum="100" MinWidth="150"></Slider>
-        <Button Background="RoyalBlue" Click="Underscore_Click" Padding="8,5">_</Button>
-        <Button Background="Maroon" Click="X_Click" Padding="8,5">X</Button>
+        <Button Name="MinimizeButton" Background="RoyalBlue" Click="Underscore_Click" Padding="8,5">_</Button>
+        <Button Name="CloseButton" Background="Maroon" Click="X_Click" Padding="8,5">X</Button>
       </StackPanel>
       <Label Name="StatusLabel" HorizontalAlignment="Right" Margin="10,0">19.06.2001 16:26:35  |  0%  |  0:00 / 0:00</Label>
     </StackPanel>
