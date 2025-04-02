@@ -24,7 +24,7 @@
       <ProgressBar Foreground="White" Name="CollectProgress" Margin="0,10,0,0" ></ProgressBar>
       <Button HorizontalAlignment="Center" IsVisible="False" Name="ErrorExitButton" Click="ErrorExitButton_OnClick">Sulge programm</Button>
     </StackPanel>
-    <TabControl Name="TabsControl" Grid.Row="1" FontSize="12" IsEnabled="False" IsVisible="False">
+    <TabControl FontSize="12" Name="TabsControl" Grid.Row="1" IsEnabled="False" IsVisible="False">
 <!--Avaleht-->
       <TabItem Name="TabPrimary" Header="Avaleht">
         <StackPanel>
@@ -117,15 +117,15 @@
           <Label Classes="H1" Margin="0,10">Taustad</Label>
           <WrapPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,-40,0,0">
             <StackPanel Margin="0,0">
-              <Image Name="ThumbDesktop" Width="200" Height="200" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp" DoubleTapped="ChangeDesktop"></Image>
+              <Image Name="ThumbDesktop" Width="200" Height="200" DoubleTapped="ChangeDesktop"></Image>
               <Label HorizontalAlignment="Center">Töölaud</Label>
             </StackPanel>
             <StackPanel Margin="20,0,0,0">
-              <Image Name="ThumbLockscreen" Width="200" Height="200" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp" DoubleTapped="ChangeLogin"></Image>
+              <Image Name="ThumbLockscreen" Width="200" Height="200" DoubleTapped="ChangeLogin"></Image>
               <Label HorizontalAlignment="Center">Logimisekraan</Label>
             </StackPanel>
             <StackPanel Margin="20,0,0,0">
-              <Image Name="ThumbMiniversion" Width="200" Height="200" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp" DoubleTapped="ChangeMini"></Image>
+              <Image Name="ThumbMiniversion" Width="200" Height="200" DoubleTapped="ChangeMini"></Image>
               <Label HorizontalAlignment="Center">Miniversioon</Label>
             </StackPanel>
           </WrapPanel>
@@ -209,39 +209,39 @@
                   <Label Margin="-5,5">Funktsioonid</Label>
                   <WrapPanel Width="400">
                     <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Image Name="FeatTS" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Image Name="FeatTS" MaxHeight="32" MaxWidth="32" ></Image>
                       <Label Margin="10,10">Interaktiivne töölaud</Label>
                     </StackPanel>
                     <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Image Name="FeatRM" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Image Name="FeatRM" MaxHeight="32" MaxWidth="32" ></Image>
                       <Label Margin="10,10">Rainmeter</Label>
                     </StackPanel>
                     <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Image Name="FeatIP" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Image Name="FeatIP" MaxHeight="32" MaxWidth="32" ></Image>
                       <Label Margin="10,10">Integratsioonitarkvara</Label>
                     </StackPanel>
                     <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Image Name="FeatCS" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Image Name="FeatCS" MaxHeight="32" MaxWidth="32" ></Image>
                       <Label Margin="10,10">Klassikaline start menüü</Label>
                     </StackPanel>
                     <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Image Name="FeatMM" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Image Name="FeatMM" MaxHeight="32" MaxWidth="32" ></Image>
                       <Label Margin="10,10">Standardfunktsioonid</Label>
                     </StackPanel>
                     <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Image Name="FeatRD" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Image Name="FeatRD" MaxHeight="32" MaxWidth="32" ></Image>
                       <Label Margin="10,10">Kaugjuhtimine</Label>
                     </StackPanel>
                     <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Image Name="FeatWX" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Image Name="FeatWX" MaxHeight="32" MaxWidth="32" ></Image>
                       <Label Margin="10,10">Windows 10+</Label>
                     </StackPanel>
                     <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Image Name="FeatLT" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Image Name="FeatLT" MaxHeight="32" MaxWidth="32" ></Image>
                       <Label Margin="10,10">LiveTuner optimeerimised</Label>
                     </StackPanel>
                     <StackPanel Classes="NM" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Image Name="FeatGP" MaxHeight="32" MaxWidth="32" Source="avares://Markdown.Avalonia/Assets/ImageNotFound.bmp"></Image>
+                      <Image Name="FeatGP" MaxHeight="32" MaxWidth="32" ></Image>
                       <Label Margin="10,10">Grupipoliitika</Label>
                     </StackPanel>
                   </WrapPanel>
@@ -275,7 +275,7 @@
     <Style Selector="WrapPanel.Left">
       <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
-    <Style Selector="TabItem > TextBlock">
+    <Style Selector="TabItem > AccessText">
       <Setter Property="FontSize" Value="14"/>
       <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>

@@ -85,17 +85,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
+    <PackageReference Include="Avalonia" Version="11.2.6" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.6" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.6" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Themes.Simple" Version="11.0.10" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.6" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="11.2.6" />
     <PackageReference Include="ComputerInfo" Version="0.2.0" />
-    <PackageReference Include="Hardware.Info" Version="100.1.0" />
-    <PackageReference Include="Universe.CpuUsage" Version="2.2.497.598" />
+    <PackageReference Include="Hardware.Info" Version="101.0.1" />
+    <PackageReference Include="Universe.CpuUsage" Version="2.2.778.893" />
   </ItemGroup>
 
   <ItemGroup>
