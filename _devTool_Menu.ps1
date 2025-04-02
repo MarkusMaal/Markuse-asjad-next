@@ -76,7 +76,7 @@ function Main {  # main function
 		}
         # footer
         $hint = $hints[$sel-1]
-        Write-Host "`r`nDevTool v1.2.1`r`n`r`n$hint"
+        Write-Host "`r`nDevTool v1.2.2`r`n`r`n$hint"
 		Write-Host "${setCursorTop}" -NoNewLine
 		$KE = [System.Console]::ReadKey()               # wait for user to press a key, then save that as an object
 		Write-Host "${setCursorTop}" -NoNewLine
