@@ -50,11 +50,11 @@
     <Panel Name="Version" Opacity="0">
       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Name="VersionContent">
         <Label HorizontalAlignment="Center" FontSize="50">Versioon</Label>
-        <Label HorizontalAlignment="Center" FontSize="25">Tarkvara: 0.85i</Label>
+        <Label HorizontalAlignment="Center" FontSize="25">Tarkvara: 0.86i</Label>
         <Label HorizontalAlignment="Center" FontSize="25">M.S. 1.0 draiver: 0.0</Label>
         <Label HorizontalAlignment="Center" FontSize="25">Platvorm: Avalonia UI</Label>
         <Label HorizontalAlignment="Center" FontSize="25">Brauser: 1.0</Label>
-        <Label HorizontalAlignment="Center" FontSize="25">Video pleier: LibVLCSharp 3.0.20</Label>
+        <Label HorizontalAlignment="Center" FontSize="25">Video pleier: LibVLCSharp 3.9.2</Label>
       </StackPanel>
       <Label Name="ConfigContent" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="25">Konfigureerimiseks kasutage Markuse arvuti juhtpaneeli</Label>
       <StackPanel Name="BottomRightText1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Classes="HotkeyLabels" Margin="0,0,15,10">

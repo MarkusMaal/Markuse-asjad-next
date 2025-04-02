@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace MarkuStation2
 {
@@ -47,6 +48,8 @@ namespace MarkuStation2
             _libVLC = new LibVLC();
             mp = new MediaPlayer(_libVLC);
             mp2 = new MediaPlayer(_libVLC);
+            mp.Volume = 100;
+            mp2.Volume = 100;
             if (!Directory.Exists(mas_root))
             {
                 Directory.CreateDirectory(mas_root);
@@ -522,6 +525,17 @@ namespace MarkuStation2
             VideoPlayer.MediaPlayer = mp;
             mp2.Media = new(_libVLC, mas_root + "/_temp.wav");
             VideoPlayer.MediaPlayer.Media = new(_libVLC, mas_root + "/_temp.mp4");
+
+            // hide mouse cursor
+            new Thread(() =>
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    Thread.Sleep(100);
+                    Dispatcher.UIThread.Post(() =>
+                        this.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None));
+                }
+            }).Start();
             if (running && playIntros)
             {
                 VideoPlayer.MediaPlayer.Play();
