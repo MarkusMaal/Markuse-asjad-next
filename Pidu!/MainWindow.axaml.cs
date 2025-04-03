@@ -465,7 +465,7 @@ namespace Pidu_
 
         private void About_Click(object? sender, RoutedEventArgs e)
         {
-            _ = MessageBoxShow("Teeme pidu!\nNullist uuesti kirjutatud Avalonia UI ja .NET Core 8.0 raamistikes\nC# keeles.\n\nKasutab LibVLCSharp teeki\nVersioon 2.1.1 / 28.03.2025\nTegi: Markus Maal\nKogu muusika kuulub nende respektiivsetele omanikele.\nAutoriõiguste rikkumine ei ole lubatud!\n\nMis on uut?\n+ Otseülekande režiim, kui käivitada /stream parameetriga.", "Pidu!", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
+            _ = MessageBoxShow("Teeme pidu!\nNullist uuesti kirjutatud Avalonia UI ja .NET Core 8.0 raamistikes\nC# keeles.\n\nKasutab LibVLCSharp teeki\nVersioon 2.1.2 / 03.04.2025\nTegi: Markus Maal\nKogu muusika kuulub nende respektiivsetele omanikele.\nAutoriõiguste rikkumine ei ole lubatud!\n\nMis on uut?\n* Parandatud viga macOS-is, kus aken ei avanenud täisekraanis.", "Pidu!", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
         }
 
         // Reimplementation of WinForms MessageBox.Show
@@ -533,6 +533,13 @@ namespace Pidu_
             using var fs = new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas/songname.txt", FileMode.Create, FileAccess.Write);
             fs.Write(Encoding.UTF8.GetBytes(BigTitle?.Content?.ToString().Replace("Hetkel esitusel: ", "") ?? ""));
             fs.Close();
+        }
+
+        private void Control_OnLoaded(object? sender, RoutedEventArgs e)
+        {
+            if (!OperatingSystem.IsMacOS() || Program.streamMode) return;
+            this.WindowState = WindowState.Normal;
+            this.WindowState = WindowState.FullScreen;
         }
     }
 }

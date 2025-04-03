@@ -9,7 +9,7 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
     <ApplicationIcon>pidu.ico</ApplicationIcon>
-    <AssemblyVersion>2.1.1.0</AssemblyVersion>
+    <AssemblyVersion>2.1.2.0</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\Goa-Party.jpg" />

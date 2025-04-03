@@ -11,7 +11,7 @@
         SystemDecorations="BorderOnly" SizeChanged="Control_OnSizeChanged"
         Title="Pidu_" Foreground="White" FontFamily="Microsoft Sans Serif"
         Closing="Window_Closing" PointerPressed="Window_PointerPressed_1"
-        Background="Transparent" KeyDown="Window_KeyDown">
+        Background="Transparent" KeyDown="Window_KeyDown" Loaded="Control_OnLoaded">
   <Grid Name="WideGrid">
     <Panel Name="Overlay" Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0.25">
       
