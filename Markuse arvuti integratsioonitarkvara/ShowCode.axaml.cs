@@ -23,6 +23,10 @@ namespace Markuse_arvuti_integratsioonitarkvara
         public ShowCode()
         {
             InitializeComponent();
+            if (app.dev)
+            {
+                return;
+            }
             string[] log_content;
             string fileName = app.mas_root + "/maia/request_permission.maia";
             if (File.Exists(app.mas_root + "/maia/request_permission.mai"))

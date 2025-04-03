@@ -160,6 +160,9 @@
   <data name="mas_vpc" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mas_vpc.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="mas_tablet" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mas_tablet.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="mas_vpc_full" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mas_vpc_full.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -192,5 +195,8 @@
   </data>
   <data name="user_blue" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\user_blue.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pidu" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pidu.ico;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

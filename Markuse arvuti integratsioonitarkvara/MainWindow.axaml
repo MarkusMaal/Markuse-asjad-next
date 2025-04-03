@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="205"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="245"
         x:Class="Markuse_arvuti_integratsioonitarkvara.MainWindow"
         Title="Markuse_arvuti_integratsioonitarkvara"
              xmlns:local="using:Markuse_arvuti_integratsioonitarkvara"
@@ -14,7 +14,7 @@
         TransparencyLevelHint="Transparent"
         Background="Transparent"
         IsHitTestVisible="True" CanResize="False" BorderThickness="0"
-        Width="400" Height="205" WindowStartupLocation="CenterScreen"
+        Width="400" Height="245" WindowStartupLocation="CenterScreen"
         BorderBrush="Transparent" WindowState="Maximized" ShowInTaskbar="False"
         Icon="Resources/mas_general.png">
   <Grid>
@@ -24,6 +24,7 @@
              FontSize="30" HorizontalAlignment="Center"
              Margin="0,10" FontWeight="SemiLight"
              Name="DeviceLabel">markuse asjad</Label>
+      <Label HorizontalAlignment="Center" FontSize="10">© Markuse Maal 2025</Label>
     </StackPanel>
   </Grid>
 </Window>

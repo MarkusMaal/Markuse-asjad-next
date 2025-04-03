@@ -13,6 +13,12 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using Avalonia.Controls.Notifications;
+using DesktopNotifications;
+using DesktopNotifications.Avalonia;
+using INotificationManager = DesktopNotifications.INotificationManager;
+using Notification = DesktopNotifications.Notification;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
@@ -29,88 +35,114 @@ namespace Markuse_arvuti_integratsioonitarkvara
         public string[]? specialevents = new string[1];
         internal string attestation = "BYPASS";
         static bool bad = false;
+        private TrayIcon ti;
+        private readonly INotificationManager _notificationManage = Program.notificationManager ??
+                                                                    throw new InvalidOperationException("Missing notification manager");
+        
         public override void Initialize()
         {
-            AvaloniaXamlLoader.Load(this);
-            this.DataContext = this;
-            fmount = GetMount();
-            
+            try
+            {
+                AvaloniaXamlLoader.Load(this);
+                this.DataContext = this;
+                fmount = GetMount();
+            }
+            catch (Exception ex) when (!Debugger.IsAttached)
+            {
+                Program.CatchErrors(ex, "App.Initialize");
+            }
         }
 
         public override void OnFrameworkInitializationCompleted()
         {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                desktop.MainWindow = new MainWindow();
-                if (!CheckVerifileTamper())
+            try {
+                if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {
-                    bad = true;
-                    attestation = "CHECK_TAMPER";
-                    desktop.MainWindow = null;
-                } else if (!File.Exists(mas_root + "/edition.txt"))
-                {
-                    attestation = "FOREIGN";
-                    desktop.MainWindow = null;
-                }
-                if (desktop?.Args?.Length > 0)
-                {
-                    string[] args = desktop.Args;
-                    if (args.Contains("/root"))
+                    if (!dev || (desktop.Args!.Contains("/debug")))
                     {
-                        Console.WriteLine("Selle programmiga ei saa arvutit nullist juurutada. Palun kasutage /reroot parameetrit, et arvuti uuesti juurutada.");
+                        dev = false;
+                        desktop.MainWindow = new MainWindow();
                     }
-                    else if (args.Contains("/reroot"))
+                    else
                     {
-                        foreach (Process p in Process.GetProcesses())
+                        desktop.MainWindow = new InterfaceTest();
+                    }
+
+                    if (!CheckVerifileTamper())
+                    {
+                        bad = true;
+                        attestation = "CHECK_TAMPER";
+                        desktop.MainWindow = null;
+                    } else if (!File.Exists(mas_root + "/edition.txt"))
+                    {
+                        attestation = "FOREIGN";
+                        desktop.MainWindow = null;
+                    }
+                    if (desktop?.Args?.Length > 0)
+                    {
+                        string[] args = desktop.Args;
+                        if (args.Contains("/root"))
                         {
-                            if (p.ProcessName == "JTR.exe" || p.ProcessName == "JTR.EXE" || p.ProcessName == "JTR") // veendume, et JTR oleks kindlasti avatud, vastasel juhul rikume Verifile sertifikaadi (mis pole hea btw)
+                            Console.WriteLine("Selle programmiga ei saa arvutit nullist juurutada. Palun kasutage /reroot parameetrit, et arvuti uuesti juurutada.");
+                        }
+                        else if (args.Contains("/reroot"))
+                        {
+                            foreach (Process p in Process.GetProcesses())
                             {
-                                croot = true;
+                                if (p.ProcessName == "JTR.exe" || p.ProcessName == "JTR.EXE" || p.ProcessName == "JTR") // veendume, et JTR oleks kindlasti avatud, vastasel juhul rikume Verifile sertifikaadi (mis pole hea btw)
+                                {
+                                    croot = true;
+                                }
+                            }
+                            if (!croot)
+                            {
+                                Console.WriteLine("Juurutamiseks kasutage taasjuurutamise tööriista. Ilma taasjuurutamise tööriistata juurutamine võib põhjustada Verifile sertifikaadi riknemist.");
                             }
                         }
-                        if (!croot)
-                        {
-                            Console.WriteLine("Juurutamiseks kasutage taasjuurutamise tööriista. Ilma taasjuurutamise tööriistata juurutamine võib põhjustada Verifile sertifikaadi riknemist.");
-                        }
                     }
-                }
-                else
-                {
-                    if (File.Exists(mas_root + "/edition.txt") && !bad)
+                    else
                     {
-                        attestation = Verifile2();
-                        switch (attestation)
+                        if (File.Exists(mas_root + "/edition.txt") && !bad)
                         {
-                            case "VERIFIED":
-                                break;
-                            case "FOREIGN":
-                                Console.WriteLine("See programm töötab ainult Markuse arvutis.\nVeakood: VF_FOREIGN");
-                                break;
-                            case "FAILED":
-                                Console.WriteLine("Verifile püsivuskontrolli läbimine nurjus.\nVeakood: VF_FAILED");
-                                break;
-                            case "TAMPERED":
-                                Console.WriteLine("See arvuti pole õigesti juurutatud. Seda võis põhjustada hiljutine riistvaramuudatus. Palun kasutage juurutamiseks Markuse asjade juurutamistööriista.\nVeakood: VF_TAMPERED");
-                                break;
-                            case "LEGACY":
-                                Console.WriteLine("See arvuti on juurutatud vana juurutamistööriistaga. Palun juurutage arvuti uuesti uue juurutamistarkvaraga.\nVeakood: VF_LEGACY");
-                                break;
-                        }
-                        if (!Verifile())
-                        {
-                            Console.WriteLine("Markuse asjad tarkvara ei ole õigesti juurutatud. Palun juurutage seade kasutades juurutamise tööriista.");
-                            desktop.MainWindow = null;
+                            attestation = Verifile2();
+                            switch (attestation)
+                            {
+                                case "VERIFIED":
+                                    break;
+                                case "FOREIGN":
+                                    Console.WriteLine("See programm töötab ainult Markuse arvutis.\nVeakood: VF_FOREIGN");
+                                    break;
+                                case "FAILED":
+                                    Console.WriteLine("Verifile püsivuskontrolli läbimine nurjus.\nVeakood: VF_FAILED");
+                                    break;
+                                case "TAMPERED":
+                                    Console.WriteLine("See arvuti pole õigesti juurutatud. Seda võis põhjustada hiljutine riistvaramuudatus. Palun kasutage juurutamiseks Markuse asjade juurutamistööriista.\nVeakood: VF_TAMPERED");
+                                    break;
+                                case "LEGACY":
+                                    Console.WriteLine("See arvuti on juurutatud vana juurutamistööriistaga. Palun juurutage arvuti uuesti uue juurutamistarkvaraga.\nVeakood: VF_LEGACY");
+                                    break;
+                            }
+                            if (!Verifile())
+                            {
+                                Console.WriteLine("Markuse asjad tarkvara ei ole õigesti juurutatud. Palun juurutage seade kasutades juurutamise tööriista.");
+                                desktop.MainWindow = null;
+                            }
                         }
                     }
                 }
+
+
+                base.OnFrameworkInitializationCompleted();
             }
-
-
-            base.OnFrameworkInitializationCompleted();
+            catch (Exception ex) when (!Debugger.IsAttached)
+            {
+                Program.CatchErrors(ex, "App.OnFrameworkInitializationCompleted");
+            }
         }
-
+        
         private void Folders_Click(object? sender, System.EventArgs e)
         {
+            CookToast("Kodukasta avamine");
             Process p = new Process();
             p.StartInfo.FileName = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             p.StartInfo.UseShellExecute = true;
@@ -152,7 +184,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         p.StartInfo.UseShellExecute = true;
                         p.StartInfo.Verb = "runas";
                         p.Start();
-                    } catch {
+                    } catch (Exception) when (!Debugger.IsAttached) {
                         return;
                     }
                 }
@@ -190,9 +222,9 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         public void InitSettings()
         {
-            if (File.Exists(mas_root + "\\events.txt"))
+            if (File.Exists(mas_root + "/events.txt"))
             {
-                string fcont = File.ReadAllText(mas_root + "\\events.txt");
+                string fcont = File.ReadAllText(mas_root + "/events.txt");
                 specialevents = fcont.Split(';');
             }
             if (File.Exists(mas_root + "/Config.json"))
@@ -242,10 +274,15 @@ namespace Markuse_arvuti_integratsioonitarkvara
             }
             return drv;
         }
+
+        public void ResetTrayIcon()
+        {
+            TrayIcon.SetIcons(this, TrayIcon.GetIcons(this));
+        }
         
         public TrayIcon GetTrayIcon()
         {
-            return (TrayIcon)this.Resources["TrayIcon1"];
+            return TrayIcon.GetIcons(this)!.First();;
         }
 
         private void Cpanel_Clicked(object? sender, System.EventArgs e)
@@ -421,6 +458,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void PITS_Click(object? sender, System.EventArgs e)
         {
+            CookToast("Interaktiivse töölaua laadimine...");
             if (OperatingSystem.IsWindows())
             {
                 if (!File.Exists(mas_root + "/irunning.log"))
@@ -447,7 +485,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
         }
         private void MS_Click(object? sender, System.EventArgs e)
         {
-
+            CookToast("MarkuStation 2 käivitamine...");
             if (File.Exists(mas_root + "/Markuse asjad/MarkuStation2") || File.Exists(mas_root + "/Markuse asjad/MarkuStation2.exe"))
             {
                 Process p = new Process();
@@ -475,6 +513,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void LockWorkstation_Click(object? sender, EventArgs e)
         {
+            CookToast("Ekraani lukustamine...");
             var p = new Process();
             if (OperatingSystem.IsWindows()) {
                 p.StartInfo.FileName = mas_root + "/Markuse asjad/Markuse arvuti lukustamissüsteem";
@@ -501,12 +540,14 @@ namespace Markuse_arvuti_integratsioonitarkvara
             if (OperatingSystem.IsWindows()) {
                 if (!File.Exists(mas_root + "/noteopen.txt"))
                 {
+                    CookToast("Töölauamärkmete avamine...");
                     File.WriteAllText(mas_root + "/noteopen.txt", "See fail sisaldab informatsiooni töölauamärkmetega töötamiseks.");
                     Process.Start(mas_root + "/Markuse asjad/TöölauaMärkmed.exe");
                     ((NativeMenuItem)sender).Header = "Sulge töölauamärkmed";
                 }
                 else if (File.Exists(mas_root + @"\noteopen.txt"))
                 {
+                    CookToast("Töölauamärkmete sulgemine...");
                     File.Delete(mas_root + "/noteopen.txt");
                     File.WriteAllText(mas_root + "/closenote.log", "See fail saadab töölauamärkmete rakendusele käskluse sulgeda. Kui te näete seda teksti, palun kustutage see fail.");
                     ((NativeMenuItem)sender).Header = "Ava töölauamärkmed";
@@ -514,12 +555,14 @@ namespace Markuse_arvuti_integratsioonitarkvara
             } else {
                 if (!File.Exists(mas_root + "/noteopen.txt"))
                 {
+                    CookToast("Töölauamärkmete avamine...");
                     File.WriteAllText(mas_root + "/noteopen.txt", "See fail sisaldab informatsiooni töölauamärkmetega töötamiseks.");
                     Process.Start(mas_root + "/Markuse asjad/TöölauaMärkmed");
                     ((NativeMenuItem)sender).Header = "Sulge töölauamärkmed";
                 }
                 else if (File.Exists(mas_root + @"\noteopen.txt"))
                 {
+                    CookToast("Töölauamärkmete sulgemine...");
                     File.Delete(mas_root + "/noteopen.txt");
                     File.WriteAllText(mas_root + "/closenote.log", "See fail saadab töölauamärkmete rakendusele käskluse sulgeda. Kui te näete seda teksti, palun kustutage see fail.");
                     ((NativeMenuItem)sender).Header = "Ava töölauamärkmed";
@@ -529,6 +572,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void NativeMenuItem_Click_1(object? sender, System.EventArgs e)
         {
+            CookToast("Virtuaalarvuti käivitamine...");
             if (OperatingSystem.IsWindows())
             {
                 Process p = new Process();
@@ -560,6 +604,46 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
                 ((NativeMenuItem)sender).IsEnabled = false;
             }
+        }
+
+        public async void CookToast(string text)
+        {
+            try
+            {
+                var nf = new Notification
+                {
+                    Title = "Markuse arvuti integratsioonitarkvara",
+                    Body = text
+                };
+                await _notificationManage.ShowNotification(nf);
+                new Thread(() =>
+                {
+                    Thread.Sleep(10000);
+                    _notificationManage.HideNotification(nf);
+                }).Start();
+            }
+            catch (Exception) when (!Debugger.IsAttached)
+            {
+                // ignored
+            }
+        }
+
+        private void Pidu_OnClick(object? sender, EventArgs e)
+        {
+            CookToast("Pidu algab nüüd!");
+            new Process
+            {
+                StartInfo =
+                {
+                    FileName = mas_root + "/Markuse asjad/Pidu!",
+                    UseShellExecute = false,
+                }
+            }.Start();
+        }
+
+        private void CloseMenu_Click(object? sender, EventArgs e)
+        {
+            
         }
     }
 }

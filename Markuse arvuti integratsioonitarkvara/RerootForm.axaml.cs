@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using System.Text;
 using System.Xml.Linq;
 using System;
+using System.Diagnostics;
 using Avalonia;
 using System.IO;
 using Avalonia.Media;
@@ -153,7 +154,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 File.WriteAllText(app.mas_root + "/edition_1.txt", "[Edition_info];" + edition + ";" + version + ";" + build + ";Yes;" + rooter + ";et-EE;" + win + ";" + feats + ";" + pin + ";" + name + "\n;[this file is for backwards compatibility with legacy programs]", Encoding.GetEncoding(1252));
                 Environment.Exit(0);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!Debugger.IsAttached)
             {
                 Console.WriteLine(string.Format("Juurutusteabe salvestamine nurjus\n\n{0}\n\n{1}", ex.Message, ex.StackTrace));
             }

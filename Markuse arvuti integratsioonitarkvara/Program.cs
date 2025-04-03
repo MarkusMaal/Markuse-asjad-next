@@ -1,13 +1,21 @@
 ﻿using Avalonia;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Diagnostics;
-using System.Threading;
+using System.IO;
+using System.Runtime.InteropServices;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using DesktopNotifications;
+using DesktopNotifications.Avalonia;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
     internal class Program
     {
+
+        public static INotificationManager notificationManager = null!;
+
         public static readonly MasConfig config = new()
         {
             AllowScheduledTasks = false,
@@ -20,16 +28,44 @@ namespace Markuse_arvuti_integratsioonitarkvara
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.
         [STAThread]
-        public static void Main(string[] args) => BuildAvaloniaApp()
-            .StartWithClassicDesktopLifetime(args);
+        public static void Main(string[] args)
+        {
+            try
+            {
+                BuildAvaloniaApp()
+                    .StartWithClassicDesktopLifetime(args, ShutdownMode.OnExplicitShutdown);
+            }
+            catch (Exception ex) when (!Debugger.IsAttached) {
+                CatchErrors(ex, "Program.Main");
+            }
+        }
 
         // Avalonia configuration, don't remove; also used by visual designer.
-        public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<App>()
+        private static AppBuilder BuildAvaloniaApp()
+        {
+            try {
+                return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace()
-                .With(new MacOSPlatformOptions { ShowInDock = false});
+                .SetupDesktopNotifications(out notificationManager!)
+                .With(new MacOSPlatformOptions { ShowInDock = false });
+            }
+            catch (Exception ex) when (!Debugger.IsAttached)  {
+                CatchErrors(ex, "Program.BuildAvaloniaApp");
+                return null;
+            }
+        }
 
+        public static void CatchErrors(Exception ex, string invoker)
+        {
+            var exePath = Environment.ProcessPath;
+            if (!OperatingSystem.IsLinux())
+            {
+                Process.Start(new ProcessStartInfo(exePath!) { UseShellExecute = true });
+            }
+            File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/mas_error.log", $"----------------------------------------------\nMarkuse arvuti integratsioonitarkvara\n----------------------------------------------\n\nTaaskäivitamise Markuse arvuti integratsioonitarkvara probleemi tõttu. Palun käivitage see programm siluriga, et asja täpsemalt uurida.\n\nTehniline info:\n\nRakendus: {exePath!}\nKuupäev ja kellaaeg: {DateTime.Now}\nVälja kutsuja: {invoker}\nErand: {ex.Message}\nKuhila jälg:\n{ex.StackTrace}");
+            Environment.Exit(0);
+        }
     }
 }

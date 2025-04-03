@@ -13,130 +13,162 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
     public partial class MainWindow : Window
     {
         private bool allowCode = true;
-        private readonly TrayIcon ti;
         private readonly App app;
         private bool initialized = false;
         Color[] scheme;
         readonly DispatcherTimer dispatcherTimer = new();
         public MainWindow()
         {
-            InitializeComponent();
-            if (!OperatingSystem.IsLinux())
+            try
             {
-                //Console.WriteLine("Windows/Mac paranduste aktiveerimine...");
-                this.ExtendClientAreaToDecorationsHint = false;
-                this.SystemDecorations = SystemDecorations.None;
-            }
-            app = (App)Application.Current;
-            if (app.Verifile() && !app.croot)
-            {
-                app.InitSettings();
-                if (!app.showsplash)
+                app = (App)Application.Current;
+                InitializeComponent();
+                if (app.dev)
                 {
-                    this.IsVisible = false;
-                    this.Opacity = 0;        
-                    if (OperatingSystem.IsMacOS()) {
-                        this.WindowState = WindowState.Minimized;
-                        this.Width = 0;
-                        this.Height = 0;
+                    return;
+                }
+
+                new Thread(() =>
+                {
+                    if (!OperatingSystem.IsLinux())
+                    {
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            //Console.WriteLine("Windows/Mac paranduste aktiveerimine...");
+                            this.ExtendClientAreaToDecorationsHint = false;
+                            this.SystemDecorations = SystemDecorations.None;
+                        });
                     }
-                }
-                ti = app.GetTrayIcon();
-                scheme = LoadTheme();
-                if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
-                {
-                    this.DeviceLabel.Content = "markuse virtuaalarvuti asjad";
-                    this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_virtualpc);
-                }
-                else
-                {
-                    this.DeviceLabel.Content = "markuse arvuti asjad";
-                    this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_computers);
-                }
-                InitTimers();
-            } else if (app.croot)
+
+                    if (app.Verifile() && !app.croot)
+                    {
+                        app.InitSettings();
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            if (app.showsplash) return;
+                            this.IsVisible = false;
+                            this.Opacity = 0;
+                            if (OperatingSystem.IsMacOS())
+                            {
+                                this.WindowState = WindowState.Minimized;
+                                this.Width = 0;
+                                this.Height = 0;
+                            }
+                        });
+                        scheme = LoadTheme();
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) +
+                                            "/Android.lnk"))
+                            {
+                                this.DeviceLabel.Content = "markuse tahvelarvuti asjad";
+                                this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_tablet);
+                            }
+
+                            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
+                                                 "/.masv"))
+                            {
+                                this.DeviceLabel.Content = "markuse virtuaalarvuti asjad";
+                                this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_virtualpc);
+                            }
+                            else
+                            {
+                                this.DeviceLabel.Content = "markuse arvuti asjad";
+                                this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_computers);
+                            }
+                        });
+                        InitTimers();
+                    }
+                    else if (app.croot)
+                    {
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            RerootForm rf = new();
+                            rf.Show();
+                        });
+                    }
+                    else
+                    {
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            new VerifileFail().Show();
+                            Close();
+                        });
+                    }
+                }).Start();
+            }
+            catch (Exception ex)
             {
-                RerootForm rf = new();
-                rf.Show();
-            } else
-            {
-                new VerifileFail().Show();
-                this.Close();
-                return;
+                var exePath = Environment.ProcessPath;
+                Process.Start(new ProcessStartInfo(exePath!) { UseShellExecute = true });
+                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/mas_error.log", $"-------------------------------\n\nMarkuse arvuti integratsioonitarkvara\n\n-------------------------------\n\nTaaskäivitamise Markuse arvuti integratsioonitarkvara probleemi tõttu. Palun käivitage see programm siluriga, et asja täpsemalt uurida.\n\nTehniline info:\n\nKuupäev ja kellaaeg: {DateTime.Now}\nErand: {ex.Message}\nKuhila jälg:\n{ex.StackTrace}");
+                Environment.Exit(0);
             }
         }
 
         private void InitTimers()
         {
-            dispatcherTimer.Tick += new EventHandler(GeneralTimer);
-            if (app.showsplash)
-            {
-                dispatcherTimer.Interval = new TimeSpan(0, 0, 2);
-            } else
-            {
-                dispatcherTimer.Interval = new TimeSpan(0, 0, 0);
-            }
+            dispatcherTimer.Tick += GeneralTimer;
+            dispatcherTimer.Interval = new TimeSpan(0, 0, app.showsplash ? 2 : 0);
             dispatcherTimer.Start();
         }
 
         private void CheckEvents()
         {
             //erisündmused
-            try
+            if (app.specialevents is not { Length: > 0 }) return;
+            //käi läbi erisündmuste massiivist
+            foreach (var element in app.specialevents)
             {
-                if ((app.specialevents != null) && (app.specialevents.Length > 0))
+                //loo alamelemendid
+                string[] subelements = element.Split('-');
+                if (subelements.Length < 3) continue;
+                //loo kp elemendid
+                string[] dateelements = [subelements[0].ToString(), subelements[1].ToString(), subelements[2].ToString()];
+                //kui kp pole sama, siis ignoreeri
+                if (!(dateelements[0].ToString() == DateTime.Today.Day.ToString() && dateelements[1].ToString() == DateTime.Today.Month.ToString() && dateelements[2].ToString() == DateTime.Today.Year.ToString()))
                 {
-                    //käi läbi erisündmuste massiivist
-                    foreach (string element in app.specialevents)
-                    {
-                        //loo alamelemendid
-                        string[] subelements = element.Split('-');
-                        //loo kp elemendid
-                        string[] dateelements = [subelements[0].ToString(), subelements[1].ToString(), subelements[2].ToString()];
-                        //kui kp pole sama, siis ignoreeri
-                        if (!(dateelements[0].ToString() == DateTime.Today.Day.ToString() && dateelements[0].ToString() == DateTime.Today.Month.ToString() && dateelements[2].ToString() == DateTime.Today.Year.ToString()))
-                        {
-                            continue;
-                        }
-                        //loo kellaaja elemendid
-                        string[] timestamp = [subelements[3].ToString(), subelements[4].ToString(), subelements[5].ToString()];
-                        //kui kellaaeg varasem, siis ignoreeri
-                        if (!(Convert.ToInt32(timestamp[0].ToString()) >= DateTime.Now.Hour && Convert.ToInt32(timestamp[1].ToString()) >= DateTime.Now.Minute && Convert.ToInt32(timestamp[2].ToString()) >= DateTime.Now.Second))
-                        {
-                            continue;
-                        }
-                        //leia failinimi
-                        string file = subelements[6].ToString();
-                        //leia binraarne muutuja
-                        bool willclose = Convert.ToBoolean(subelements[7].ToString());
-                        //loo protsess
-                        Process p = new();
-                        p.StartInfo.FileName = file;
-                        p.StartInfo.Arguments = subelements[8].ToString();
-                        p.Start();
-                        //sulge programm kui willclose on tõene
-                        if (willclose)
-                        {
-                            app.croot = true;
-                            Environment.Exit(0);
-                        }
-                        //eemalda elemendid specialevent massiivist
-                        app.specialevents = null;
-                    }
+                    continue;
                 }
+                //loo kellaaja elemendid
+                string[] timestamp = [subelements[3].ToString(), subelements[4].ToString(), subelements[5].ToString()];
+                //kui kellaaeg varasem, siis ignoreeri
+                if (!(Convert.ToInt32(timestamp[0].ToString()) <= DateTime.Now.Hour && Convert.ToInt32(timestamp[1].ToString()) <= DateTime.Now.Minute))
+                {
+                    continue;
+                }
+                //leia failinimi
+                string file = subelements[6].ToString();
+                //leia binraarne muutuja
+                bool willclose = Convert.ToBoolean(subelements[7].ToString());
+                //loo protsess
+                Process p = new();
+                p.StartInfo.FileName = file;
+                p.StartInfo.Arguments = subelements[8].ToString();
+                p.Start();
+                //sulge programm kui willclose on tõene
+                if (willclose)
+                {
+                    app.croot = true;
+                    Environment.Exit(0);
+                }
+                //eemalda elemendid specialevent massiivist
+                app.specialevents = null;
+                break;
             }
-            catch { }
         }
 
         private void GeneralTimer(object? sender, EventArgs e)
         {
             initialized = true;
+            app.ResetTrayIcon();
             Program.config.Load(app.mas_root);
             if (dispatcherTimer.Interval < new TimeSpan(0, 0, 5))
             {
@@ -176,7 +208,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 }
                 else
                 {
-                    try { File.Delete(app.mas_root + "/maia/request_permission.maia"); } catch { File.Delete(app.mas_root + "/maia/request_permission.mai"); }
+                    try { File.Delete(app.mas_root + "/maia/request_permission.maia"); } catch (Exception) when (!Debugger.IsAttached) { File.Delete(app.mas_root + "/maia/request_permission.mai"); }
                 }
             }
         }
@@ -194,14 +226,14 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void ReloadMenu()
         {
-            if (!ti.IsVisible) {
+            if ((app.GetTrayIcon() == null) || !app.GetTrayIcon().IsVisible) {
                 return;
             }
             //foreach (NativeMenuItemBase nmi in ti.Menu.Items)
             List<NativeMenuItem> toRemove = [];
-            for (int i = 0; i < ti.Menu.Items.Count; i++)
+            for (int i = 0; i < app.GetTrayIcon().Menu.Items.Count; i++)
             {
-                NativeMenuItemBase nmi = ti.Menu.Items[i];
+                NativeMenuItemBase nmi = app.GetTrayIcon().Menu.Items[i];
                 NativeMenuItem n = (NativeMenuItem)nmi;
                 switch (n.Header)
                 {
@@ -226,7 +258,8 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         bool flashLocked = File.Exists(app.mas_root + "/flash_unlock_is_enabled.log");
                         n.Header = flashLocked ? "Lülita mälupulga lukustus välja" : "Lülita mälupulga lukustus sisse";
                         if (!initialized) {
-                            n.Click += (object? sender, EventArgs e) => {
+                            n.Click += (object? sender, EventArgs e) =>
+                            {
                                 if (OperatingSystem.IsLinux()) {
                                     bool flashLocked = File.Exists(app.mas_root + "/flash_unlock_is_enabled.log");
                                     if (!flashLocked) {
@@ -237,8 +270,10 @@ namespace Markuse_arvuti_integratsioonitarkvara
                                         p.StartInfo.CreateNoWindow = true;
                                         p.StartInfo.UseShellExecute = false;
                                         p.Start();
+                                        app.CookToast("Mälupulga lukustus lülitati sisse");
                                     } else {
                                         File.Delete(app.mas_root + "/flash_unlock_is_enabled.log");
+                                        app.CookToast("Mälupulga lukustus lülitati välja");
                                     }
                                 } else if (OperatingSystem.IsWindows()) {
                                 // do something for Windows
@@ -328,9 +363,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
                                 NativeMenuItem nvmi = ((NativeMenuItem)sender);
                                 if (nvmi.Header == "Kuva kõik töölauaikoonid")
                                 {
+                                    app.CookToast("Töölauaikoonide kuvamine...");
                                     nvmi.Header = "Peida need töölauaikoonid";
                                 } else
                                 {
+                                    app.CookToast("Töölauaikoonide peitmine...");
                                     nvmi.Header = "Kuva kõik töölauaikoonid";
                                 }
                                 if (OperatingSystem.IsWindows())
@@ -428,32 +465,35 @@ namespace Markuse_arvuti_integratsioonitarkvara
             }
             foreach (NativeMenuItem r in toRemove)
             {
-                ti.Menu.Items.Remove(r);
+                app.GetTrayIcon().Menu.Items.Remove(r);
             }
         }
 
         private void Window_Loaded(object? sender, RoutedEventArgs e)
         {
+            if (app.dev) return;
             ApplyTheme();
-            ti.IsVisible = true;
-            if (OperatingSystem.IsMacOS() && !Debugger.IsAttached)
+            new Thread(() =>
             {
-                if (Process.GetProcesses().Any(p => p.ProcessName.Contains("DesktopIcons"))) return;
-                new Process
+                if (OperatingSystem.IsMacOS() && !Debugger.IsAttached)
                 {
-                    StartInfo =
+                    if (Process.GetProcesses().Any(p => p.ProcessName.Contains("DesktopIcons"))) return;
+                    new Process
                     {
-                        FileName = "open",
-                        Arguments = "-a \"" + app.mas_root + "/Markuse asjad/DesktopIcons.app\"",
-                        UseShellExecute = false,
-                    }
-                }.Start();
-            }
+                        StartInfo =
+                        {
+                            FileName = "open",
+                            Arguments = "-a \"" + app.mas_root + "/Markuse asjad/DesktopIcons.app\"",
+                            UseShellExecute = false,
+                        }
+                    }.Start();
+                }
+            }).Start();
             ReloadMenu();
         }
 
         private void StopMaia(object sender, EventArgs e) {
-            Console.WriteLine("Stop M.A.I.A.");
+            app.CookToast("M.A.I.A. serveri peatamine...");
             foreach (Process p in Process.GetProcesses()) {
                 if (p.ProcessName.Contains("python") || p.ProcessName.Contains("py.exe")) {
                     p.Kill();
@@ -462,7 +502,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
         }
 
         private void StartMaia(object sender, EventArgs e) {
-            Console.WriteLine("Start M.A.I.A.");
+            app.CookToast("M.A.I.A. serveri käivitamine...");
             Process p = new();
             if (!OperatingSystem.IsWindows()) {
                 p.StartInfo.FileName = "python3";
@@ -523,14 +563,28 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void ApplyTheme()
         {
-            app.Styles.Add(new Style(x => x.OfType<MenuItem>())
+            try
             {
-                Setters =
+                new Thread(() =>
                 {
-                    new Setter(TemplatedControl.BackgroundProperty, new SolidColorBrush(scheme[0])),
-                    new Setter(TemplatedControl.ForegroundProperty, new SolidColorBrush(scheme[1]))
-                }
-            });
+                    Thread.Sleep(5000);
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        app.Styles.Add(new Style(x => x.OfType<MenuItem>())
+                        {
+                            Setters =
+                            {
+                                new Setter(BackgroundProperty, new SolidColorBrush(scheme[0])),
+                                new Setter(ForegroundProperty, new SolidColorBrush(scheme[1]))
+                            }
+                        });                        
+                    });
+                }).Start();
+            }
+            catch (Exception ex) when (!Debugger.IsAttached)
+            {
+                app.CookToast("Teema rakendamine nurjus!");
+            }
             /*app.Styles.Add(new Style(x => x.OfType<MenuItem>().Class("White"))
             {
                 Setters =
@@ -543,6 +597,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void SaveTheme(Color bg, Color fg)
         {
+            app.CookToast("Teema salvestati");
             this.scheme[0] = bg;
             this.scheme[1] = fg;
             File.WriteAllText(app.mas_root + "/scheme.cfg", bg.R.ToString() + ":" + bg.G.ToString() + ":" + bg.B.ToString() + ":;" + fg.R.ToString() + ":" + fg.G.ToString() + ":" + fg.B.ToString() + ":;");
@@ -551,7 +606,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void ModifyContextText(string old, string nw)
         {
-            foreach (NativeMenuItemBase nmi in ti.Menu.Items)
+            foreach (NativeMenuItemBase nmi in app.GetTrayIcon().Menu.Items)
             {
                 if (((NativeMenuItem)nmi).Header == old)
                 {

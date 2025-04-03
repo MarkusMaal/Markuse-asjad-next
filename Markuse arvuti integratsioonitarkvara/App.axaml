@@ -9,52 +9,55 @@
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
-  <Application.Resources>
-      <TrayIcon ToolTipText="Markuse arvuti integratsioonitarkvara" Icon="Resources/mas_general.png" x:Key="TrayIcon1">
-        <TrayIcon.Menu>
-          <NativeMenu>
-            <NativeMenuItem Click="Folders_Click" Header="Ava Markuse kaustad" Icon="Resources/folder.png"/>
-            <NativeMenuItem Header="Ühtegi mälupulka pole sisestatud" Icon="Resources/mas_flash.png" >
-              <NativeMenu>
-                <NativeMenuItem Click="FlashPanel_Click" Header="Käivita juhtpaneel"  Icon="Resources/mas_flash.png" />
-                <NativeMenuItem Header="Ava kasutaja kaust" Icon="Resources/user_blue.png" IsEnabled="False"/>
-                <!--<NativeMenuItem Header="Loo uus kasutaja" Icon="Resources/new.bmp" /><NativeMenuItem Header="Eemalda kasutaja" Icon="Resources/failure.gif" />-->
-                <NativeMenuItem Header="Teisendamine" Icon="Resources/br.png" IsEnabled="False">
-                  <NativeMenu>
-                    <NativeMenuItem Header="Premium -> Ultimate" Icon="Resources/mas_flash.png"></NativeMenuItem>
-                  </NativeMenu>
-                </NativeMenuItem>
-              </NativeMenu>
-            </NativeMenuItem>
-            <NativeMenuItem Click="FlashUnlock_Click" Header="Lülita mälupulga lukustus sisse" Icon="Resources/mas_flash.png"/>
-            <NativeMenuItem Header="Kuva kõik töölauaikoonid" Icon="Resources/pending.gif"/>
-            <NativeMenuItem Click="NativeMenuItem_Click_1" Header="Käivita virtuaalarvuti" Icon="Resources/mas_virtualpc.png"/>
-            <NativeMenuItem Click="StickyNotes_Click" Header="Ava töölauamärkmed" Icon="Resources/noteicon.png"/>
-            <NativeMenuItem Click="LockWorkstation_Click" Header="Lukusta töölaud" Icon="Resources/root_idc_key.png"/>
-            <NativeMenuItem Click="PITS_Click" Header="Käivita Projekt ITS" Icon="Resources/mas_its_symmetric.png"/>
-            <NativeMenuItem Click="MS_Click" Header="Käivita MarkuStation" Icon="Resources/MarkuStation_awesome.png"/>
-            <NativeMenuItem Header="M.A.I.A. serveri haldamine" Icon="Resources/br.png">
-              <NativeMenu>
-                <NativeMenuItem Header="Ava brauseris" Icon="Resources/unknown.png"/>
-                <NativeMenuItem Header="Võimalda ligipääsu taotlemine" IsChecked="True" ToggleType="CheckBox" />
-                <NativeMenuItem Header="Peata" Icon="Resources/failure.gif"/>
-              </NativeMenu>
-            </NativeMenuItem>
-            <NativeMenuItem Header="Tarkvara paigaldamise režiim" Icon="Resources/unknown.png"/>
-            <NativeMenuItem Header="Värviskeem" Icon="Resources/theming.png">
-              <NativeMenu>
-                <NativeMenuItem Header="Valge"></NativeMenuItem>
-                <NativeMenuItem Header="Öörežiim"></NativeMenuItem>
-                <NativeMenuItem Header="Sinine"></NativeMenuItem>
-                <NativeMenuItem Header="Jõulud"></NativeMenuItem>
-                <NativeMenuItem Header="Süsteemi värviskeem"></NativeMenuItem>
-                <NativeMenuItem Header="Kohandatud"></NativeMenuItem>
-              </NativeMenu>
-            </NativeMenuItem>
-            <NativeMenuItem Header="Markuse arvuti juhtpaneel" Icon="Resources/mas_general.png" Click="Cpanel_Clicked"/>
-            <NativeMenuItem Header="Sulge see menüü" Icon="Resources/failure.gif"/>
-          </NativeMenu>
-        </TrayIcon.Menu>
-      </TrayIcon>
-  </Application.Resources>
+    <TrayIcon.Icons>
+      <TrayIcons>
+        <TrayIcon ToolTipText="Markuse arvuti integratsioonitarkvara" Icon="/Resources/mas_general.png">
+          <TrayIcon.Menu>
+            <NativeMenu>
+              <NativeMenuItem Click="Folders_Click" Header="Ava Markuse kaustad" Icon="Resources/folder.png"/>
+              <NativeMenuItem Header="Ühtegi mälupulka pole sisestatud" Icon="Resources/mas_flash.png" >
+                <NativeMenu>
+                  <NativeMenuItem Click="FlashPanel_Click" Header="Käivita juhtpaneel"  Icon="Resources/mas_flash.png" />
+                  <NativeMenuItem Header="Ava kasutaja kaust" Icon="Resources/user_blue.png" IsEnabled="False"/>
+                  <!--<NativeMenuItem Header="Loo uus kasutaja" Icon="Resources/new.bmp" /><NativeMenuItem Header="Eemalda kasutaja" Icon="Resources/failure.gif" />-->
+                  <NativeMenuItem Header="Teisendamine" Icon="Resources/br.png" IsEnabled="False">
+                    <NativeMenu>
+                      <NativeMenuItem Header="Premium -> Ultimate" Icon="Resources/mas_flash.png"></NativeMenuItem>
+                    </NativeMenu>
+                  </NativeMenuItem>
+                </NativeMenu>
+              </NativeMenuItem>
+              <NativeMenuItem Click="FlashUnlock_Click" Header="Lülita mälupulga lukustus sisse" Icon="Resources/mas_flash.png"/>
+              <NativeMenuItem Header="Kuva kõik töölauaikoonid" Icon="Resources/pending.gif"/>
+              <NativeMenuItem Click="NativeMenuItem_Click_1" Header="Käivita virtuaalarvuti" Icon="Resources/mas_virtualpc.png"/>
+              <NativeMenuItem Click="StickyNotes_Click" Header="Ava töölauamärkmed" Icon="Resources/noteicon.png"/>
+              <NativeMenuItem Click="LockWorkstation_Click" Header="Lukusta töölaud" Icon="Resources/root_idc_key.png"/>
+              <NativeMenuItem Click="PITS_Click" Header="Käivita Projekt ITS" Icon="Resources/mas_its_symmetric.png"/>
+              <NativeMenuItem Click="MS_Click" Header="Käivita MarkuStation" Icon="Resources/MarkuStation_awesome.png"/>
+              <NativeMenuItem Click="Pidu_OnClick" Header="Käivita pidu!" Icon="Resources/pidu.ico"></NativeMenuItem>
+              <NativeMenuItem Header="M.A.I.A. serveri haldamine" Icon="Resources/br.png">
+                <NativeMenu>
+                  <NativeMenuItem Header="Ava brauseris" Icon="Resources/unknown.png"/>
+                  <NativeMenuItem Header="Võimalda ligipääsu taotlemine" IsChecked="True" ToggleType="CheckBox" />
+                  <NativeMenuItem Header="Peata" Icon="Resources/failure.gif"/>
+                </NativeMenu>
+              </NativeMenuItem>
+              <NativeMenuItem Header="Tarkvara paigaldamise režiim" Icon="Resources/unknown.png"/>
+              <NativeMenuItem Header="Värviskeem" Icon="Resources/theming.png">
+                <NativeMenu>
+                  <NativeMenuItem Header="Valge"></NativeMenuItem>
+                  <NativeMenuItem Header="Öörežiim"></NativeMenuItem>
+                  <NativeMenuItem Header="Sinine"></NativeMenuItem>
+                  <NativeMenuItem Header="Jõulud"></NativeMenuItem>
+                  <NativeMenuItem Header="Süsteemi värviskeem"></NativeMenuItem>
+                  <NativeMenuItem Header="Kohandatud"></NativeMenuItem>
+                </NativeMenu>
+              </NativeMenuItem>
+              <NativeMenuItem Header="Markuse arvuti juhtpaneel" Icon="Resources/mas_general.png" Click="Cpanel_Clicked"/>
+              <NativeMenuItem Header="Sulge see menüü" Icon="Resources/failure.gif" Click="CloseMenu_Click"/>
+            </NativeMenu>
+          </TrayIcon.Menu>
+        </TrayIcon>
+        </TrayIcons>
+      </TrayIcon.Icons>
 </Application>

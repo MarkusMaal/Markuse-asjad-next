@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="400" Height="400"
+        MinWidth="300" MinHeight="370"
+        x:Class="Markuse_arvuti_integratsioonitarkvara.InterfaceTest"
+        Title="Kasutajaliidese test">
+    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Center">
+        <Label HorizontalAlignment="Center" Margin="0, 0,0,15" FontSize="25">Liidese testid</Label>
+        <Button Click="Button_OnClick">Tegumiriba menüü</Button>
+        <Button Click="Button_OnClick">Käivitusaken</Button>
+        <Button Click="Button_OnClick">Juurutamise vorm</Button>
+        <Button Click="Button_OnClick">M.A.I.A. kood</Button>
+        <Button Click="Button_OnClick">Verifile kontrolli nurjumine</Button>
+        <Button Click="Button_OnClick">Paigalduse lõpetamise aken</Button>
+        <Button Click="Button_OnClick">Silu rakendus</Button>
+        <CheckBox Click="CheckBox_OnClick" IsChecked="True" HorizontalAlignment="Center">Arendaja režiim</CheckBox>
+        <StackPanel.Styles>
+            <Style Selector="Button">
+                <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+                <Setter Property="Margin" Value="5"></Setter>
+            </Style>
+        </StackPanel.Styles>
+    </StackPanel>
+</Window>
