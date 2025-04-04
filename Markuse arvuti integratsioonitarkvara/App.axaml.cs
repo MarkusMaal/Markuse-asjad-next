@@ -14,11 +14,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using Avalonia.Controls.Notifications;
-using DesktopNotifications;
-using DesktopNotifications.Avalonia;
-using INotificationManager = DesktopNotifications.INotificationManager;
-using Notification = DesktopNotifications.Notification;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
@@ -36,8 +31,14 @@ namespace Markuse_arvuti_integratsioonitarkvara
         internal string attestation = "BYPASS";
         static bool bad = false;
         private TrayIcon ti;
-        private readonly INotificationManager _notificationManage = Program.notificationManager ??
-                                                                    throw new InvalidOperationException("Missing notification manager");
+
+        public enum NotificationType
+        {
+            Info,
+            Warning,
+            Error,
+            Question
+        }
         
         public override void Initialize()
         {
@@ -606,21 +607,45 @@ namespace Markuse_arvuti_integratsioonitarkvara
             }
         }
 
-        public async void CookToast(string text)
+        public void CookToast(string text, NotificationType icon = NotificationType.Info)
         {
             try
             {
-                var nf = new Notification
+                string[] icons;
+                if (OperatingSystem.IsLinux())
                 {
-                    Title = "Markuse arvuti integratsioonitarkvara",
-                    Body = text
-                };
-                await _notificationManage.ShowNotification(nf);
-                new Thread(() =>
+                    icons = ["info", "data-warning", "error", "dialog-question"];
+                    var p = new Process
+                    {
+                        StartInfo = {
+                            FileName = "notify-send",
+                            Arguments = "-a \"Markuse arvuti integratsioonitarkvara\" -i " + icons[(int)icon] +
+                                        $" \"{text}\" -t 5000",
+                            UseShellExecute = false,
+                        } 
+                    };
+                    p.Start();
+                } else if (OperatingSystem.IsWindows())
                 {
-                    Thread.Sleep(10000);
-                    _notificationManage.HideNotification(nf);
-                }).Start();
+                    var ps1File = mas_root + "/notify.ps1";
+                    icons = ["Information", "Exclamation", "Error", "Question"];
+                    if (!File.Exists(ps1File))
+                    {
+                        using var w = new StreamWriter(ps1File);
+                        w.Write("[reflection.assembly]::loadwithpartialname(\"System.Windows.Forms\")\n[reflection.assembly]::loadwithpartialname(\"System.Drawing\")\n$notify = new-object system.windows.forms.notifyicon\n$notify.icon = [System.Drawing.SystemIcons]::$args[0]\n$notify.visible = $true\n$notify.showballoontip(10,$args[1],$args[2],[system.windows.forms.tooltipicon]::None)");
+                        w.Close();
+                    }
+                    
+                    var p = new Process
+                    {
+                        StartInfo = {
+                            FileName = "powershell",
+                            Arguments = $"-NoProfile -ExecutionPolicy ByPass -File \"{ps1File}\" " + icons[(int)icon] + " \"Markuse arvuti integratsioonitarkvara\" \"" + text + "\"",
+                            UseShellExecute = false,
+                        } 
+                    };
+                    p.Start();
+                }
             }
             catch (Exception) when (!Debugger.IsAttached)
             {

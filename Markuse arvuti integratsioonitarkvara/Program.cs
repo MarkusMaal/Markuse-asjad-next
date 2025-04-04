@@ -5,8 +5,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using DesktopNotifications;
-using DesktopNotifications.Avalonia;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Markuse_arvuti_integratsioonitarkvara
@@ -14,7 +12,6 @@ namespace Markuse_arvuti_integratsioonitarkvara
     internal class Program
     {
 
-        public static INotificationManager notificationManager = null!;
 
         public static readonly MasConfig config = new()
         {
@@ -48,7 +45,6 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace()
-                .SetupDesktopNotifications(out notificationManager!)
                 .With(new MacOSPlatformOptions { ShowInDock = false });
             }
             catch (Exception ex) when (!Debugger.IsAttached)  {
