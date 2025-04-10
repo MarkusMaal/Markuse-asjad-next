@@ -25,6 +25,9 @@ using Markuse_arvuti_juhtpaneel.IntegrationSoftware;
 using System.Globalization;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
+using Avalonia.VisualTree;
+using MsBox.Avalonia.Dto;
+using MsBox.Avalonia.Models;
 
 namespace Markuse_arvuti_juhtpaneel
 {
@@ -36,19 +39,65 @@ namespace Markuse_arvuti_juhtpaneel
         string[] locations;
         bool freezeTimer = false;
         private bool preventWrites = true;
-        readonly string whatNew = "+ Töölauaikoonide kohandamine\n+ Laadimisekraan info kogumise ajal";
+        readonly string whatNew = "+ Ligipääsetavuse parandused ainult klaviatuuriga kasutajatele\n+ Ctrl+Tab ja Ctrl+Shift+Tab navigatsioon\n+ Abistavad tekstid menüüelementidel kursoriga peatumisel\n+ Teema värvid laadimisel ja teiste akende avamisel\n* Parandatud viga, kus sulgemisnupp ei olnud nähtav, kui see oleks pidanud olema nähtav";
         private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true, TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default};
         private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = CommandSourceGenerationContext.Default };
         private List<string> desktopIcons = [];
         DesktopLayout? desktopLayout;
         MasConfig config = new();
         private bool LaunchError = false;
-        double angle = 0.0;
+        private double angle = 0.0;
+        private int eggLevel = 0;
+        private List<Key> pressedKeys = [];
         public MainWindow()
         {
             InitializeComponent();
             InitResources();
             InitButtons();
+            GetTopLevel(this).KeyDown += InputElement_OnKeyDown;
+            GetTopLevel(this).KeyUp += OnKeyUp;
+        }
+
+        private void OnKeyUp(object? sender, KeyEventArgs e)
+        {
+            if (e.KeyModifiers.HasFlag(KeyModifiers.Alt) && e.Key == Key.H)
+            {
+                _ = MessageBoxShow(
+                    "Alt - Kuva klaviatuuri otseteed\n" +
+                    (OperatingSystem.IsMacOS() ? "Cmd + Q" :"Alt + F4") + " - Sulge rakendus\n" +
+                    "Alt + H - Kuva kõik kiirklahvid\n" +
+                    "Alt + A - Navigeeri avalehele\n" +
+                    "Alt + M - Navigeeri MarkuStationi vahekaardile\n" +
+                    "Alt + K - Ava konfiguratsiooni vahekaart\n" +
+                    "Alt + D - Ava töölaua vahekaart\n" +
+                    "Alt + T - Ava teabe vahekaart\n" +
+                    "CTRL + TAB - Järgmine vahekaart\n" +
+                    "CTRL + SHIFT + TAB - Eelmine vahekaart\n", "Kiirklahvid", ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Question
+                    );
+            }
+            if (!e.KeyModifiers.HasFlag(KeyModifiers.Control) || (e.Key != Key.Tab)) return;
+            if (e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+            {
+                if (TabsControl.SelectedIndex != 0)
+                {
+                    TabsControl.SelectedIndex--;
+                }
+                else
+                {
+                    TabsControl.SelectedIndex = TabsControl.Items.Count - 1;
+                }
+            }
+            else
+            {
+                if (TabsControl.SelectedIndex != TabsControl.Items.Count - 1)
+                {
+                    TabsControl.SelectedIndex += 1;
+                }
+                else
+                {
+                    TabsControl.SelectedIndex = 0;
+                }
+            }
         }
 
         /* Avaleht */
@@ -248,6 +297,10 @@ namespace Markuse_arvuti_juhtpaneel
             hints["Terminal"] = "Käivitab terminali (terminal)";
             hints["Ooterežiimi seaded"] = "Avab akna, kus saate kohandada ooterežiimi seadeid";
             hints["Laadi andmed uuesti"] = "Laadib seadistused uuesti, juhul, kui need peaksid olema muutunud";
+            foreach (var um in GetUniverse())
+            {
+                hints[um] = "Markuse asjad universum!";
+            }
             this.InfoTextBlock.Text = hints[(string?)((Button)e.Source).Content];
         }
 
@@ -335,7 +388,7 @@ namespace Markuse_arvuti_juhtpaneel
         // Reimplementation of WinForms MessageBox.Show
         private Task MessageBoxShow(string message, string caption = "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum buttons = MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon icon = MsBox.Avalonia.Enums.Icon.None)
         {
-            var box = MessageBoxManager.GetMessageBoxStandard(caption, message, buttons, icon);
+            var box = MessageBoxManager.GetMessageBoxStandard(caption, message, buttons, icon, WindowStartupLocation.CenterOwner);
             var result = box.ShowWindowDialogAsync(this);
             return result;
         }
@@ -381,17 +434,32 @@ namespace Markuse_arvuti_juhtpaneel
         /* Loads mas theme */
         Color[] LoadTheme()
         {
+            if (!File.Exists(masRoot + "/scheme.cfg"))
+            {
+                return [Colors.Black, Colors.White];
+            }
             string[] bgfg = File.ReadAllText(masRoot + "/scheme.cfg").Split(';');
             string[] bgs = bgfg[0].ToString().Split(':');
             string[] fgs = bgfg[1].ToString().Split(':');
-            Color[] cols = { Color.FromArgb(255, byte.Parse(bgs[0]), byte.Parse(bgs[1]), byte.Parse(bgs[2])), Color.FromArgb(255, byte.Parse(fgs[0]), byte.Parse(fgs[1]), byte.Parse(fgs[2])) };
+            Color[] cols = [Color.FromArgb(255, byte.Parse(bgs[0]), byte.Parse(bgs[1]), byte.Parse(bgs[2])), Color.FromArgb(255, byte.Parse(fgs[0]), byte.Parse(fgs[1]), byte.Parse(fgs[2]))
+            ];
             return cols;
+        }
+
+        void ApplyColors()
+        {
+            this.Background = new SolidColorBrush(scheme[0]);
+            this.Foreground = new SolidColorBrush(scheme[1]);
+            Program.BgCol = this.Background;
+            Program.FgCol = this.Foreground;
         }
 
         void ApplyTheme()
         {
             this.Background = new SolidColorBrush(scheme[0]);
             this.Foreground = new SolidColorBrush(scheme[1]);
+            Program.BgCol = this.Background;
+            Program.FgCol = this.Foreground;
             ImageBrush IB = new ImageBrush(new Bitmap(masRoot + "/bg_common.png"));
             IB.Stretch = Stretch.Fill;
             this.Styles.Add(new Style(x => x.OfType<Button>())
@@ -664,7 +732,10 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 devPrefix = "Markuse tahvelarvuti asjade";
             }
-            SetCollectProgress(1, "Konfiguratsiooni laadimine...");
+            SetCollectProgress(1, "Teema laadimine...");
+            scheme = LoadTheme();
+            Dispatcher.UIThread.Post(ApplyColors);
+            SetCollectProgress(20, "Konfiguratsiooni laadimine...");
             if (File.Exists(masRoot + "/Config.json"))
             {
                 config.Load(masRoot);
@@ -699,7 +770,7 @@ namespace Markuse_arvuti_juhtpaneel
                 SetCollectProgress(-2, devPrefix + " tarkvara ei ole juurutatud. Palun juurutage seade kasutades juurutamise tööriista.");
                 return;
             }
-            SetCollectProgress(10, "Väljaande info kogumine...");
+            SetCollectProgress(30, "Väljaande info kogumine...");
             if (File.Exists(masRoot + "/edition.txt"))
             {
 
@@ -724,12 +795,10 @@ namespace Markuse_arvuti_juhtpaneel
                         Program.Launcherror = true;
                         return;
                 }
-                SetCollectProgress(25, "Verifile OK");
+                SetCollectProgress(35, "Verifile OK");
                 if (Verifile())
                 {
-                    SetCollectProgress(30, "Teema laadimine...");
-                    scheme = LoadTheme();
-                    SetCollectProgress(50, "Töölauaikooni seadete laadimine...");
+                    SetCollectProgress(40, "Töölauaikooni seadete laadimine...");
                     LoadDesktopSettings();
                     SetCollectProgress(55, "Kogun infot töölauaikoonide kohta...");
 
@@ -780,6 +849,7 @@ namespace Markuse_arvuti_juhtpaneel
                         {
                             // Projekt ITS aktiivne
                             WindowState = WindowState.FullScreen;
+                            CloseButton.IsVisible = true;
                         }
                         CollectProgress.Value = 100;
                         if (VF_STATUS != "BYPASS")
@@ -851,12 +921,82 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void Image_DoubleTapped(object? sender, Avalonia.Input.TappedEventArgs e)
         {
-            RotateObject([Logo, LoaderLogo]);
+            RotateObject([Logo, LoaderLogo, FailGif]);
+            if (GameNameBox.Text == null) return;
+            if (!GameNameBox.Text.Equals(Encoding.UTF8.GetString([0x4F, 0x6C, 0x67, 0x65, 0x20,
+                    0x76, 0x61, 0x6C, 0x6D, 0x69, 0x73, 0x20, 0x6D, 0x69, 0x6C, 0x6C, 0x65, 0x67,
+                    0x69, 0x20, 0x75, 0x73, 0x6B, 0x75, 0x6D, 0x61, 0x74, 0x75, 0x20, 0x6A, 0x61,
+                    0x6F, 0x6B, 0x73, 0x21])) && (eggLevel == 0)) return;
+            eggLevel++;
+            if (!GameNameBox.Text.Equals(char.ToUpper(TopLabel.Text[0]) + $"{TopLabel.Text[1..]} on lahe!")) return;
+            if (eggLevel % 4 != 0) return;
+            var allControls = this.GetVisualDescendants();
+            List<Control> controls = [];
+            controls.AddRange(allControls.Cast<Control>());
+            new Thread(() =>
+            {
+                Random r = new();
+                foreach (var v in allControls)
+                {
+                    Thread.Sleep(r.Next(10));
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        ShakeObject((Control)v); 
+                    });
+                }
+            }).Start();
+        }
+
+        private void ShakeObject(Control senders)
+        {
+            if (senders.Name is "Logo" or "Header1" or "TopLabel") return;
+            const int duration = 500;
+            const double strength = 3.0;
+            Animation animation = new()
+            {
+                Duration = TimeSpan.FromMilliseconds(duration),
+                IterationCount = new IterationCount(9999),
+                PlaybackDirection = PlaybackDirection.Alternate,
+                FillMode = FillMode.Both,
+                Easing = new SineEaseInOut()
+            };
+            KeyFrame key1 = new()
+            {
+                KeyTime = TimeSpan.FromMilliseconds(0)
+            };
+            KeyFrame key2 = new()
+            {
+                KeyTime = TimeSpan.FromMilliseconds(duration / 2)
+            };
+            KeyFrame key3 = new()
+            {
+                KeyTime = TimeSpan.FromMilliseconds(duration)
+            };
+            if (!senders.GetVisualDescendants().Any())
+            {
+                key1.Setters.Add(new Setter(RotateTransform.AngleProperty, 0.0));
+                key2.Setters.Add(new Setter(RotateTransform.AngleProperty, -strength));
+                key3.Setters.Add(new Setter(RotateTransform.AngleProperty, strength));
+            }
+            else
+            {
+                key1.Setters.Add(new Setter(ScaleTransform.ScaleXProperty, 1.0));
+                key1.Setters.Add(new Setter(ScaleTransform.ScaleYProperty, 1.0));
+                key2.Setters.Add(new Setter(ScaleTransform.ScaleXProperty, 1.025));
+                key2.Setters.Add(new Setter(ScaleTransform.ScaleYProperty, 1.025));
+                key3.Setters.Add(new Setter(ScaleTransform.ScaleXProperty, 1.0));
+                key3.Setters.Add(new Setter(ScaleTransform.ScaleYProperty, 1.0));
+            }
+
+            animation.Children.Add(key1);
+            animation.Children.Add(key2);
+            animation.Children.Add(key3);
+            _ = animation.RunAsync(senders);
         }
 
         private void RotateObject(Control[] senders)
         {
-            int duration = 500;
+            const int duration = 500;
             angle += 90;
             Animation animation = new()
             {
@@ -878,7 +1018,7 @@ namespace Markuse_arvuti_juhtpaneel
             key2.Setters.Add(new Setter(RotateTransform.AngleProperty, angle));
             animation.Children.Add(key1);
             animation.Children.Add(key2);
-            foreach (Control c in senders)
+            foreach (var c in senders)
             {
                 _ = animation.RunAsync(c);
             }
@@ -1019,7 +1159,9 @@ namespace Markuse_arvuti_juhtpaneel
                     LocationBox =
                     {
                         Text = GameLocation
-                    }
+                    },
+                    Background = this.Background,
+                    Foreground = this.Foreground
                 };
                 await mse.ShowDialog(this).WaitAsync(new CancellationToken(false));
                 if (mse.DialogResult && (mse.LocationBox.Text == ";") && (mse.NameBox.Text == ";"))
@@ -1429,12 +1571,14 @@ namespace Markuse_arvuti_juhtpaneel
         private async void EditBg(object sender, RoutedEventArgs e)
         {
             if (Program.Launcherror) return;
-            ColorPickerDialog cpd = new ColorPickerDialog
+            var cpd = new ColorPickerDialog
             {
                 Color =
                 {
                     Color = scheme[0]
-                }
+                },
+                Background = this.Background,
+                Foreground = this.Foreground
             };
             await cpd.ShowDialog(this);
             this.scheme[0] = cpd.Color.Color;
@@ -1452,8 +1596,15 @@ namespace Markuse_arvuti_juhtpaneel
         private async void EditFg(object sender, RoutedEventArgs e)
         {
             if (Program.Launcherror) return;
-            ColorPickerDialog cpd = new ColorPickerDialog();
-            cpd.Color.Color = scheme[1];
+            var cpd = new ColorPickerDialog
+            {
+                Color =
+                {
+                    Color = scheme[1]
+                },
+                Background = this.Background,
+                Foreground = this.Foreground
+            };
             await cpd.ShowDialog(this);
             this.scheme[1] = cpd.Color.Color;
             if (cpd.result)
@@ -1624,6 +1775,7 @@ namespace Markuse_arvuti_juhtpaneel
                 p.WaitForExit();
                 Dispatcher.UIThread.Post(() =>
                 {
+                    ErtGrid.Background = null;
                     ErtGrid.IsEnabled = true;
                     WindowState = ps;
                     IsVisible = true;
@@ -1761,6 +1913,8 @@ namespace Markuse_arvuti_juhtpaneel
             }
             dEdit.NameBox.SelectedItem = dEdit.NameBox.Items[desktopIcons.IndexOf(icon)];
             dEdit.LocationBox.Text = uri;
+            dEdit.Background = this.Background;
+            dEdit.Foreground = this.Foreground;
             await dEdit.ShowDialog(this).WaitAsync(new CancellationToken(false));
             if (!dEdit.DialogResult) return;
             if (dEdit.NameBox.SelectedIndex != -1)
@@ -1883,6 +2037,7 @@ namespace Markuse_arvuti_juhtpaneel
             TabsControl.IsVisible = false;
             Header1.IsVisible = false;
             CheckSysLabel.IsVisible = true;
+            this.ErtGrid.Background = null;
             ThreadStart ts = CollectInfo;
             var t = new Thread(ts)
             {
@@ -1904,6 +2059,8 @@ namespace Markuse_arvuti_juhtpaneel
                 dEdit.NameBox.Items.Add(s);   
             }
 
+            dEdit.Background = this.Background;
+            dEdit.Foreground = this.Foreground;
             dEdit.DeleteButton.IsVisible = false;
             await dEdit.ShowDialog(this).WaitAsync(new CancellationToken(false));
             if (!dEdit.DialogResult) return;
@@ -1996,6 +2153,67 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void Image_DoubleTapped_1(object? sender, Avalonia.Input.TappedEventArgs e)
         {
+        }
+
+        private static string[] GetUniverse()
+        {
+            return Encoding.UTF8.GetString(Program.Universe.Reverse().ToArray()).Split(',');
+        }
+        
+        private void InputElement_OnKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.Key is Key.LeftAlt or Key.RightAlt)
+            {
+                TipLabel.IsVisible = true;
+                CloseButton.IsVisible = false;
+            }
+            pressedKeys.Add(e.Key);
+            if (pressedKeys.Count <= 10) return;
+            pressedKeys.RemoveAt(0);
+            List<Key> anokim = [Key.Up, Key.Up, Key.Down, Key.Down, Key.Left, Key.Right, Key.Left, Key.Right, Key.B, Key.A];
+            if (pressedKeys.Where((t, i) => t != anokim[i]).Any()) return;
+            var r = new Random();
+            var universeMembers = GetUniverse();
+            foreach (var control in this.GetVisualDescendants())
+            {
+                var um = universeMembers[r.Next(0, universeMembers.Length - 1)]; 
+                switch (control)
+                {
+                    case TextBox tb:
+                        tb.Text = um;
+                        break;
+                    case Label lb:
+                        lb.Content = um;
+                        break;
+                    case TextBlock tbl:
+                        tbl.Text = um;
+                        break;
+                    case CheckBox cb:
+                        cb.Content = um;
+                        break;
+                    case Button b:
+                        b.Content = um;
+                        break;
+                    case ListBox lb:
+                        for (var i = 0; i < lb.Items.Count; i++)
+                        {
+                            um = universeMembers[r.Next(0, universeMembers.Length - 1)];
+                            lb.Items[i] = um;
+                        }
+                        break;
+                }
+            }
+        }
+
+        private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
+        {
+            TipLabel.IsVisible = false;
+            CloseButton.IsVisible = File.Exists(masRoot + "/irunning.log");
+        }
+
+        private void CloseButton_OnClick(object? sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

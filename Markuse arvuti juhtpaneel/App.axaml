@@ -2,11 +2,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Markuse_arvuti_juhtpaneel.App"
              RequestedThemeVariant="Dark" 
-             Name="Markuse arvuti juhtpaneel">
+             xmlns:msBoxControls="clr-namespace:MsBox.Avalonia.Controls;assembly=MsBox.Avalonia"
+             xmlns:markuseArvutiJuhtpaneel="clr-namespace:Markuse_arvuti_juhtpaneel"
+             Name="Markuse arvuti juhtpaneel"
+             x:DataType="markuseArvutiJuhtpaneel:Program">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+        
+        <!-- Some overrides for MsBox.Avalonia styling (standard view only) -->
+        <Style Selector="msBoxControls|MsBoxStandardView">
+            <Setter Property="Background" Value="{Binding BgCol}"/>
+        </Style>
+        <Style Selector="msBoxControls|MsBoxStandardView TextBox.styled">
+            <Setter Property="Foreground" Value="{Binding FgCol}"/>
+        </Style>
+        <Style Selector="msBoxControls|MsBoxStandardView Button.button">
+            <Setter Property="Foreground" Value="{Binding FgCol}"/>
+        </Style>
     </Application.Styles>
 </Application>
