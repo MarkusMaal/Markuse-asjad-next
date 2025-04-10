@@ -23,6 +23,8 @@ using DesktopIcons;
 using MsBox.Avalonia.Enums;
 using Markuse_arvuti_juhtpaneel.IntegrationSoftware;
 using System.Globalization;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 
 namespace Markuse_arvuti_juhtpaneel
 {
@@ -34,8 +36,6 @@ namespace Markuse_arvuti_juhtpaneel
         string[] locations;
         bool freezeTimer = false;
         private bool preventWrites = true;
-        DispatcherTimer dispatcherTimer2 = new();
-        DispatcherTimer rotateLogo = new();
         readonly string whatNew = "+ Töölauaikoonide kohandamine\n+ Laadimisekraan info kogumise ajal";
         private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true, TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default};
         private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = CommandSourceGenerationContext.Default };
@@ -43,6 +43,7 @@ namespace Markuse_arvuti_juhtpaneel
         DesktopLayout? desktopLayout;
         MasConfig config = new();
         private bool LaunchError = false;
+        double angle = 0.0;
         public MainWindow()
         {
             InitializeComponent();
@@ -607,8 +608,6 @@ namespace Markuse_arvuti_juhtpaneel
                 IsBackground = true
             };
             t.Start();
-            rotateLogo.Tick += new EventHandler(RotateLogo);
-            rotateLogo.Interval = new TimeSpan(0, 0, 0, 0, 16);
         }
         
         private void SetCollectProgress(int value, String status)
@@ -616,7 +615,7 @@ namespace Markuse_arvuti_juhtpaneel
             Dispatcher.UIThread.Post(() =>
             {
                 if (value == -2)
-                {
+                { 
                     CollectProgress.Value = 0;
                     LoaderLogo.IsVisible = false;
                     FailGif.IsVisible = true;
@@ -852,25 +851,37 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void Image_DoubleTapped(object? sender, Avalonia.Input.TappedEventArgs e)
         {
-            if (rotateLogo.IsEnabled)
-            {
-                rotateLogo.Stop();
-            } else
-            {
-                rotateLogo.Start();
-            }
+            RotateObject([Logo, LoaderLogo]);
         }
 
-        private void RotateLogo(object sender, EventArgs e)
+        private void RotateObject(Control[] senders)
         {
-            rotation += 3;
-            if (rotation % 90 == 0)
+            int duration = 500;
+            angle += 90;
+            Animation animation = new()
             {
-                rotateLogo.Stop();
+                Duration = TimeSpan.FromMilliseconds(duration),
+                IterationCount = new IterationCount(1),
+                PlaybackDirection = PlaybackDirection.Normal,
+                FillMode = FillMode.Forward,
+                Easing = new SineEaseInOut()
+            };
+            KeyFrame key1 = new()
+            {
+                KeyTime = TimeSpan.FromMilliseconds(0)
+            };
+            KeyFrame key2 = new()
+            {
+                KeyTime = TimeSpan.FromMilliseconds(duration)
+            };
+            key1.Setters.Add(new Setter(RotateTransform.AngleProperty, angle - 90.0));
+            key2.Setters.Add(new Setter(RotateTransform.AngleProperty, angle));
+            animation.Children.Add(key1);
+            animation.Children.Add(key2);
+            foreach (Control c in senders)
+            {
+                _ = animation.RunAsync(c);
             }
-            var tg = new TransformGroup();
-            tg.Children.Add(new RotateTransform(rotation));
-            Logo.RenderTransform = tg;
         }
 
         private void Grid_SizeChanged(object? sender, Avalonia.Controls.SizeChangedEventArgs e)
@@ -960,7 +971,7 @@ namespace Markuse_arvuti_juhtpaneel
 
             if (files.Count >= 1)
             {
-                this.LocationBox.Text = files[0].Path.AbsolutePath;
+                this.LocationBox.Text = Uri.UnescapeDataString(files[0].Path.AbsolutePath);
             }
         }
 
@@ -1981,6 +1992,10 @@ namespace Markuse_arvuti_juhtpaneel
                     IsVisible = true;
                 });
             }).Start();
+        }
+
+        private void Image_DoubleTapped_1(object? sender, Avalonia.Input.TappedEventArgs e)
+        {
         }
     }
 }
