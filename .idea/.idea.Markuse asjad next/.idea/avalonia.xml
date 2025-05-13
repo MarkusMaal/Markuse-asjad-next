@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="DesktopIcons/App.axaml" value="DesktopIcons/DesktopIcons.csproj" />
+        <entry key="DesktopIcons/MainWindow.axaml" value="DesktopIcons/DesktopIcons.csproj" />
+        <entry key="DesktopIcons/TopIcon.axaml" value="DesktopIcons/DesktopIcons.csproj" />
+        <entry key="Interaktiivne töölaud/App.axaml" value="Interaktiivne töölaud/Interaktiivne töölaud.csproj" />
+        <entry key="Interaktiivne töölaud/MainWindow.axaml" value="Interaktiivne töölaud/Interaktiivne töölaud.csproj" />
+        <entry key="Interaktiivne töölaud/Office.axaml" value="Interaktiivne töölaud/Interaktiivne töölaud.csproj" />
+        <entry key="MarkuStation2/MainWindow.axaml" value="MarkuStation2/MarkuStation2.csproj" />
+        <entry key="Markuse arvuti integratsioonitarkvara/App.axaml" value="Markuse arvuti integratsioonitarkvara/Markuse arvuti integratsioonitarkvara.csproj" />
+        <entry key="Markuse arvuti integratsioonitarkvara/InterfaceTest.axaml" value="Markuse arvuti integratsioonitarkvara/Markuse arvuti integratsioonitarkvara.csproj" />
+        <entry key="Markuse arvuti integratsioonitarkvara/MainWindow.axaml" value="Markuse arvuti integratsioonitarkvara/Markuse arvuti integratsioonitarkvara.csproj" />
+        <entry key="Markuse arvuti integratsioonitarkvara/RerootForm.axaml" value="Markuse arvuti integratsioonitarkvara/Markuse arvuti integratsioonitarkvara.csproj" />
+        <entry key="Markuse arvuti integratsioonitarkvara/ShowCode.axaml" value="Markuse arvuti integratsioonitarkvara/Markuse arvuti integratsioonitarkvara.csproj" />
+        <entry key="Markuse arvuti integratsioonitarkvara/VerifileFail.axaml" value="Markuse arvuti integratsioonitarkvara/Markuse arvuti integratsioonitarkvara.csproj" />
+        <entry key="Markuse arvuti integratsioonitarkvara/WaitInstall.axaml" value="Markuse arvuti integratsioonitarkvara/Markuse arvuti integratsioonitarkvara.csproj" />
+        <entry key="Markuse arvuti juhtpaneel/App.axaml" value="Markuse arvuti juhtpaneel/Markuse arvuti juhtpaneel.csproj" />
+        <entry key="Markuse arvuti juhtpaneel/ColorPickerDialog.axaml" value="Markuse arvuti juhtpaneel/Markuse arvuti juhtpaneel.csproj" />
+        <entry key="Markuse arvuti juhtpaneel/DesktopIcon_Edit.axaml" value="Markuse arvuti juhtpaneel/Markuse arvuti juhtpaneel.csproj" />
+        <entry key="Markuse arvuti juhtpaneel/MainWindow.axaml" value="Markuse arvuti juhtpaneel/Markuse arvuti juhtpaneel.csproj" />
+        <entry key="Markuse arvuti juhtpaneel/MarkuStation_Edit.axaml" value="Markuse arvuti juhtpaneel/Markuse arvuti juhtpaneel.csproj" />
+        <entry key="Markuse arvuti ooterežiim/MainWindow.axaml" value="Markuse arvuti ooterežiim/Markuse arvuti ooterežiim.csproj" />
+        <entry key="Markuse arvuti ooterežiim/SettingsWindow.axaml" value="Markuse arvuti ooterežiim/Markuse arvuti ooterežiim.csproj" />
+        <entry key="Pidu!/App.axaml" value="Pidu!/Pidu!.csproj" />
+        <entry key="Pidu!/MainWindow.axaml" value="Pidu!/Pidu!.csproj" />
+        <entry key="TöölauaMärkmed/MainWindow.axaml" value="TöölauaMärkmed/TöölauaMärkmed.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

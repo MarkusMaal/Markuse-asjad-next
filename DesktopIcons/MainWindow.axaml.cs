@@ -19,6 +19,7 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Platform;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 
@@ -425,11 +426,12 @@ public partial class MainWindow : Window
     {
         var size = icon_size / 2;
         var me = desktopLayout.Logo; 
-        var aspect = (double)Screens.Primary.Bounds.Width / (double)Screens.Primary.Bounds.Height;
+        var primaryScreen = Screens.Primary ?? Screens.All[0]; 
+        var aspect = (double)primaryScreen.Bounds.Width / (double)primaryScreen.Bounds.Height;
         var padx = (int)(0.25 * size) ;
         if (aspect > 3.0) // super ultra-wide
         {
-            padx = Screens.Primary.Bounds.Width / 4;
+            padx = primaryScreen.Bounds.Width / 4;
         }
         var tI = new TopIcon
         {
@@ -441,7 +443,7 @@ public partial class MainWindow : Window
                     { Opacity = 0 }
             },
             WindowStartupLocation = WindowStartupLocation.Manual,
-            Position = new PixelPoint((me.LocationX > 0) ? me.LocationX : padx, me.LocationY > 0 ? me.LocationY : Screens.Primary.Bounds.Height - (int)(size * 1.5) - (int)(size * 0.25)),
+            Position = new PixelPoint((me.LocationX > 0) ? me.LocationX : padx, me.LocationY > 0 ? me.LocationY : primaryScreen.Bounds.Height - (int)(size * 1.5) - (int)(size * 0.25)),
             Width = size,
             Height = size,
             icon = me.IconA,
@@ -463,8 +465,9 @@ public partial class MainWindow : Window
         const int special_count = 3;
         int width = icon_size / 3;
         int height = icon_size / 3;
-        int offset_left = Screens.Primary.Bounds.Width / 2 -  (width + grid_padding / 4) * special_count / 2;
-        int offset_top = Screens.Primary.Bounds.Height - height * 2;
+        var primaryScreen = Screens.Primary ?? Screens.All[0]; 
+        int offset_left = primaryScreen.Bounds.Width / 2 -  (width + grid_padding / 4) * special_count / 2;
+        int offset_top = primaryScreen.Bounds.Height - height * 2;
         int i = 0;
         specialWindows = new TopIcon[special_count];
         foreach (SpecialIcon me in special_icons) {
@@ -509,8 +512,10 @@ public partial class MainWindow : Window
         int grid_width = (grid_items_x - 1) * grid_padding + icon_size * grid_items_x;
         int grid_height = (grid_items_y - 1) * grid_padding + icon_size * grid_items_y;
 
-        int offset_left = Screens.Primary.Bounds.Width / 2 - grid_width / 2;
-        int offset_top = Screens.Primary.Bounds.Height / 2 - grid_height / 2;
+        var primaryScreen = Screens.Primary ?? Screens.All[0]; 
+        
+        int offset_left = primaryScreen.Bounds.Width / 2 - grid_width / 2;15224
+        int offset_top = primaryScreen.Bounds.Height / 2 - grid_height / 2;
         
         DesktopIcon[] children = desktopLayout.Children;
         
@@ -554,7 +559,7 @@ public partial class MainWindow : Window
                 offset_left += icon_size + grid_padding;
                 i++;
             }
-            offset_left = Screens.Primary.Bounds.Width / 2 - grid_width / 2;
+            offset_left = primaryScreen.Bounds.Width / 2 - grid_width / 2;
             offset_top += icon_size + grid_padding;
         }
     }
