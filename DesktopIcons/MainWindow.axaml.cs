@@ -514,7 +514,7 @@ public partial class MainWindow : Window
 
         var primaryScreen = Screens.Primary ?? Screens.All[0]; 
         
-        int offset_left = primaryScreen.Bounds.Width / 2 - grid_width / 2;15224
+        int offset_left = primaryScreen.Bounds.Width / 2 - grid_width / 2;
         int offset_top = primaryScreen.Bounds.Height / 2 - grid_height / 2;
         
         DesktopIcon[] children = desktopLayout.Children;

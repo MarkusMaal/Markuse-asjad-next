@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # Compiled and linked executables
 out/
+
+# DevTool settings
+DevTool.json

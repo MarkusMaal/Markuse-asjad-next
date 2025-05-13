@@ -8,6 +8,11 @@
 * Microsoft Powershell devToolide kasutamiseks
 * Avalonia UI pluginad vastava IDE jaoks (Microsoft Visual Studio või JetBrains Rider)
 * Operatsioonsüsteem: Windows, macOS või Linux (muid süsteeme ei toetata)
+* Minimaalne vajalik salvestusruum:
+  * Mitmele platvormile kompileerimine: 25GB (puhastamata), 7GB (puhastatud), 3GB (tihendatud binraarid)
+  * Ühele platvormile kompileerimine: 5GB (puhastamata), ~1.5GB (puhastatud), ~500MB (tihendatud binraarid)
+  * mas kaust (sh mas-corefiles + mas_maia + Markuse-asjad-next): ~2GB
+  * Kompileerimata lähtekood: ~280MB tihendatud, ~600MB lahti pakitud
 
 
 ## PowerShell paigaldamine
@@ -33,14 +38,13 @@ Seejärel peaks avama järgmine menüü:
 3. Show projects
 4. Update binaries
 5. Build solution
-6. Git commit
-7. Change colors: 2
-8. Verbose mode: False
-9. Exit
+6. Clean solution
+7. Settings
+8. Exit
 
-DevTool v1.2.1
+DevTool v1.3
 
-Ends all Markuse asjad processes, which may not conflict with new binaries
+Ends all Markuse asjad processes, which may be in conflict with new binaries
 ```
 
 Saate menüüs navigeerida numbrite või nooleklahvidega ning valiku kinnitada vajutades sisestusklahvi (ENTER).
@@ -50,6 +54,41 @@ Kompileerimiseks valige `5. Build solution`. See kompileerib kõik rakendused te
 Et näha millised rakendused on edukalt kompileeritud, kasutage menüüvalikut `3. Show projects`. Iga edukalt kompileeritud rakenduse taga peaks olema kiri `[Build OK]`.
 
 Binraaride uuendamiseks valige menüüst `4. Update binaries`. See sulgeb kõik avatud rakendused automaatselt ning avab need pärast uute binraaride kopeerimist ka uuesti.
+
+
+## Puhastamine
+
+Puhastamiseks valige `6. Clean solution`. See kustutab ajutised failid, mis olid kasutusel kompileerimise käigus. Samuti saate ka soovi korral kustutada ehitatud binraarid `out/` kaustas, juhul kui te need juba kuhugi mujale liigutasite või soovite otsast alustada.
+
+
+## Mitme platvormi jaoks kompileerimine
+
+Selleks, et kompileerida iga toetatud platvormi jaoks, valige menüüst `7. Settings`, mis avab omakorda veel ühe menüü:
+
+```
+
+          🔴
+        🟡  🟢   markuse arvuti asjad
+          🔵
+
+1. Change colors: 2 
+2. Verbose mode: False 
+3. Show logo: True 
+4. Show version: True 
+5. Show hints: True 
+6. Cross-build: False 
+7. Reset settings 
+8. Go back 
+
+DevTool v1.3
+
+Changes color scheme in this script 
+```
+
+Olge kindlad, et `6. Cross-build` väärtus oleks `True`. Seejärel valige `8. Go back`, et minna tagasi eelmisesse menüüse ning valige sealt `5. Build solution`.
+
+NB: Mitme platvormi jaoks kompileerimine võtab oluliselt kauem aega ja nõuab rohkem salvestusruumi!
+
 
 ## macOS .app konteinerite loomine
 
