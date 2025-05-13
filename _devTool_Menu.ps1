@@ -15,6 +15,7 @@ if (Test-Path "DevTool.json" -PathType Leaf) {
 	$showlogo = $settings.ShowLogo
 	$showhints = $settings.ShowHints
 	$showversion = $settings.ShowVersion
+	$crossbuild = $settings.CrossBuild
 }
 
 function Exit-Now {  # tidy everything up and exit the script; usage: Exit-Now
@@ -78,7 +79,7 @@ function ShowHint {
 		$Sel = 1
 	}
 	$hint = $Hints[$Sel-1]
-	if ($showversion) { Write-Host "`r`nDevTool v1.3" }
+	if ($showversion) { Write-Host "`r`nDevTool v1.3.1" }
 	if ($showhints) { Write-Host "`r`n$hint" }
 }
 
