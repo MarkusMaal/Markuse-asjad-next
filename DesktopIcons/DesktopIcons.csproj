@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -54,5 +54,9 @@
 
     <ItemGroup>
       <Content Include="desktop.ico" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MasCommon\MasCommon.csproj" />
     </ItemGroup>
 </Project>

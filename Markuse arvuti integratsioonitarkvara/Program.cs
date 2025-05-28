@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using MasCommon;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
@@ -13,7 +14,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
     {
 
 
-        public static readonly MasConfig config = new()
+        public static readonly CommonConfig config = new()
         {
             AllowScheduledTasks = false,
             ShowLogo = true,

@@ -14,11 +14,13 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using MasCommon;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
     public class App : Application
     {
+        public Verifile vf = new ();
         public string mas_root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas";
         public static string static_mas_root = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas";
         readonly public static string[] whitelistedHashes = { "B881FBAB5E73D3984F2914FAEA743334D1B94DFFE98E8E1C4C8C412088D2C9C2", "A0B93B23301FC596789F83249A99F507A9DA5CBA9D636E4D4F88676F530224CB", "B08AABB1ED294D8292FDCB2626D4B77C0A53CB4754F3234D8E761E413289057F", "8076CF7C156D44472420C1225B9F6ADB661E3B095E29E52E3D4E8598BB399A8F" };
@@ -69,7 +71,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         desktop.MainWindow = new InterfaceTest();
                     }
 
-                    if (!CheckVerifileTamper())
+                    if (!Verifile.CheckVerifileTamper())
                     {
                         bad = true;
                         attestation = "CHECK_TAMPER";
@@ -105,7 +107,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                     {
                         if (File.Exists(mas_root + "/edition.txt") && !bad)
                         {
-                            attestation = Verifile2();
+                            attestation = vf.MakeAttestation();
                             switch (attestation)
                             {
                                 case "VERIFIED":
@@ -123,7 +125,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                                     Console.WriteLine("See arvuti on juurutatud vana juurutamistööriistaga. Palun juurutage arvuti uuesti uue juurutamistarkvaraga.\nVeakood: VF_LEGACY");
                                     break;
                             }
-                            if (!Verifile())
+                            if (!vf.IsVerified())
                             {
                                 Console.WriteLine("Markuse asjad tarkvara ei ole õigesti juurutatud. Palun juurutage seade kasutades juurutamise tööriista.");
                                 desktop.MainWindow = null;
@@ -144,7 +146,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
         private void Folders_Click(object? sender, System.EventArgs e)
         {
             CookToast("Kodukasta avamine");
-            Process p = new Process();
+            var p = new Process();
             p.StartInfo.FileName = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             p.StartInfo.UseShellExecute = true;
             p.Start();
@@ -200,24 +202,22 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 {
                     File.Delete(mas_root + "/running.log");
                 }
-                if (fmount != "")
-                {
-                    Process p = new Process();
-                    p.StartInfo.FileName = fmount + "/Markuse mälupulk/Markuse mälupulk/bin/Debug/Markuse mälupulk.exe";
-                    p.StartInfo.WorkingDirectory = fmount + "/Markuse mälupulk/Markuse mälupulk/bin/Debug";
-                    p.StartInfo.UseShellExecute = false;
-                    p.Start();
-                }
-            } else if (OperatingSystem.IsLinux()) {
-                if (fmount != "")
-                {
-                    Process p = new Process();
-                    p.StartInfo.FileName = "java";
-                    p.StartInfo.Arguments = "-jar " + fmount + "/.fdpanel/fdpanel.jar";
-                    p.StartInfo.WorkingDirectory = fmount + "/.fdpanel";
-                    p.StartInfo.UseShellExecute = false;
-                    p.Start();
-                }
+
+                if (fmount == "") return;
+                var p = new Process();
+                p.StartInfo.FileName = fmount + "/Markuse mälupulk/Markuse mälupulk/bin/Debug/Markuse mälupulk.exe";
+                p.StartInfo.WorkingDirectory = fmount + "/Markuse mälupulk/Markuse mälupulk/bin/Debug";
+                p.StartInfo.UseShellExecute = false;
+                p.Start();
+            } else if (OperatingSystem.IsLinux())
+            {
+                if (fmount == "") return;
+                var p = new Process();
+                p.StartInfo.FileName = "java";
+                p.StartInfo.Arguments = "-jar " + fmount + "/.fdpanel/fdpanel.jar";
+                p.StartInfo.WorkingDirectory = fmount + "/.fdpanel";
+                p.StartInfo.UseShellExecute = false;
+                p.Start();
             }
         }
 
@@ -298,163 +298,6 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 p.StartInfo.FileName = mas_root + "/Markuse asjad/Markuse arvuti juhtpaneel";
                 p.Start();
             }
-        }
-
-
-        private static bool CheckVerifileTamper()
-        {
-            if (!File.Exists(static_mas_root + "/verifile2.jar"))
-            {
-                Console.WriteLine("Verifile 2.0 tarkvara (verifile2.jar) ei ole Markuse asjade juurkaustas.\nVeakood: VF_MISSING");
-                return false;
-            }
-            string hash = "";
-            using (var sha256 = SHA256.Create())
-            {
-                using (var stream = File.OpenRead(static_mas_root + "/verifile2.jar"))
-                {
-                    hash = BitConverter.ToString(sha256.ComputeHash(stream));
-                }
-            }
-            if (!whitelistedHashes.Contains(hash.Replace("-", "")))
-            {
-                Console.WriteLine("Arvuti püsivuskontrolli käivitamine nurjus. Põhjus: Verifile 2.0 räsi ei ole sobiv.");
-                return false;
-            }
-            return true;
-        }
-
-
-
-        /// <summary>
-        /// Builds a script that displays all Java binaries and versions for your system and marks it executable (Unix-like systems)
-        /// </summary>
-        private void BuildJavaFinder()
-        {
-            if (!File.Exists(mas_root + "/find_java" + (OperatingSystem.IsWindows() ? ".bat" : ".sh")))
-            {
-
-                var builder = new StringBuilder();
-                using var javaFinder = new StringWriter(builder)
-                {
-                    NewLine = OperatingSystem.IsWindows() ? "\r\n" : "\n"
-                };
-                if (OperatingSystem.IsWindows())
-                {
-                    javaFinder.WriteLine("@echo off");
-                    javaFinder.WriteLine("setlocal EnableDelayedExpansion");
-                    javaFinder.WriteLine("for /f \"delims=\" %%a in ('where java') do (");
-                    javaFinder.WriteLine("\tset \"javaPath=\"%%a\"\"");
-                    javaFinder.WriteLine("\tfor /f \"tokens=3\" %%V in ('%%javaPath%% -version 2^>^&1 ^| findstr /i \"version\"') do (");
-                    javaFinder.WriteLine("\t\tset \"version=%%V\"");
-                    javaFinder.WriteLine("\t\tset \"version=!version:\"=!\"");
-                    javaFinder.WriteLine("\t\techo !javaPath:\"=!:!version!");
-                    javaFinder.WriteLine("\t)");
-                    javaFinder.WriteLine(")");
-                    javaFinder.WriteLine("endlocal");
-                    javaFinder.WriteLine("exit/b");
-                }
-                else if (OperatingSystem.IsLinux())
-                {
-                    javaFinder.WriteLine("#!/usr/bin/bash");
-                }
-                else if (OperatingSystem.IsMacOS())
-                {
-                    javaFinder.WriteLine("#!/bin/bash");
-                }
-                if (!OperatingSystem.IsWindows())
-                {
-                    javaFinder.WriteLine("OLDIFS=$IFS");
-                    javaFinder.WriteLine("IFS=:");
-                    javaFinder.WriteLine("for dir in $PATH; do");
-                    javaFinder.WriteLine("    if [[ -x \"$dir/java\" ]]; then  # Check if java exists and is executable");
-                    javaFinder.WriteLine("        javaPath=\"$dir/java\"");
-                    javaFinder.WriteLine("        version=$(\"$javaPath\" -version 2>&1 | awk -F '\"' '/version/ {print $2}')");
-                    javaFinder.WriteLine("        echo \"$javaPath:$version\"");
-                    javaFinder.WriteLine("    fi");
-                    javaFinder.WriteLine("done");
-                    javaFinder.WriteLine("IFS=$OLDIFS");
-                }
-                File.WriteAllText(mas_root + "/find_java" + (OperatingSystem.IsWindows() ? ".bat" : ".sh"), builder.ToString(), Encoding.ASCII);
-                if (!OperatingSystem.IsWindows())
-                {
-                    File.SetUnixFileMode(mas_root + "/find_java.sh", UnixFileMode.UserRead | UnixFileMode.UserExecute | UnixFileMode.UserWrite);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Finds the latest version of Java installed on your system, since if you install the Java SE version, Verifile may not work with it.
-        /// </summary>
-        /// <returns>Path to the latest Java binary found on your system</returns>
-        private string FindJava()
-        {
-            CultureInfo culture = CultureInfo.CurrentCulture;
-            string p = culture.NumberFormat.NumberDecimalSeparator;
-            string latest_version = $"0{p}0";
-            string latest_path = "";
-            string interpreter = OperatingSystem.IsWindows() ? "cmd" : "bash";
-            if (OperatingSystem.IsWindows())
-            {
-                mas_root = mas_root.Replace("/", "\\");
-            }
-            Process pr = new()
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    FileName = interpreter,
-                    Arguments = (OperatingSystem.IsWindows() ? "/c " : "") + "\"" + mas_root + (OperatingSystem.IsWindows() ? "\\" : "/") + "find_java." + (OperatingSystem.IsWindows() ? "bat" : "sh") + "\"",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                }
-            };
-            pr.Start();
-            while (!pr.StandardOutput.EndOfStream)
-            {
-                string[] path_version = (pr.StandardOutput.ReadLine() ?? ":").Replace(":\\", "_WINDRIVE\\").Split(':');
-                string path = path_version[0].Replace("_WINDRIVE\\", ":\\");
-                string version = path_version[1].Split('_')[0];
-                version = version.Split('.')[0] + p + version.Split('.')[1];
-                if (double.Parse(version, NumberStyles.Any) > double.Parse(latest_version, NumberStyles.Any))
-                {
-                    latest_path = path;
-                    latest_version = version;
-                }
-            }
-            return latest_path;
-        }
-
-
-        private string Verifile2()
-        {
-            BuildJavaFinder();
-            Process p = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = FindJava(),
-                    Arguments = "-jar " + mas_root + "/verifile2.jar",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                }
-            };
-            p.Start();
-            while (!p.StandardOutput.EndOfStream)
-            {
-                string line = p.StandardOutput.ReadLine() ?? "";
-                return line.Split('\n')[0];
-            }
-            return "FAILED";
-        }
-
-
-        internal bool Verifile()
-        {
-            return Verifile2() == "VERIFIED";
         }
 
         private void PITS_Click(object? sender, System.EventArgs e)

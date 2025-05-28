@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 using System;
 using System.IO;
 using System.Linq;
-using TöölauaMärkmed.IntegrationSoftware;
+using MasCommon;
 
 namespace TöölauaMärkmed
 {
@@ -12,7 +12,7 @@ namespace TöölauaMärkmed
     {
         public int activeindex = 1;
         public readonly string masRoot = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas";
-        readonly MasConfig config = new()
+        readonly CommonConfig config = new()
         {
             AutostartNotes = false,
         };

@@ -19,13 +19,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls.Presenters;
 using Avalonia.Layout;
-using DesktopIcons;
+using MasCommon;
 using MsBox.Avalonia.Enums;
-using Markuse_arvuti_juhtpaneel.IntegrationSoftware;
 using System.Globalization;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.VisualTree;
+using MasCommon;
 using MsBox.Avalonia.Dto;
 using MsBox.Avalonia.Models;
 
@@ -33,6 +33,7 @@ namespace Markuse_arvuti_juhtpaneel
 {
     public partial class MainWindow : Window
     {
+        Verifile vf = new();
         string masRoot = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas";
         Color[] scheme;
         int rotation = 0;
@@ -41,10 +42,10 @@ namespace Markuse_arvuti_juhtpaneel
         private bool preventWrites = true;
         readonly string whatNew = "+ Ligipääsetavuse parandused ainult klaviatuuriga kasutajatele\n+ Ctrl+Tab ja Ctrl+Shift+Tab navigatsioon\n+ Abistavad tekstid menüüelementidel kursoriga peatumisel\n+ Teema värvid laadimisel ja teiste akende avamisel\n* Parandatud viga, kus sulgemisnupp ei olnud nähtav, kui see oleks pidanud olema nähtav";
         private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true, TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default};
-        private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = CommandSourceGenerationContext.Default };
+        private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = MasConfigSourceGenerationContext.Default };
         private List<string> desktopIcons = [];
         DesktopLayout? desktopLayout;
-        MasConfig config = new();
+        CommonConfig config = new();
         private bool LaunchError = false;
         private double angle = 0.0;
         private int eggLevel = 0;
@@ -584,80 +585,6 @@ namespace Markuse_arvuti_juhtpaneel
             }
         }
 
-        /// <summary>
-        /// Finds the latest version of Java installed on your system, since if you install the Java SE version, Verifile may not work with it.
-        /// </summary>
-        /// <returns>Path to the latest Java binary found on your system</returns>
-        private string FindJava()
-        {
-            CultureInfo culture = CultureInfo.CurrentCulture;
-            string p = culture.NumberFormat.NumberDecimalSeparator;
-            string latest_version = $"0{p}0";
-            string latest_path = "";
-            string interpreter = OperatingSystem.IsWindows() ? "cmd" : "bash";
-            if (OperatingSystem.IsWindows())
-            {
-                masRoot = masRoot.Replace("/", "\\");
-            }
-            Process pr = new()
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    FileName = interpreter,
-                    Arguments = (OperatingSystem.IsWindows() ? "/c " : "") + "\"" + masRoot + (OperatingSystem.IsWindows() ? "\\" : "/") + "find_java." + (OperatingSystem.IsWindows() ? "bat" : "sh") + "\"",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                }
-            };
-            pr.Start();
-            while (!pr.StandardOutput.EndOfStream)
-            {
-                string[] path_version = (pr.StandardOutput.ReadLine() ?? ":").Replace(":\\", "_WINDRIVE\\").Split(':');
-                string path = path_version[0].Replace("_WINDRIVE\\", ":\\");
-                string version = path_version[1].Split('_')[0];
-                version = version.Split('.')[0] + p + version.Split('.')[1];
-                if (double.Parse(version, NumberStyles.Any) > double.Parse(latest_version, NumberStyles.Any))
-                {
-                    latest_path = path;
-                    latest_version = version;
-                }
-            }
-            return latest_path;
-        }
-
-
-        private string Verifile2()
-        {
-            BuildJavaFinder();
-            Process p = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = FindJava(),
-                    Arguments = "-jar " + masRoot + "/verifile2.jar",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                }
-            };
-            p.Start();
-            while (!p.StandardOutput.EndOfStream)
-            {
-                string line = p.StandardOutput.ReadLine() ?? "";
-                return line.Split('\n')[0];
-            }
-            return "FAILED";
-        }
-
-
-        private bool Verifile()
-        {
-            return Verifile2() == "VERIFIED" ||  Verifile2() == "BYPASS";
-        }
-
         private void InitTimers()
         {
             LaunchError = Program.Launcherror;
@@ -774,7 +701,7 @@ namespace Markuse_arvuti_juhtpaneel
             if (File.Exists(masRoot + "/edition.txt"))
             {
 
-                switch (Verifile2())
+                switch (vf.MakeAttestation())
                 {
                     case "VERIFIED":
                         break;
@@ -796,7 +723,7 @@ namespace Markuse_arvuti_juhtpaneel
                         return;
                 }
                 SetCollectProgress(35, "Verifile OK");
-                if (Verifile())
+                if (vf.IsVerified())
                 {
                     SetCollectProgress(40, "Töölauaikooni seadete laadimine...");
                     LoadDesktopSettings();
@@ -825,7 +752,7 @@ namespace Markuse_arvuti_juhtpaneel
                     }
 
                     SetCollectProgress(75, "Oleku kontrollimine...");
-                    var VF_STATUS = Verifile2();
+                    var VF_STATUS = vf.MakeAttestation();
                     SetCollectProgress(80, "UI ettevalmistamine...");
                     Dispatcher.UIThread.Post(() =>
                     {
@@ -1559,7 +1486,7 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 return;
             }
-            Command cmd = new()
+            DesktopCommand cmd = new()
             {
                 Arguments = args,
                 Type = type
@@ -1622,7 +1549,7 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void GetEditionInfo()
         {
-            if (!Verifile())
+            if (!vf.IsVerified())
             {
                 return;
             }
@@ -1671,7 +1598,7 @@ namespace Markuse_arvuti_juhtpaneel
                           .Append(fi.LastWriteTime.ToShortTimeString());
             editionDetails.AppendLine();
             editionDetails.AppendLine("Kinnituskood: " + masVer[9]);
-            editionDetails.AppendLine("Olek: " + Verifile2());
+            editionDetails.AppendLine("Olek: " + vf.MakeAttestation());
             EditionDetails.Text = editionDetails.ToString();
             string[] features = masVer[8].Split('-');
             FeatTS.Source = cross;

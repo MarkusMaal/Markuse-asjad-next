@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace DesktopIcons;
+namespace MasCommon;
 
 /// <summary>
 /// This class defines desktop layout
@@ -84,7 +84,7 @@ public class DesktopLayout
 // Required for generating trimmed executables
 [JsonSerializable(typeof(DesktopLayout))]
 [JsonSerializable(typeof(string))]        
-[JsonSerializable(typeof(int))]        
-internal partial class DesktopLayoutSourceGenerationContext : JsonSerializerContext
+[JsonSerializable(typeof(int))]
+public partial class DesktopLayoutSourceGenerationContext : JsonSerializerContext
 {
 }

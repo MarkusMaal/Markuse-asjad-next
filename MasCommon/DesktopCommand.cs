@@ -1,9 +1,8 @@
-
 using System.Text.Json.Serialization;
 
-namespace DesktopIcons;
+namespace MasCommon;
 
-public class Command
+public class DesktopCommand
 {
     /// <summary>
     /// Specify what kind of command you want to send to desktop app
@@ -17,8 +16,8 @@ public class Command
 }
 
 // Required for generating trimmed executables
-[JsonSerializable(typeof(Command))]
-[JsonSerializable(typeof(string))]        
-internal partial class CommandSourceGenerationContext : JsonSerializerContext
+[JsonSerializable(typeof(DesktopCommand))]
+[JsonSerializable(typeof(string))]
+public partial class CommandSourceGenerationContext : JsonSerializerContext
 {
 }

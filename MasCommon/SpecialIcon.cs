@@ -1,27 +1,15 @@
+using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
-namespace DesktopIcons;
+namespace MasCommon;
 
 /// <summary>
 /// This class defines a special icon, which is different from a regular icon, as it may have 2 icon states and is independent of regular icons
 /// </summary>
 public class SpecialIcon
 {
-    // dummy constructor
-    [JsonConstructor]
-    public SpecialIcon(string iconA, string iconB, string executable, int locationX, int locationY)
-    {
-        IconA = iconA;
-        IconB = iconB;
-        Executable = executable;
-        LocationX = locationX;
-        LocationX = locationY;
-    }
-    
-    public SpecialIcon() {
-        LocationY = -1;
-        LocationX = -1;}
-    
     /// <summary>
     /// State A of the icon.
     /// </summary>
@@ -34,19 +22,19 @@ public class SpecialIcon
     
     
     /// <summary>
-    /// The app to run.
+    /// The app to run
     /// If special: prefix is used, a command for this program is executed instead
     /// </summary>
     public string Executable { get; set; }
     
     /// <summary>
-    /// Location on the desktop (X-coordinate).
+    /// Location on the desktop (X-coordinate)
     /// -1 means automatic positioning
     /// </summary>
     public int LocationX { get; set; }
     
     /// <summary>
-    /// Location on the desktop (Y-coordinate).
+    /// Location on the desktop (Y-coordinate)
     /// -1 means automatic positioning
     /// </summary>
     public int LocationY { get; set; }

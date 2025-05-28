@@ -47,7 +47,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         });
                     }
 
-                    if (app.Verifile() && !app.croot)
+                    if (app.vf.IsVerified() && !app.croot)
                     {
                         app.InitSettings();
                         Dispatcher.UIThread.Post(() =>

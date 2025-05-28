@@ -1,16 +1,16 @@
-﻿using System.IO;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Markuse_arvuti_juhtpaneel.IntegrationSoftware
+namespace MasCommon
 {
     /// <summary>
     /// This class defines Markus' stuff integration configuration file
     /// </summary>
-    class MasConfig
+    public class CommonConfig
     {
         /// <summary>
-        /// Whether or not we should automatically start quick notes app on integration software startup.
+        /// Whether we should automatically start quick notes app on integration software startup.
         /// </summary>
         public bool AutostartNotes { get; set; }
 
@@ -40,7 +40,7 @@ namespace Markuse_arvuti_juhtpaneel.IntegrationSoftware
         /// <param name="mas_root">Root directory for Markus' stuff system. Usually %UserProfile\.mas.</param>
         public void Load(string mas_root)
         {
-            MasConfig? cnf = JsonSerializer.Deserialize<MasConfig>(File.ReadAllText(mas_root + "/Config.json"), _cnfSerializerOptions);
+            var cnf = JsonSerializer.Deserialize<CommonConfig>(File.ReadAllText(mas_root + "/Config.json"), _cnfSerializerOptions);
             this.AutostartNotes = cnf.AutostartNotes;
             this.AllowScheduledTasks = cnf.AllowScheduledTasks;
             this.ShowLogo = cnf.ShowLogo;
@@ -59,10 +59,10 @@ namespace Markuse_arvuti_juhtpaneel.IntegrationSoftware
     }
 
     // Required for generating trimmed executables
-    [JsonSerializable(typeof(MasConfig))]
+    [JsonSerializable(typeof(CommonConfig))]
     [JsonSerializable(typeof(bool))]
     [JsonSerializable(typeof(int))]
-    internal partial class MasConfigSourceGenerationContext : JsonSerializerContext
+    public partial class MasConfigSourceGenerationContext : JsonSerializerContext
     {
     }
 

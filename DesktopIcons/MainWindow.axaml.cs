@@ -22,18 +22,14 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using MasCommon;
 
 
 namespace DesktopIcons;
 
 public partial class MainWindow : Window
 {
-    private static readonly string[] VERIFILE_FLAGS = ["VERIFIED", "LEGACY", "TAMPERED", "FAILED", "FOREIGN", "BYPASS", "MISSING", "CHECK_TAMPER"]; // never ever modify this during runtime
-    private static readonly string[] WHITELISTED_HASHES = [
-        "B881FBAB5E73D3984F2914FAEA743334D1B94DFFE98E8E1C4C8C412088D2C9C2",
-        "A0B93B23301FC596789F83249A99F507A9DA5CBA9D636E4D4F88676F530224CB",
-        "B08AABB1ED294D8292FDCB2626D4B77C0A53CB4754F3234D8E761E413289057F",
-        "8076CF7C156D44472420C1225B9F6ADB661E3B095E29E52E3D4E8598BB399A8F"];
+    private Verifile vf = new();
     public string ATTESTATION_STATE = "BYPASS";
     public string mas_root = "C:\\mas";
     private string cd = "";
@@ -67,8 +63,8 @@ public partial class MainWindow : Window
         };
         DataContext = new MainWindowModel();
         GetMasRoot();
-        ATTESTATION_STATE = Verifile2();
-        CheckVerifileTamper();
+        ATTESTATION_STATE = vf.MakeAttestation();
+        if (!Verifile.CheckVerifileTamper()) ATTESTATION_STATE = "CHECK_TAMPER";
         if ((ATTESTATION_STATE != "VERIFIED") && (ATTESTATION_STATE != "BYPASS"))
         {
             Console.Error.WriteLine("Verifile kontroll nurjus!");
@@ -153,11 +149,11 @@ public partial class MainWindow : Window
         if (e.FullPath.EndsWith(BackForwardSlash("\\DesktopIconsCommand.json")))
         {
             Console.WriteLine("Found command file!");
-            Command? command = null;
+            DesktopCommand? command = null;
             if (e.ChangeType is WatcherChangeTypes.Changed or WatcherChangeTypes.Created) // ignore if deleted
             {
                 if (!File.Exists(e.FullPath)) { return; }
-                command = JsonSerializer.Deserialize<Command>(File.ReadAllText(e.FullPath), _cmdSerializerOptions);
+                command = JsonSerializer.Deserialize<DesktopCommand>(File.ReadAllText(e.FullPath), _cmdSerializerOptions);
                 Console.WriteLine("Serialize OK");
 
                 if (command != null)
@@ -625,26 +621,6 @@ public partial class MainWindow : Window
         GenerateChildren();
     }
     
-    private void CheckVerifileTamper()
-    {
-        if (!File.Exists(mas_root + BackForwardSlash(@"\verifile2.jar")))
-        {
-            ATTESTATION_STATE = "MISSING";
-        }
-        var hash = "";
-        using (var sha256 = SHA256.Create())
-        {
-            using (var stream = File.OpenRead(mas_root + BackForwardSlash(@"\verifile2.jar")))
-            {
-                hash = BitConverter.ToString(sha256.ComputeHash(stream));
-            }
-        }
-        if (!WHITELISTED_HASHES.Contains(hash.Replace("-", "")))
-        {
-            ATTESTATION_STATE = "CHECK_TAMPER";
-        }
-    }
-    
     private void GetMasRoot()
     {
         if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
@@ -676,129 +652,6 @@ public partial class MainWindow : Window
         return path;
     }
     
-    /// <summary>
-    /// Builds a script that displays all Java binaries and versions for your system and marks it executable (Unix-like systems)
-    /// </summary>
-    private void BuildJavaFinder()
-    {
-        if (!File.Exists(mas_root + "/find_java" + (OperatingSystem.IsWindows() ? ".bat" : ".sh")))
-        {
-
-            var builder = new StringBuilder();
-            using var javaFinder = new StringWriter(builder)
-            {
-                NewLine = OperatingSystem.IsWindows() ? "\r\n" : "\n"
-            };
-            if (OperatingSystem.IsWindows())
-            {
-                javaFinder.WriteLine("@echo off");
-                javaFinder.WriteLine("setlocal EnableDelayedExpansion");
-                javaFinder.WriteLine("for /f \"delims=\" %%a in ('where java') do (");
-                javaFinder.WriteLine("\tset \"javaPath=\"%%a\"\"");
-                javaFinder.WriteLine("\tfor /f \"tokens=3\" %%V in ('%%javaPath%% -version 2^>^&1 ^| findstr /i \"version\"') do (");
-                javaFinder.WriteLine("\t\tset \"version=%%V\"");
-                javaFinder.WriteLine("\t\tset \"version=!version:\"=!\"");
-                javaFinder.WriteLine("\t\techo !javaPath:\"=!:!version!");
-                javaFinder.WriteLine("\t)");
-                javaFinder.WriteLine(")");
-                javaFinder.WriteLine("endlocal");
-                javaFinder.WriteLine("exit/b");
-            }
-            else if (OperatingSystem.IsLinux())
-            {
-                javaFinder.WriteLine("#!/usr/bin/bash");
-            }
-            else if (OperatingSystem.IsMacOS())
-            {
-                javaFinder.WriteLine("#!/bin/bash");
-            }
-            if (!OperatingSystem.IsWindows())
-            {
-                javaFinder.WriteLine("OLDIFS=$IFS");
-                javaFinder.WriteLine("IFS=:");
-                javaFinder.WriteLine("for dir in $PATH; do");
-                javaFinder.WriteLine("    if [[ -x \"$dir/java\" ]]; then  # Check if java exists and is executable");
-                javaFinder.WriteLine("        javaPath=\"$dir/java\"");
-                javaFinder.WriteLine("        version=$(\"$javaPath\" -version 2>&1 | awk -F '\"' '/version/ {print $2}')");
-                javaFinder.WriteLine("        echo \"$javaPath:$version\"");
-                javaFinder.WriteLine("    fi");
-                javaFinder.WriteLine("done");
-                javaFinder.WriteLine("IFS=$OLDIFS");
-            }
-            File.WriteAllText(mas_root + "/find_java" + (OperatingSystem.IsWindows() ? ".bat" : ".sh"), builder.ToString(), Encoding.ASCII);
-            if (!OperatingSystem.IsWindows())
-            {
-                File.SetUnixFileMode(mas_root + "/find_java.sh", UnixFileMode.UserRead | UnixFileMode.UserExecute | UnixFileMode.UserWrite);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Finds the latest version of Java installed on your system, since if you install the Java SE version, Verifile may not work with it.
-    /// </summary>
-    /// <returns>Path to the latest Java binary found on your system</returns>
-    private string FindJava()
-    {
-        CultureInfo culture = CultureInfo.CurrentCulture;
-        string p = culture.NumberFormat.NumberDecimalSeparator;
-        string latest_version = $"0{p}0";
-        string latest_path = "";
-        string interpreter = OperatingSystem.IsWindows() ? "cmd" : "bash";
-        if (OperatingSystem.IsWindows())
-        {
-            mas_root = mas_root.Replace("/", "\\");
-        }
-        Process pr = new()
-        {
-            StartInfo = new ProcessStartInfo()
-            {
-                FileName = interpreter,
-                Arguments = (OperatingSystem.IsWindows() ? "/c " : "") + "\"" + mas_root + (OperatingSystem.IsWindows() ? "\\" : "/") + "find_java." + (OperatingSystem.IsWindows() ? "bat" : "sh") + "\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
-            }
-        };
-        pr.Start();
-        while (!pr.StandardOutput.EndOfStream) {
-            string[] path_version = (pr.StandardOutput.ReadLine() ?? ":").Replace(":\\", "_WINDRIVE\\").Split(':');
-            string path = path_version[0].Replace("_WINDRIVE\\", ":\\");
-            string version = path_version[1].Split('_')[0];
-            version = version.Split('.')[0] + p + version.Split('.')[1];
-            if (double.Parse(version, NumberStyles.Any) > double.Parse(latest_version, NumberStyles.Any))
-            {
-                latest_path = path;
-                latest_version = version;
-            }
-        }
-        return latest_path;
-    }
-    
-    private string Verifile2()
-    {
-        BuildJavaFinder();
-        Process p = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = FindJava(),
-                Arguments = "-jar " + mas_root + BackForwardSlash(@"\verifile2.jar"),
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
-            }
-        };
-        p.Start();
-        while (!p.StandardOutput.EndOfStream)
-        {
-            string line = p.StandardOutput.ReadLine() ?? "";
-            return line.Split('\n')[0];
-        }
-        return "FAILED";
-    }
-
     public void NavigateDirectory(string path, bool opendir = false, string selfile = null)
     {
         SomethingSelected = false;
