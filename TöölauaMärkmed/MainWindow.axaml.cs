@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using System;
 using System.IO;
 using System.Reflection.Emit;
+using MasCommon;
 
 namespace TöölauaMärkmed
 {
@@ -25,6 +26,11 @@ namespace TöölauaMärkmed
         DispatcherTimer timer = new DispatcherTimer();
         public MainWindow()
         {
+            if (!Verifile.CheckFiles(Verifile.FileScope.DesktopNotes))
+            {
+                Console.WriteLine("Arvuti ei vasta Markuse asjade nõuetele.");
+                Environment.Exit(255);
+            }
             InitializeComponent();
             timer.Tick += (object? sender, EventArgs e) =>
             {

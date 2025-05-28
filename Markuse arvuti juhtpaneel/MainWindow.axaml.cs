@@ -21,13 +21,9 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Layout;
 using MasCommon;
 using MsBox.Avalonia.Enums;
-using System.Globalization;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.VisualTree;
-using MasCommon;
-using MsBox.Avalonia.Dto;
-using MsBox.Avalonia.Models;
 
 namespace Markuse_arvuti_juhtpaneel
 {
@@ -40,7 +36,7 @@ namespace Markuse_arvuti_juhtpaneel
         string[] locations;
         bool freezeTimer = false;
         private bool preventWrites = true;
-        readonly string whatNew = "+ Ligipääsetavuse parandused ainult klaviatuuriga kasutajatele\n+ Ctrl+Tab ja Ctrl+Shift+Tab navigatsioon\n+ Abistavad tekstid menüüelementidel kursoriga peatumisel\n+ Teema värvid laadimisel ja teiste akende avamisel\n* Parandatud viga, kus sulgemisnupp ei olnud nähtav, kui see oleks pidanud olema nähtav";
+        readonly string whatNew = "+ Markuse arvuti asjad kasutavad nüüd MasCommon teeki\n+ Lisanduvad Verifile kontrollid, et vältida ootamatuid kokkujooksmisi";
         private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true, TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default};
         private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = MasConfigSourceGenerationContext.Default };
         private List<string> desktopIcons = [];
@@ -311,12 +307,12 @@ namespace Markuse_arvuti_juhtpaneel
         }
 
         private void ScreenshotNow(object? sender, RoutedEventArgs e) {
-            string year = DateTime.Now.Year.ToString();
-            string month = DateTime.Now.Month.ToString();
-            string day = DateTime.Now.Day.ToString();
-            string currentDate = year + month.PadLeft(2, '0') + day.PadLeft(2, '0');
-            string currentTime = DateTime.Now.ToLongTimeString().Replace(":", "");
-            string filename = "Screenshot_" + currentDate + "_" + currentTime + ".png";
+            var year = DateTime.Now.Year.ToString();
+            var month = DateTime.Now.Month.ToString();
+            var day = DateTime.Now.Day.ToString();
+            var currentDate = year + month.PadLeft(2, '0') + day.PadLeft(2, '0');
+            var currentTime = DateTime.Now.ToLongTimeString().Replace(":", "");
+            var filename = "Screenshot_" + currentDate + "_" + currentTime + ".png";
             if (OperatingSystem.IsLinux())
             {
                 // Must have spectacle installed on KDE Plasma, other DEs and WMs not supported
@@ -324,7 +320,7 @@ namespace Markuse_arvuti_juhtpaneel
             } else if (OperatingSystem.IsWindows())
             {
                 filename = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/" + filename;
-                Process p = new Process();
+                var p = new Process();
                 p.StartInfo.FileName = "powershell";
                 p.StartInfo.Arguments = masRoot.Replace("/", "\\") + "\\ScreenShot.ps1 -FileName \"" + filename.Replace("/", "\\") + "\"";
                 p.StartInfo.CreateNoWindow = true;
@@ -333,18 +329,18 @@ namespace Markuse_arvuti_juhtpaneel
                 p.WaitForExit();
                 MessageBoxShow("Kuvatõmmis salvestati edukalt", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success);
             } else if (OperatingSystem.IsMacOS()) {
-                // 1 second delay, because we want to wait for the button to exit the "pressed" state
+                // 1-second delay, because we want to wait for the button to exit the "pressed" state
                 RunCommand("screencapture", "-T 1 \"" + Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/" + filename + "\"", false);
             }
         }
 
         private async void ScreenshotAs(object? sender, RoutedEventArgs e) {
-            string year = DateTime.Now.Year.ToString();
-            string month = DateTime.Now.Month.ToString();
-            string day = DateTime.Now.Day.ToString();
-            string currentDate = year + month.PadLeft(2, '0') + day.PadLeft(2, '0');
-            string currentTime = DateTime.Now.ToLongTimeString().Replace(":", "");
-            string filename = "Screenshot_" + currentDate + "_" + currentTime + ".png";
+            var year = DateTime.Now.Year.ToString();
+            var month = DateTime.Now.Month.ToString();
+            var day = DateTime.Now.Day.ToString();
+            var currentDate = year + month.PadLeft(2, '0') + day.PadLeft(2, '0');
+            var currentTime = DateTime.Now.ToLongTimeString().Replace(":", "");
+            var filename = "Screenshot_" + currentDate + "_" + currentTime + ".png";
         
             // Get top level from the current control. Alternatively, you can use Window reference instead.
             var topLevel = TopLevel.GetTopLevel(this);
@@ -356,29 +352,26 @@ namespace Markuse_arvuti_juhtpaneel
                 SuggestedFileName = filename,
             });
 
-            if (file is not null)
+            if (file is null) return;
+            filename = file.Path.AbsolutePath;
+            Thread.Sleep(2000);
+            if (OperatingSystem.IsWindows())
             {
-                filename = file.Path.AbsolutePath;
-                Thread.Sleep(2000);
-                if (OperatingSystem.IsWindows())
-                {
-                    Process p = new Process();
-                    p.StartInfo.FileName = "powershell";
-                    p.StartInfo.Arguments = masRoot.Replace("/", "\\") + "\\ScreenShot.ps1 -FileName \"" + filename.Replace("/", "\\") + "\"";
-                    p.StartInfo.CreateNoWindow = true;
-                    p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    p.Start();
-                    p.WaitForExit();
-                    _ = MessageBoxShow("Kuvatõmmis salvestati edukalt", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success);
-                }
-                else if (OperatingSystem.IsLinux())
-                {
-                    RunCommand("spectacle", "-f -b -o \"" + filename + "\"", false);
-                } else if (OperatingSystem.IsMacOS()) {
-                    // 1 second delay to wait for the save as dialog to close
-                    RunCommand("screencapture", "-T 1 \"" + filename + "\"", false);
-                }
-        
+                var p = new Process();
+                p.StartInfo.FileName = "powershell";
+                p.StartInfo.Arguments = masRoot.Replace("/", "\\") + "\\ScreenShot.ps1 -FileName \"" + filename.Replace("/", "\\") + "\"";
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                p.Start();
+                await p.WaitForExitAsync();
+                _ = MessageBoxShow("Kuvatõmmis salvestati edukalt", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success);
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                RunCommand("spectacle", "-f -b -o \"" + filename + "\"", false);
+            } else if (OperatingSystem.IsMacOS()) {
+                // 1-second delay to wait for the save as dialog to close
+                RunCommand("screencapture", "-T 1 \"" + filename + "\"", false);
             }
 
         }
@@ -402,7 +395,7 @@ namespace Markuse_arvuti_juhtpaneel
         
         
         private void RunCommand(string command, string args, bool waitForExit = true) {
-            Process p = new Process();
+            var p = new Process();
             p.StartInfo.FileName = command;
             p.StartInfo.Arguments = args;
             p.StartInfo.CreateNoWindow = true;
@@ -418,7 +411,7 @@ namespace Markuse_arvuti_juhtpaneel
         {
             if (OperatingSystem.IsWindows())
             {
-                Process p = new Process();
+                var p = new Process();
                 p.StartInfo.FileName = "cmd";
                 p.StartInfo.Arguments = "/c start " + filename;
                 p.StartInfo.UseShellExecute = false;
@@ -439,15 +432,15 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 return [Colors.Black, Colors.White];
             }
-            string[] bgfg = File.ReadAllText(masRoot + "/scheme.cfg").Split(';');
-            string[] bgs = bgfg[0].ToString().Split(':');
-            string[] fgs = bgfg[1].ToString().Split(':');
+            var bgfg = File.ReadAllText(masRoot + "/scheme.cfg").Split(';');
+            var bgs = bgfg[0].ToString().Split(':');
+            var fgs = bgfg[1].ToString().Split(':');
             Color[] cols = [Color.FromArgb(255, byte.Parse(bgs[0]), byte.Parse(bgs[1]), byte.Parse(bgs[2])), Color.FromArgb(255, byte.Parse(fgs[0]), byte.Parse(fgs[1]), byte.Parse(fgs[2]))
             ];
             return cols;
         }
 
-        void ApplyColors()
+        private void ApplyColors()
         {
             this.Background = new SolidColorBrush(scheme[0]);
             this.Foreground = new SolidColorBrush(scheme[1]);
@@ -455,14 +448,16 @@ namespace Markuse_arvuti_juhtpaneel
             Program.FgCol = this.Foreground;
         }
 
-        void ApplyTheme()
+        private void ApplyTheme()
         {
             this.Background = new SolidColorBrush(scheme[0]);
             this.Foreground = new SolidColorBrush(scheme[1]);
             Program.BgCol = this.Background;
             Program.FgCol = this.Foreground;
-            ImageBrush IB = new ImageBrush(new Bitmap(masRoot + "/bg_common.png"));
-            IB.Stretch = Stretch.Fill;
+            var IB = new ImageBrush(new Bitmap(masRoot + "/bg_common.png"))
+            {
+                Stretch = Stretch.Fill
+            };
             this.Styles.Add(new Style(x => x.OfType<Button>())
             {
                 Setters = { new Setter(ForegroundProperty, new SolidColorBrush(scheme[1])) },
@@ -509,80 +504,21 @@ namespace Markuse_arvuti_juhtpaneel
                 {
                     return;
                 }
-                Color[] tempScheme = LoadTheme();
-                if (tempScheme != scheme)
-                {
-                    scheme = LoadTheme();
-                    ApplyTheme();
-                }
+                var tempScheme = LoadTheme();
+                if (tempScheme == scheme) return;
+                scheme = LoadTheme();
+                ApplyTheme();
             }
             catch
             {
-
+                // ignored
             }
         }
 
-        private void StopThread(Thread th)
+        private static void StopThread(Thread th)
         {
             th.Interrupt();
             th.Join();
-        }
-
-        /// <summary>
-        /// Builds a script that displays all Java binaries and versions for your system and marks it executable (Unix-like systems)
-        /// </summary>
-        private void BuildJavaFinder()
-        {
-            if (!File.Exists(masRoot + "/find_java" + (OperatingSystem.IsWindows() ? ".bat" : ".sh")))
-            {
-
-                var builder = new StringBuilder();
-                using var javaFinder = new StringWriter(builder)
-                {
-                    NewLine = OperatingSystem.IsWindows() ? "\r\n" : "\n"
-                };
-                if (OperatingSystem.IsWindows())
-                {
-                    javaFinder.WriteLine("@echo off");
-                    javaFinder.WriteLine("setlocal EnableDelayedExpansion");
-                    javaFinder.WriteLine("for /f \"delims=\" %%a in ('where java') do (");
-                    javaFinder.WriteLine("\tset \"javaPath=\"%%a\"\"");
-                    javaFinder.WriteLine("\tfor /f \"tokens=3\" %%V in ('%%javaPath%% -version 2^>^&1 ^| findstr /i \"version\"') do (");
-                    javaFinder.WriteLine("\t\tset \"version=%%V\"");
-                    javaFinder.WriteLine("\t\tset \"version=!version:\"=!\"");
-                    javaFinder.WriteLine("\t\techo !javaPath:\"=!:!version!");
-                    javaFinder.WriteLine("\t)");
-                    javaFinder.WriteLine(")");
-                    javaFinder.WriteLine("endlocal");
-                    javaFinder.WriteLine("exit/b");
-                }
-                else if (OperatingSystem.IsLinux())
-                {
-                    javaFinder.WriteLine("#!/usr/bin/bash");
-                }
-                else if (OperatingSystem.IsMacOS())
-                {
-                    javaFinder.WriteLine("#!/bin/bash");
-                }
-                if (!OperatingSystem.IsWindows())
-                {
-                    javaFinder.WriteLine("OLDIFS=$IFS");
-                    javaFinder.WriteLine("IFS=:");
-                    javaFinder.WriteLine("for dir in $PATH; do");
-                    javaFinder.WriteLine("    if [[ -x \"$dir/java\" ]]; then  # Check if java exists and is executable");
-                    javaFinder.WriteLine("        javaPath=\"$dir/java\"");
-                    javaFinder.WriteLine("        version=$(\"$javaPath\" -version 2>&1 | awk -F '\"' '/version/ {print $2}')");
-                    javaFinder.WriteLine("        echo \"$javaPath:$version\"");
-                    javaFinder.WriteLine("    fi");
-                    javaFinder.WriteLine("done");
-                    javaFinder.WriteLine("IFS=$OLDIFS");
-                }
-                File.WriteAllText(masRoot + "/find_java" + (OperatingSystem.IsWindows() ? ".bat" : ".sh"), builder.ToString(), Encoding.ASCII);
-                if (!OperatingSystem.IsWindows())
-                {
-                    File.SetUnixFileMode(masRoot + "/find_java.sh", UnixFileMode.UserRead | UnixFileMode.UserExecute | UnixFileMode.UserWrite);
-                }
-            }
         }
 
         private void InitTimers()
@@ -723,7 +659,7 @@ namespace Markuse_arvuti_juhtpaneel
                         return;
                 }
                 SetCollectProgress(35, "Verifile OK");
-                if (vf.IsVerified())
+                if (Verifile.CheckFiles(Verifile.FileScope.ControlPanel))
                 {
                     SetCollectProgress(40, "Töölauaikooni seadete laadimine...");
                     LoadDesktopSettings();
@@ -1271,7 +1207,7 @@ namespace Markuse_arvuti_juhtpaneel
                         p.Kill();
                     }
                 }
-                Process pr = new Process();
+                var pr = new Process();
                 pr.StartInfo.FileName = masRoot + "/ChangeWallpaper.exe";
                 pr.StartInfo.UseShellExecute = false;
                 pr.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -1293,13 +1229,9 @@ namespace Markuse_arvuti_juhtpaneel
                 {
                     ThumbDesktop.Source = new Bitmap(masRoot + "/bg_desktop.png");
                 }
-                foreach (Process p in Process.GetProcesses())
+                foreach (var p in Process.GetProcesses())
                 {
-                    if ((p.ProcessName == "cmd.exe") || (p.ProcessName == "cmd.EXE") || (p.ProcessName == "cmd"))
-                    {
-                        p.Kill();
-                    }
-                    else if ((p.ProcessName == "conhost.exe") || (p.ProcessName == "conhost.EXE") || (p.ProcessName == "conhost"))
+                    if (p.ProcessName is "cmd.exe" or "cmd.EXE" or "cmd" or "conhost.exe" or "conhost.EXE" or "conhost")
                     {
                         p.Kill();
                     }
@@ -1344,7 +1276,7 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 return;
             }
-            string filename = files[0].Path.AbsolutePath;
+            var filename = files[0].Path.AbsolutePath;
             ThumbLockscreen.Source = null;
             File.Delete(masRoot + "/bg_login.png");
             File.Copy(filename, masRoot + "/bg_login.png");
@@ -1367,7 +1299,7 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 return;
             }
-            string filename = files[0].Path.AbsolutePath;
+            var filename = files[0].Path.AbsolutePath;
             ThumbMiniversion.Source = null;
             File.Delete(masRoot + "/bg_uncommon.png");
             File.Copy(filename, masRoot + "/bg_uncommon.png");
@@ -1396,7 +1328,7 @@ namespace Markuse_arvuti_juhtpaneel
                 ThumbMiniversion.Source = null;
                 string rootBackSlash = masRoot.Replace("/", "\\");
                 //võta kasutusele ajutine taustapilt
-                Process pr = new Process();
+                var pr = new Process();
                 pr.StartInfo.FileName = masRoot + "/ChangeWallpaper.exe";
                 pr.StartInfo.UseShellExecute = false;
                 pr.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -1419,7 +1351,7 @@ namespace Markuse_arvuti_juhtpaneel
                 pr.StartInfo.FileName = masRoot + "/Markuse asjad/Markuse arvuti integratsioonitarkvara.exe";
                 pr.Start();
                 ReloadThumbs();
-                foreach (Process p in Process.GetProcesses())
+                foreach (var p in Process.GetProcesses())
                 {
                     try
                     {
@@ -1463,7 +1395,7 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 if (File.Exists(masRoot + "/events.txt"))
                 {
-                    Process p = new Process();
+                    var p = new Process();
                     p.StartInfo = new ProcessStartInfo(masRoot + "/events.txt")
                     {
                         UseShellExecute = true,
@@ -1491,8 +1423,7 @@ namespace Markuse_arvuti_juhtpaneel
                 Arguments = args,
                 Type = type
             };
-            var jsonData = JsonSerializer.Serialize(cmd, _cmdSerializerOptions);
-            File.WriteAllText(masRoot + "/DesktopIconsCommand.json", jsonData);
+            cmd.Send(masRoot);
         }
 
         private async void EditBg(object sender, RoutedEventArgs e)
@@ -1586,7 +1517,7 @@ namespace Markuse_arvuti_juhtpaneel
                     EditionBox.Fill = new SolidColorBrush(Colors.BlueViolet);
                     break;
             }
-            StringBuilder editionDetails = new StringBuilder();
+            var editionDetails = new StringBuilder();
             editionDetails.AppendLine("Versioon: " + masVer[2]);
             editionDetails.AppendLine("Järk: " + masVer[3]);
             editionDetails.AppendLine("Nimi: " + masVer[10]);
@@ -1600,7 +1531,7 @@ namespace Markuse_arvuti_juhtpaneel
             editionDetails.AppendLine("Kinnituskood: " + masVer[9]);
             editionDetails.AppendLine("Olek: " + vf.MakeAttestation());
             EditionDetails.Text = editionDetails.ToString();
-            string[] features = masVer[8].Split('-');
+            var features = masVer[8].Split('-');
             FeatTS.Source = cross;
             FeatRM.Source = cross;
             FeatIP.Source = cross;
@@ -1610,7 +1541,7 @@ namespace Markuse_arvuti_juhtpaneel
             FeatWX.Source = cross;
             FeatLT.Source = cross;
             FeatGP.Source = cross;
-            foreach (string feature in features)
+            foreach (var feature in features)
             {
                 switch (feature)
                 {
@@ -1663,7 +1594,7 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void OpenMasRootClicked(object sender, RoutedEventArgs e)
         {
-            Process p = new Process();
+            var p = new Process();
             p.StartInfo = new ProcessStartInfo(masRoot)
             {
                 UseShellExecute = true,

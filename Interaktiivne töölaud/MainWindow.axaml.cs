@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System;
 using System.Diagnostics;
+using MasCommon;
 
 namespace Interaktiivne_töölaud
 {
@@ -9,7 +10,20 @@ namespace Interaktiivne_töölaud
     {
         public MainWindow()
         {
-            InitializeComponent();
+            if (Verifile.CheckVerifileTamper() && Program.vf.IsVerified() && Verifile.CheckFiles(Verifile.FileScope.InteractiveDesktop))
+            {
+                InitializeComponent();
+            }
+            else
+            {
+                Console.WriteLine(@"Seade ei vasta Markuse arvuti asjad nõuetele. Kasutage Markuse asjade juurutamise tööriista, et see probleem lahendada.");
+                Console.Write("Olek: VF_CHECKING\r");
+                var vf = new Verifile();
+                var result = vf.MakeAttestation();
+                if (result == "VERIFIED") result = "MISSING_FILES";
+                Console.WriteLine($@"Olek: VF_{result}             ");
+                Environment.Exit(255);
+            }
         }
 
         private void Enter_PointerReleased(object? sender, RoutedEventArgs e)

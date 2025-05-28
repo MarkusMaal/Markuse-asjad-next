@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using MasCommon;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
@@ -47,7 +48,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         });
                     }
 
-                    if (app.vf.IsVerified() && !app.croot)
+                    if (app.vf.IsVerified() && Verifile.CheckFiles(Verifile.FileScope.IntegrationSoftware) && !app.croot)
                     {
                         app.InitSettings();
                         Dispatcher.UIThread.Post(() =>
@@ -175,6 +176,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 dispatcherTimer.Interval = TimeSpan.FromMilliseconds(Program.config.PollRate);
             }
             this.IsVisible = false;
+            if (app.vf.MakeAttestation() != "VERIFIED")
+            {
+                Console.WriteLine("Verifile kontroll nurjus, programmi sulgemine");
+                Environment.Exit(255);
+            }
             if (OperatingSystem.IsMacOS()) {
                 this.WindowState = WindowState.Minimized;
                 this.Width = 0;

@@ -1,10 +1,13 @@
 ﻿using Avalonia;
 using System;
+using MasCommon;
 
 namespace Interaktiivne_töölaud
 {
     internal class Program
     {
+        public static Verifile vf = new();
+        
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.

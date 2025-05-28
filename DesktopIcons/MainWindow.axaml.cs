@@ -45,7 +45,6 @@ public partial class MainWindow : Window
     private int icon_size = 200;
     private bool generate_hidden_children;
     private readonly JsonSerializerOptions _serializerOptions;
-    private readonly JsonSerializerOptions _cmdSerializerOptions;
     private FileSystemWatcher watcher;
 
     private DesktopLayout? desktopLayout;
@@ -56,15 +55,11 @@ public partial class MainWindow : Window
             WriteIndented = true,
             TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default
         };
-        _cmdSerializerOptions = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            TypeInfoResolver = CommandSourceGenerationContext.Default
-        };
         DataContext = new MainWindowModel();
         GetMasRoot();
         ATTESTATION_STATE = vf.MakeAttestation();
         if (!Verifile.CheckVerifileTamper()) ATTESTATION_STATE = "CHECK_TAMPER";
+        if (!Verifile.CheckFiles(Verifile.FileScope.DesktopIcons)) ATTESTATION_STATE = "MISSING_FILES";
         if ((ATTESTATION_STATE != "VERIFIED") && (ATTESTATION_STATE != "BYPASS"))
         {
             Console.Error.WriteLine("Verifile kontroll nurjus!");
@@ -146,14 +141,15 @@ public partial class MainWindow : Window
 
     private void CommandRecieveEvent(object sender, FileSystemEventArgs e)
     {
-        if (e.FullPath.EndsWith(BackForwardSlash("\\DesktopIconsCommand.json")))
+        if (e.FullPath.EndsWith(BackForwardSlash("\\DesktopIconsCommand.json")) && vf.IsVerified())
         {
             Console.WriteLine("Found command file!");
-            DesktopCommand? command = null;
+            DesktopCommand? command = new DesktopCommand();
             if (e.ChangeType is WatcherChangeTypes.Changed or WatcherChangeTypes.Created) // ignore if deleted
             {
                 if (!File.Exists(e.FullPath)) { return; }
-                command = JsonSerializer.Deserialize<DesktopCommand>(File.ReadAllText(e.FullPath), _cmdSerializerOptions);
+
+                command.Load(mas_root);
                 Console.WriteLine("Serialize OK");
 
                 if (command != null)
