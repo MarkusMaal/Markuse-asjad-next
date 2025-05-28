@@ -13,7 +13,7 @@ clear
 # List of projects that can only be compiled as x86_64 and therefore must be translated through Rosetta when running on macOS
 # We have to do that here, because LibVLC for Apple Silicon isn't available yet
 [string] $RosettaOnly = 'MarkuStation2','Pidu!'
-Get-ChildItem . -Directory -Exclude ".vscode",".vs",".idea",".git","out","UniplatformTest" | Foreach-Object {
+Get-ChildItem . -Directory -Exclude ".vscode",".vs",".idea",".git","out","UniplatformTest","MasCommon" | Foreach-Object {
 	# this stores just the directory name, not the full path
 	$pn = $_.Name
 	if (Test-Path "$(Split-Path $MyInvocation.MyCommand.Path)/out/$pn" -PathType Leaf) {

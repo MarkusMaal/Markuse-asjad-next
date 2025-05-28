@@ -79,7 +79,7 @@ function ShowHint {
 		$Sel = 1
 	}
 	$hint = $Hints[$Sel-1]
-	if ($showversion) { Write-Host "`r`nDevTool v1.3.1" }
+	if ($showversion) { Write-Host "`r`nDevTool v1.3.2" }
 	if ($showhints) { Write-Host "`r`n$hint" }
 }
 
