@@ -2,9 +2,11 @@
 
 IFS=$'\n'
 SOLUTION_DIR="$(pwd)"
+# exit if out doesn't exist
 cd out || exit
-for tbl in $(ls -1)
+for dir in *.d/
 do
+  tbl=${dir%/}
    pushd "$tbl" >/dev/null || exit
     APP_NAME="$(echo $tbl | rev | cut -c3- | rev)"  # Change this to your app name
     echo "Generating ${APP_NAME}.app..."

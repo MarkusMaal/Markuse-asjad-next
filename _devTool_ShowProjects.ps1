@@ -9,6 +9,12 @@ Get-ChildItem . -Directory -Exclude ".vscode","out","UniplatformTest","MasCommon
 	}
 	if (Test-Path "$(Split-Path $MyInvocation.MyCommand.Path)/out/$pn" -PathType Leaf) {
 		Write-Output "- $in [Build OK]"
+	}
+	elseif (Test-Path "$(Split-Path $MyInvocation.MyCommand.Path)/out/$pn.d/$pn" -PathType Leaf) {
+		Write-Output "- $in [Build OK, Raw executable]"
+	}
+	elseif (Test-Path "$(Split-Path $MyInvocation.MyCommand.Path)/out/$pn.app/Contents/MacOS/$pn" -PathType Leaf) {
+		Write-Output "- $in [Build OK, macOS bundle]"
 	} else {
 		Write-Output "- $in"
 	}

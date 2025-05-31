@@ -42,7 +42,7 @@ Seejärel peaks avama järgmine menüü:
 7. Settings
 8. Exit
 
-DevTool v1.3
+DevTool v1.4
 
 Ends all Markuse asjad processes, which may be in conflict with new binaries
 ```
@@ -80,7 +80,7 @@ Selleks, et kompileerida iga toetatud platvormi jaoks, valige menüüst `7. Sett
 7. Reset settings 
 8. Go back 
 
-DevTool v1.3
+DevTool v1.4
 
 Changes color scheme in this script 
 ```
@@ -90,20 +90,11 @@ Olge kindlad, et `6. Cross-build` väärtus oleks `True`. Seejärel valige `8. G
 NB: Mitme platvormi jaoks kompileerimine võtab oluliselt kauem aega ja nõuab rohkem salvestusruumi!
 
 
-## macOS .app konteinerite loomine
+## macOS ühilduvus
 
-1. Kustutage enne alustamist out/ kataloogi sisu (`rm -rf out/`)
-2. Ehitage lahendus _devTool_PublishProjects.ps1 skriptiga (`pwsh _devTool_PublishProjects.ps1`)
-3. Käivita _devTool_KillAll.ps1 skript, et peatada jooksvad Markuse asjade rakendused (`pwsh _devTool_KillAll.ps1`)
-4. Genereerige .app konteinerid käivitades `bash ./_devTool_CreateMacBundles.sh` (NB: see skript üritab ka kopeerida binraarid automaatselt "/home/$USER/.mas/Markuse asjad" kataloogi)
-5. Ärge kasutage _devTool_UpdateAll.ps1 skripti või _devTool_Menu.ps1-s "Update binaries" valikut macOSis!!!
-6. Kui avate nüüd `out/` kataloogi Finderiga, näete seal genereeritud konteinereid, mida saate avada või liigutada Applications kausta (soovitame luua aliase, päriselt liigutamise asemel, sest siis on rakendusemenüüs alati ajakohane versioon)
-7. Kuna need binraarid ei ole märgistatud Apple poolt, siis peate iga rakenduse esimesel käivitamisel tegema järgnevat:
-   1. Lockdown peab sätetes olema välja lülitatud
-   2. Tuleb valida "Open anyway" sätete rakenduses "Privacy and Security" alt
-   3. Mõnikord peate ligipääsu andma ka teatud kaustadele, et rakendus toimiks õigesti
-   4. **MarkuStation2** ja **Pidu!** ei toimi macOS-is Apple Silicon seadmetes, kuna LibVLC ei toeta veel seda platvormi, selle asemel peate kasutama [Asahi Linuxit](https://asahilinux.org/). Võite ruumi säästmiseks need konteinerid macOSis kustutada.
-8. Käivita _devTool_Restart.ps1 skript, et Markuse arvuti asjade tarkvara taaskäivitada (`pwsh _devTool_Restart.ps1`)
+Juhul kui kasutate macOS-i, genereerib _devTool_Menu.ps1 skript teie jaoks .app konteinerid automaatselt kui valite menüüst `3. Generate and update bundles`.
+
+Kui kasutate Apple Silicon süsteemi, kompileeritakse MarkuStation2 ja Pidu! projektid x64 režiimis. Selleks, et neid rakendusi käivitada peab arvutis olema Rosetta ühilduvuskiht paigaldatud. Teeme seda seepärast, et LibVLC ei ole Apple Silicon Mac-ide jaoks saadaval.
 
 ## Aknareeglid Linuxi jaoks
 

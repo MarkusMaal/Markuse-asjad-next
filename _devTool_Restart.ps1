@@ -17,5 +17,12 @@ if ($platform -eq "Win32NT") {
 	$mit_path = $mit_path + ".exe"
 	$di_path = $di_path + ".exe"
 }
-Start-Process -FilePath $mit_path
-Start-Process -FilePath $di_path
+if ($IsMacOS) {
+	open -a "$mit_path.app"
+	open -a "$di_path.app"
+	exit
+} else
+{
+	Start-Process -FilePath $mit_path
+	Start-Process -FilePath $di_path
+}

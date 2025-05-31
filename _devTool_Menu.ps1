@@ -79,7 +79,11 @@ function ShowHint {
 		$Sel = 1
 	}
 	$hint = $Hints[$Sel-1]
-	if ($showversion) { Write-Host "`r`nDevTool v1.3.2" }
+	$str = "`r`nDevTool v1.4"
+	if ($IsMacOS) {
+		$str += " (macOS)"
+	}
+	if ($showversion) { Write-Host $str }
 	if ($showhints) { Write-Host "`r`n$hint" }
 }
 
@@ -190,8 +194,12 @@ function Main {  # main function
 	while ($false -eq [bool]@(0)) {    # always true
         & "./_devTool_Logo.ps1" # header
 		$menuitems = @('Kill processes', 'Restart processes', 'Show projects', 'Update binaries', 'Build solution', 'Clean solution', "Settings", 'Exit')  # displayable menu items
-	    $actions = @('Run-Script _devTool_KillAll.ps1', 'Run-Script _devTool_Restart.ps1', 'Run-Script _devTool_ShowProjects.ps1', 'Run-Script _devTool_UpdateAll.ps1 -Verbose $verbose', 'Run-Script _devTool_PublishProjects.ps1', 'Run-Script _devTool_Clean.ps1', 'Settings', 'Exit-Now')  # actions, which are related to menuitems
+		$actions = @('Run-Script _devTool_KillAll.ps1', 'Run-Script _devTool_Restart.ps1', 'Run-Script _devTool_ShowProjects.ps1', 'Run-Script _devTool_UpdateAll.ps1 -Verbose $verbose', 'Run-Script _devTool_PublishProjects.ps1', 'Run-Script _devTool_Clean.ps1', 'Settings', 'Exit-Now')  # actions, which are related to menuitems
         $hints = @('Ends all Markuse asjad processes, which may be in conflict with new binaries            ', 'Restarts Markuse asjad processes for maintenance purposes                               ', 'Displays all available projects on this solution                                        ', 'Upgrades all executables in .mas/Markuse asjad directory                                ', 'Attempts to build all projects for the current platform                                 ', 'Deletes leftover files from building/debugging to free up disk space                    ', 'Change devTool settings                                                                 ', 'Exits the script                                                                        ')
+		if ($IsMacOS) {
+			$menuitems[3] = "Generate and update bundles"
+			$hints[3] = 'Creates .app bundles and copies them over to .mas/Markuse asjad directory               '
+		}
 		ListMenu -MenuItems $menuitems -Sel $sel
         # footer
         ShowHint -Hints $hints -Sel $sel
