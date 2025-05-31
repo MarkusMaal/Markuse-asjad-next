@@ -244,7 +244,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 switch (n.Header)
                 {
                     case "Käivita MarkuStation":
-                        n.IsEnabled = !OperatingSystem.IsMacOS() || System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X86;
+                        n.IsEnabled = true;
                         break;
                     case "Markuse mälupulk":
                     case "Ühtegi mälupulka pole sisestatud":

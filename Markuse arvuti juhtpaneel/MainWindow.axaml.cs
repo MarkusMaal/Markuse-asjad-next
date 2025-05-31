@@ -1654,7 +1654,7 @@ namespace Markuse_arvuti_juhtpaneel
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             InitTimers();
-            TabMarkuStation.IsVisible = !IsAppleSilicon(); // LibVLC is currently unsupported on Apple Silicon, so any Markus' stuff that leverages it (incl. MarkuStation 2) will not work.
+            //TabMarkuStation.IsVisible = !IsAppleSilicon(); // LibVLC is currently unsupported on Apple Silicon, so any Markus' stuff that leverages it (incl. MarkuStation 2) will not work.
         }
 
         private void Locked_IsCheckedChanged(object? sender, RoutedEventArgs e)
