@@ -538,8 +538,14 @@ namespace Pidu_
         private void Control_OnLoaded(object? sender, RoutedEventArgs e)
         {
             if (!OperatingSystem.IsMacOS() || Program.streamMode) return;
-            this.WindowState = WindowState.Normal;
-            this.WindowState = WindowState.FullScreen;
+			new Thread(() => {
+				Thread.Sleep(1000);
+				Dispatcher.UIThread.Post(() => {
+		            this.WindowState = WindowState.Normal;
+		            this.WindowState = WindowState.Maximized;
+    		        this.WindowState = WindowState.FullScreen;
+				});
+			}).Start();
         }
     }
 }
