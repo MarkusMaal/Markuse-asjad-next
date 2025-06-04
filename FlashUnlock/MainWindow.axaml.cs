@@ -31,7 +31,7 @@ public partial class MainWindow : Window
     bool dev_killswitch = false;
     bool disable_post_unlock = false;
     bool first_time = true;
-    List<String> last_devices = new List<String>();
+    List<String> last_devices = new();
 
     DispatcherTimer flashFinder = new();
     DispatcherTimer killTaskmgr = new();
@@ -42,6 +42,8 @@ public partial class MainWindow : Window
         killTaskmgr.Interval = TimeSpan.FromMilliseconds(100);
         flashFinder.Tick += FlashFinder_Tick;
         killTaskmgr.Tick += KillTaskmgr_Tick;
+        this.WindowStartupLocation = WindowStartupLocation.Manual;
+        this.Position = Screens.All[0].WorkingArea.Position;
         InitializeComponent();
     }
 
@@ -73,6 +75,7 @@ public partial class MainWindow : Window
         if (!authenticated)
         {
             this.Show();
+            this.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None);
             //Cursor.Position = new Point(0, 0);
             //Cursor.Hide();
 
@@ -89,14 +92,19 @@ public partial class MainWindow : Window
                 }
             }
             var processes = Process.GetProcessesByName("explorer");
-            if (processes.Length > 0 && OperatingSystem.IsWindows())
+            if (OperatingSystem.IsLinux())
             {
-                new Process()
+                processes = Process.GetProcessesByName("plasmashell");
+            }
+
+            if (processes.Length > 0)
+            {
+                new Process
                 {
                     StartInfo =
                     {
-                        FileName = @"C:\Windows\System32\taskkill.exe",
-                        Arguments = @"/F /IM explorer.exe",
+                        FileName = OperatingSystem.IsWindows() ? @"C:\Windows\System32\taskkill.exe" : OperatingSystem.IsLinux() ? "/usr/bin/kquitapp6" : "",
+                        Arguments = OperatingSystem.IsWindows() ? @"/F /IM explorer.exe" : OperatingSystem.IsLinux() ? "plasmashell" : "",
                         CreateNoWindow = true,
                         WindowStyle = ProcessWindowStyle.Hidden
                     }
@@ -105,7 +113,7 @@ public partial class MainWindow : Window
             clockLabel.Content = DateTime.Now.Hour.ToString().PadLeft(2, '0') + ":" + DateTime.Now.Minute.ToString().PadLeft(2, '0');
             if (first_time || !dev_killswitch)
             {
-                label1.Content = "Autentimiseks sisestage Markuse m‰lupulk...";
+                label1.Content = "Autentimiseks sisestage Markuse m√§lupulk...";
             }
             if ((new_devices.Count > last_devices.Count) && (last_devices.Count > 0))
             {
@@ -134,11 +142,34 @@ public partial class MainWindow : Window
         {
             killTaskmgr.Stop();
             label1.Content = "Lahti lukustamine...";
-            var processes = Process.GetProcessesByName("explorer");
-            if (processes.Length == 0)
+            Process[] processes = [];
+            if (OperatingSystem.IsWindows())
             {
-                Process.Start(@"C:\Windows\explorer.exe");
+                processes = Process.GetProcessesByName("explorer");
+            } else if (OperatingSystem.IsLinux())
+            {
+                processes = Process.GetProcessesByName("plasmashell");
             }
+            if ( processes.Length == 0)
+            {
+                if (OperatingSystem.IsWindows())
+                {
+                    Process.Start(@"C:\Windows\explorer.exe");
+                } else if (OperatingSystem.IsLinux())
+                {
+                    new Process
+                    {
+                        StartInfo =
+                        {
+                            FileName = "/usr/bin/bash",
+                            Arguments = "-c \"nohup kstart5 plasmashell </dev/null >/dev/null 2>&1 &\"",
+                            CreateNoWindow = true,
+                            WindowStyle = ProcessWindowStyle.Hidden
+                        }
+                    }.Start();
+                }
+            }
+
             if (disable_post_unlock)
             {
                 this.Close();
@@ -151,7 +182,7 @@ public partial class MainWindow : Window
         }
         else if (File.Exists($"{cdrive}/.mas/stop_authenticate"))
         {
-            label1.Content = "M‰lupulga lukustust ei saa v‰lja l¸litada enne autentimist!";
+            label1.Content = "M√§lupulga lukustust ei saa v√§lja l√ºlitada enne autentimist!";
         }
     }
 
@@ -167,7 +198,7 @@ public partial class MainWindow : Window
         }
         catch
         {
-            await MessageBoxShow("See ei ole Markuse asjade s¸steemi nıutele vastav arvuti.", "Programm ei tˆˆta selles arvutis", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
+            await MessageBoxShow("See ei ole Markuse asjade s√ºsteemi n√µutele vastav arvuti.", "Programm ei t√∂√∂ta selles arvutis", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
             this.Close();
         }
         if (File.Exists(string.Format("{0}/.mas/flash_authenticate", cdrive)))
@@ -178,7 +209,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            await MessageBoxShow("‹htegi m‰lupulka pole kalibreeritud. Palun valige j‰rgmisest men¸¸st m‰lupulk, mida soovite kasutada", "Ei saa lukustada", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning);
+            await MessageBoxShow("√úhtegi m√§lupulka pole kalibreeritud. Palun valige j√§rgmisest men√º√ºst m√§lupulk, mida soovite kasutada", "Ei saa lukustada", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning);
 
             this.Hide();
 
@@ -257,7 +288,7 @@ public partial class MainWindow : Window
         {
             killTaskmgr.IsEnabled = false;
             this.Topmost = false;
-            label1.Content = "Arendaja re˛iim aktiveeriti";
+            label1.Content = "Arendaja re≈æiim aktiveeriti";
         }
         else if (e.Key == Avalonia.Input.Key.Escape)
         {
@@ -298,7 +329,7 @@ public partial class MainWindow : Window
             }
             else
             {
-                label1.Content = "Keela p‰rast avamist";
+                label1.Content = "Keela p√§rast avamist";
             }
             disable_post_unlock = !disable_post_unlock;
         }

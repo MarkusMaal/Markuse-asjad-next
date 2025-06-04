@@ -167,30 +167,29 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void FlashUnlock_Click(object? sender, System.EventArgs e)
         {
-            if (OperatingSystem.IsWindows())
+            bool none = true;
+            foreach (var p in Process.GetProcesses())
             {
-                bool none = true;
-                foreach (Process p in Process.GetProcesses())
+                if (p.ProcessName != "FlashUnlock") continue;
+                none = false;
+                File.WriteAllText(mas_root + "/stop_authenticate", "now");
+            }
+
+            if (!none) return;
+            try
+            {
+                Process p = new()
                 {
-                    if (p.ProcessName == "FlashUnlock")
+                    StartInfo =
                     {
-                        none = false;
-                        File.WriteAllText(mas_root + "/stop_authenticate", "now");
+                        FileName =
+                            mas_root + "/Markuse asjad/FlashUnlock" + (OperatingSystem.IsWindows() ? ".exe" : ""),
+                        UseShellExecute = true,
+                        Verb = "runas",
                     }
-                }
-                if (none)
-                {
-                    try
-                    {
-                        Process p = new Process();
-                        p.StartInfo.FileName = mas_root + "/Markuse asjad/FlashUnlock.exe";
-                        p.StartInfo.UseShellExecute = true;
-                        p.StartInfo.Verb = "runas";
-                        p.Start();
-                    } catch (Exception) when (!Debugger.IsAttached) {
-                        return;
-                    }
-                }
+                };
+                p.Start();
+            } catch (Exception) when (!Debugger.IsAttached) {
             }
         }
 

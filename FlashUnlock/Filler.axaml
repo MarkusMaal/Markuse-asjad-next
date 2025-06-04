@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="340" d:DesignHeight="280"
         x:Class="FlashUnlock.Filler" ShowInTaskbar="False" Topmost="True"
-        WindowState="FullScreen"
+        WindowState="FullScreen" Loaded="Control_OnLoaded"
         Title="Filler">
   <Grid Name="InnerGrid">
     <StackPanel Margin="25,30">

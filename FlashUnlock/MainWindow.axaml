@@ -6,6 +6,10 @@
         x:Class="FlashUnlock.MainWindow" Loaded="Window_Loaded"
         Closing="Window_Closing" KeyDown="Window_KeyDown"
         WindowState="FullScreen" ShowInTaskbar="False"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        SystemDecorations="BorderOnly"
         Title="FlashUnlock">
   <Grid Name="InnerGrid">
     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15">
