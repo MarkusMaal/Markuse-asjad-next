@@ -1,0 +1,12 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="400" Height="115" ShowInTaskbar="False"
+        x:Class="FlashUnlock.FlashDevices" CanResize="False" Loaded="Window_Loaded"
+        Title="Valige USB seade, mida soovite kasutada autentimiseks">
+  <Grid Margin="15,20">
+     <ComboBox Name="comboBox1" HorizontalAlignment="Stretch"></ComboBox>
+     <Button Name="button1" Width="80" HorizontalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="Button_Click_1">OK</Button>
+  </Grid>
+</Window>
