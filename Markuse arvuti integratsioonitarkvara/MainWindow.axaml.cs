@@ -260,32 +260,8 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         break;
                     case "Lülita mälupulga lukustus sisse":
                     case "Lülita mälupulga lukustus välja":
-                        n.IsEnabled = !OperatingSystem.IsMacOS();
                         bool flashLocked = File.Exists(app.mas_root + "/flash_unlock_is_enabled.log");
                         n.Header = flashLocked ? "Lülita mälupulga lukustus välja" : "Lülita mälupulga lukustus sisse";
-                        if (!initialized) {
-                            n.Click += (object? sender, EventArgs e) =>
-                            {
-                                if (OperatingSystem.IsLinux()) {
-                                    bool flashLocked = File.Exists(app.mas_root + "/flash_unlock_is_enabled.log");
-                                    if (!flashLocked) {
-                                        Process p = new();
-                                        p.StartInfo.FileName = "python3";
-                                        p.StartInfo.Arguments = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/scripts/device.py";
-                                        p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                                        p.StartInfo.CreateNoWindow = true;
-                                        p.StartInfo.UseShellExecute = false;
-                                        p.Start();
-                                        app.CookToast("Mälupulga lukustus lülitati sisse");
-                                    } else {
-                                        File.Delete(app.mas_root + "/flash_unlock_is_enabled.log");
-                                        app.CookToast("Mälupulga lukustus lülitati välja");
-                                    }
-                                } else if (OperatingSystem.IsWindows()) {
-                                // do something for Windows
-                                }
-                            };
-                        }
                         break;
                     case "Käivita Projekt ITS":
                         break;

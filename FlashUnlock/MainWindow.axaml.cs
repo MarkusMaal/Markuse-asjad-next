@@ -64,9 +64,17 @@ public partial class MainWindow : Window
                     {
                         if (filler.IsVisible)
                         {
+                            if (OperatingSystem.IsMacOS())
+                            {
+                                filler.WindowState = WindowState.Minimized;
+                            }
                             filler.Hide();
                         }
                     }
+                }
+                if (OperatingSystem.IsMacOS())
+                {
+                    this.WindowState = WindowState.Minimized;
                 }
                 this.Hide();
             }
@@ -74,6 +82,10 @@ public partial class MainWindow : Window
         killTaskmgr.IsEnabled = !authenticated;
         if (!authenticated)
         {
+            if (OperatingSystem.IsMacOS())
+            {
+                this.WindowState = WindowState.Maximized;
+            }
             this.Show();
             this.Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.None);
             //Cursor.Position = new Point(0, 0);
@@ -96,6 +108,10 @@ public partial class MainWindow : Window
             {
                 processes = Process.GetProcessesByName("plasmashell");
             }
+            else if (OperatingSystem.IsMacOS())
+            {
+                processes = Process.GetProcessesByName("finder");
+            }
 
             if (processes.Length > 0)
             {
@@ -103,8 +119,8 @@ public partial class MainWindow : Window
                 {
                     StartInfo =
                     {
-                        FileName = OperatingSystem.IsWindows() ? @"C:\Windows\System32\taskkill.exe" : OperatingSystem.IsLinux() ? "/usr/bin/kquitapp6" : "",
-                        Arguments = OperatingSystem.IsWindows() ? @"/F /IM explorer.exe" : OperatingSystem.IsLinux() ? "plasmashell" : "",
+                        FileName = OperatingSystem.IsWindows() ? @"C:\Windows\System32\taskkill.exe" : OperatingSystem.IsLinux() ? "/usr/bin/kquitapp6" : "/usr/bin/killall",
+                        Arguments = OperatingSystem.IsWindows() ? @"/F /IM explorer.exe" : OperatingSystem.IsLinux() ? "plasmashell" : "Finder",
                         CreateNoWindow = true,
                         WindowStyle = ProcessWindowStyle.Hidden
                     }
@@ -149,6 +165,9 @@ public partial class MainWindow : Window
             } else if (OperatingSystem.IsLinux())
             {
                 processes = Process.GetProcessesByName("plasmashell");
+            } else if (OperatingSystem.IsMacOS())
+            {
+                processes = Process.GetProcessesByName("finder");
             }
             if ( processes.Length == 0)
             {
@@ -205,12 +224,20 @@ public partial class MainWindow : Window
         {
             DeviceAuthID = File.ReadAllText(string.Format("{0}/.mas/flash_authenticate", cdrive));
             flashFinder.Start();
+            if (OperatingSystem.IsMacOS())
+            {
+                this.WindowState = WindowState.Minimized;
+            }
             this.Hide();
         }
         else
         {
             await MessageBoxShow("Ühtegi mälupulka pole kalibreeritud. Palun valige järgmisest menüüst mälupulk, mida soovite kasutada", "Ei saa lukustada", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning);
 
+            if (OperatingSystem.IsMacOS())
+            {
+                this.WindowState = WindowState.Minimized;
+            }
             this.Hide();
 
             FlashDevices fd = new();
@@ -254,6 +281,7 @@ public partial class MainWindow : Window
     {
         if (authenticated)
         {
+            File.Delete(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.mas/flash_unlock_is_enabled.log");
             Environment.Exit(0);
         }
         e.Cancel = !authenticated;
