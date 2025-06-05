@@ -347,7 +347,7 @@ public partial class MainWindow : Window
         string[] icons = ["Games", "Word", "Www", "Player", "Excel", "Folder", "Maia", "PowerPoint", "Apps"];
         string[] actions =
         [
-            mas_root + "/Markuse asjad/MarkuStation2", "winword", "https://start.me", mas_root + "/Markuse asjad/Pidu!", "excel", "explorer",
+            "\"" + mas_root + "/Markuse asjad/MarkuStation2\"", "winword", "https://start.me", "\"" + mas_root + "/Markuse asjad/Pidu!\"", "excel", "explorer",
             "http://localhost:14414", "powerpnt", "special:apps"
         ];
         string[] special_icons = ["EyeB", "LockB", "Reset"];
@@ -388,6 +388,12 @@ public partial class MainWindow : Window
             actions[4] = "onlyoffice-desktopeditors --new=cell";
             actions[5] = "dolphin";
             actions[7] = "onlyoffice-desktopeditors --new=slide";
+        } else if (OperatingSystem.IsMacOS())
+        {
+            actions[1] = "open -na ONLYOFFICE.app --args --new:word";
+            actions[4] = "open -na ONLYOFFICE.app --args --new:cell";
+            actions[5] = "open " + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            actions[7] = "open -na ONLYOFFICE.app --args --new:slide";
         }
         for (int i = 0; i < 9; i++)
         {

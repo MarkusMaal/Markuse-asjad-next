@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Avalonia;
@@ -75,11 +76,16 @@ public partial class TopIcon : Window
         {
             if (!action.StartsWith("special:"))
             {
-                string args = "";
-                if (action.Contains("--new"))
+                var args = "";
+                if (action.Contains(' ') && !action.Contains('"'))
                 {
-                    args = action.Split(' ')[1];
+                    args = string.Join(' ', action.Split(' ').Skip(1));
                     action = action.Split(' ')[0];
+                }
+
+                if (action.StartsWith('"') && action.EndsWith('"'))
+                {
+                    action = action.Substring(1, action.Length - 2);
                 }
                 Process p = new();
                 p.StartInfo.FileName = action;
