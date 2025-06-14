@@ -59,9 +59,16 @@ namespace Markuse_arvuti_integratsioonitarkvara
             var exePath = Environment.ProcessPath;
             if (!OperatingSystem.IsLinux())
             {
-                Process.Start(new ProcessStartInfo(exePath!) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(exePath!) { UseShellExecute = true, Arguments = "/e" });
             }
-            File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/mas_error.log", $"----------------------------------------------\nMarkuse arvuti integratsioonitarkvara\n----------------------------------------------\n\nTaaskäivitamise Markuse arvuti integratsioonitarkvara probleemi tõttu. Palun käivitage see programm siluriga, et asja täpsemalt uurida.\n\nTehniline info:\n\nRakendus: {exePath!}\nKuupäev ja kellaaeg: {DateTime.Now}\nVälja kutsuja: {invoker}\nErand: {ex.Message}\nKuhila jälg:\n{ex.StackTrace}");
+            File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/mas_error.log", $"----------------------------------------------\nMarkuse arvuti integratsioonitarkvara\n----------------------------------------------\n\nPeatasime Markuse arvuti integratsioonitarkvara probleemi tõttu. Palun käivitage see programm siluriga, et asja täpsemalt uurida.\n\nTehniline info:\n\nRakendus: {exePath ?? "?"}\nKuupäev ja kellaaeg: {DateTime.Now}\nVälja kutsuja: {invoker}\nErand: {ex.Message}\nKuhila jälg:\n{ex.StackTrace}");
+            Environment.Exit(0);
+        }
+
+        public static void Restart()
+        {
+            var exePath = Environment.ProcessPath;
+            Process.Start(new ProcessStartInfo(exePath!) { UseShellExecute = true });
             Environment.Exit(0);
         }
     }

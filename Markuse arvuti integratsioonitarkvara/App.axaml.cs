@@ -61,6 +61,14 @@ namespace Markuse_arvuti_integratsioonitarkvara
             try {
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {
+                    if (desktop.Args!.Contains("/e"))
+                    {
+                        Crash c = new();
+                        c.TechnicalData.Text = File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/mas_error.log");
+                        desktop.MainWindow = c;
+                        base.OnFrameworkInitializationCompleted();
+                        return;
+                    }
                     if (!dev || (desktop.Args!.Contains("/debug")))
                     {
                         dev = false;
@@ -69,6 +77,8 @@ namespace Markuse_arvuti_integratsioonitarkvara
                     else
                     {
                         desktop.MainWindow = new InterfaceTest();
+                        base.OnFrameworkInitializationCompleted();
+                        return;
                     }
 
                     if (!Verifile.CheckVerifileTamper())

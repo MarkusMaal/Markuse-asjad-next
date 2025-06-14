@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
@@ -38,6 +39,8 @@ public partial class InterfaceTest : Window
             case "Paigalduse lõpetamise aken":
                 new WaitInstall().Show();
                 break;
+            case "Rakenduse kokkujooksmine":
+                throw new Exception("End-user manually initiated a software crash");
             case "Silu rakendus":
                 if (app.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
                 {
@@ -57,5 +60,10 @@ public partial class InterfaceTest : Window
             if (app == null) return;
             app.dev = checkBox.IsChecked!.Value;
         }
+    }
+
+    private void Window_Closing(object? sender, Avalonia.Controls.WindowClosingEventArgs e)
+    {
+        Environment.Exit(0);
     }
 }
