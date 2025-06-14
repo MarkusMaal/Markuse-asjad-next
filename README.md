@@ -4,7 +4,7 @@
 ## Süsteemnõuded
 
 * Markuse asjad nõuetele vastav süsteem kehtiva Verifile 2.0 räsiga. Räsi genereerimiseks peate kasutama [juurutamise tööriista](https://github.com/MarkusMaal/mas-juurariist).
-* dotnet-sdk-8.0 või muu ühilduv lahendus kompileerimiseks
+* dotnet-sdk-9.0 või muu ühilduv lahendus kompileerimiseks
 * Microsoft Powershell devToolide kasutamiseks
 * Avalonia UI pluginad vastava IDE jaoks (Microsoft Visual Studio või JetBrains Rider)
 * Operatsioonsüsteem: Windows, macOS või Linux (muid süsteeme ei toetata)

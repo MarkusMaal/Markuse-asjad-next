@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Media;
 using System.Linq;
-using NickStrupat;
 using Hardware.Info;
 using System.IO;
 using Avalonia;
@@ -19,7 +18,6 @@ namespace Interaktiivne_töölaud;
 public partial class Windows : Window
 {
     readonly DispatcherTimer dpt = new();
-    private static HardwareInfo? hardwareInfo;
     double cpuUsage;
     double ramUsage;
     bool stop = false;
@@ -29,33 +27,6 @@ public partial class Windows : Window
         cpuUsage = 0;
         ramUsage = 0;
         var cts = new CancellationTokenSource();
-        hardwareInfo = new HardwareInfo();
-        collectUsage = new (() => // run in a separate thread to avoid interface freezes every second
-        {
-            while (true)
-            {
-                // Calculate CPU usage
-                hardwareInfo.RefreshCPUList();
-                hardwareInfo.RefreshDriveList();
-                cpuUsage = hardwareInfo.CpuList.First().PercentProcessorTime;
-
-                // Calculate RAM usage
-                if (!OperatingSystem.IsMacOS()) {
-                    ComputerInfo ci = new();
-                    double used = ci.TotalPhysicalMemory - ci.AvailablePhysicalMemory;
-                    double ram = ci.TotalPhysicalMemory;
-                    ramUsage = used / ram * 100.0;
-                }
-
-                Thread.Sleep(100);
-                if (stop)
-                {
-                    break;
-                }
-            }
-            stop = false;
-        });
-        collectUsage.Start();
         dpt.Interval = new TimeSpan(0, 0, 1);
         dpt.Tick += (object? sender, EventArgs e) =>
         {
@@ -103,8 +74,8 @@ public partial class Windows : Window
             NetContainer.Background = new SolidColorBrush(isinternet ? Colors.Lime : (isnetwork ? Colors.Yellow : Colors.Red));
 
             // apply colors
-            RamContainer.Background = ramBrush;
-            Cpu1Container.Background = cpuBrush;
+            //RamContainer.Background = ramBrush;
+            //Cpu1Container.Background = cpuBrush;
         };
         InitializeComponent();
     }
@@ -168,11 +139,11 @@ public partial class Windows : Window
 
     private void Window_Closing(object? sender, WindowClosingEventArgs e)
     {
-        stop = true; // wait for thread to stop before continuing with close procedure
+        /*stop = true; // wait for thread to stop before continuing with close procedure
         while (stop)
         {
             e.Cancel = true;
-        }
+        }*/
         e.Cancel = false;
     }
 

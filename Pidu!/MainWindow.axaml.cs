@@ -11,9 +11,9 @@ using Avalonia.Platform.Storage;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Media.Imaging;
-using MsBox.Avalonia;
 using Avalonia.Logging;
 using Avalonia.Platform;
+using MsBox.Avalonia;
 
 namespace Pidu_
 {

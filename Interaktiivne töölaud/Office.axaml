@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="using:Interaktiivne_töölaud"
         mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        MaxWidth="2560"
         x:Class="Interaktiivne_töölaud.Office" WindowState="FullScreen"
         x:DataType="local:OfficeModel" Loaded="Window_Loaded_1"
         Title="Office">
