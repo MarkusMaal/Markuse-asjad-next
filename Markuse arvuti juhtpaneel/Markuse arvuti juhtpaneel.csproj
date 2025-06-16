@@ -46,8 +46,10 @@
     <UpToDateCheckInput Remove="MarkuStation_Edit.axaml" />
   </ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Include="Assets\mas_web.png" />
     <AvaloniaResource Include="Assets\failure.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\mas_web.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="mas.ico" />

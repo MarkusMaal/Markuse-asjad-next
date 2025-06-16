@@ -8,7 +8,7 @@
         Width="929" Height="681" Loaded="Window_Loaded" IsVisible="False" Closing="Window_OnClosing">
   <Grid Name="ErtGrid" SizeChanged="Grid_SizeChanged" RowDefinitions="120,*">
     <StackPanel Name="Header1" IsVisible="False">
-      <Image DoubleTapped="Image_DoubleTapped" Margin="0,10,0,0" Name="Logo" Height="64" Width="64"/>
+      <Image DoubleTapped="Image_DoubleTapped" Margin="0,10,0,0" Name="Logo" Height="64" Width="64" Source="Assets/mas_web.png"/>
       <TextBlock Name="TopLabel" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" FontSize="20" FontFamily="Segoe UI Light,Ubuntu Light,sans" Margin="0,10,0,0" Text="markuse arvuti juhtpaneel">
       </TextBlock>
     </StackPanel>

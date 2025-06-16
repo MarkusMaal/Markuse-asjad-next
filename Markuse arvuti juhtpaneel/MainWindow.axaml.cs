@@ -754,7 +754,6 @@ namespace Markuse_arvuti_juhtpaneel
                 icon = new Bitmap(ms);
             }
             this.Icon = new WindowIcon(icon);
-            this.Logo.Source = icon;
             ReloadThumbs();
         }
 
