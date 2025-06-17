@@ -20,39 +20,40 @@
         Background="Transparent"
         Foreground="White" PointerPressed="Form_OnPointerPressed">
     <Grid>
-    <Grid Margin="0">
-        
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Folders}" Name="FolderView1">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        
-                            <Grid Width="78" PointerPressed="InputElement_OnPointerPressed" DoubleTapped="InputElement_OnDoubleTapped" Background="{Binding Selected}">
-                                <Grid>
-                                    <StackPanel Margin="10">
-                                        <Image Source="{Binding Image}"/>
-                                        <TextBlock Margin="5 0" FontWeight="SemiLight" FontFamily="Segoe UI"
-                                                TextAlignment="Center" TextWrapping="Wrap"
-                                                Text="{Binding Name}"/>
-                                        
-                                    </StackPanel>
+        <Polygon Name="Glass" Fill="Magenta" />
+        <Grid Margin="0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Folders}" Name="FolderView1">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            
+                                <Grid Width="78" PointerPressed="InputElement_OnPointerPressed" DoubleTapped="InputElement_OnDoubleTapped" Background="{Binding Selected}">
+                                    <Grid>
+                                        <StackPanel Margin="10">
+                                            <Image Source="{Binding Image}"/>
+                                            <TextBlock Margin="5 0" FontWeight="SemiLight" FontFamily="Segoe UI"
+                                                    TextAlignment="Center" TextWrapping="Wrap"
+                                                    Text="{Binding Name}"/>
+                                            
+                                        </StackPanel>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.Styles>
-                    <Style Selector="Grid:pointerover">
-                        <Setter Property="Background" Value="#500000ff" />
-                    </Style>
-                </ItemsControl.Styles>
-            </ItemsControl>
-        </ScrollViewer>
-        <Label Name="SomethingSel" Content="False" VerticalAlignment="Bottom" IsVisible="False" />
-    </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.Styles>
+                        <Style Selector="Grid:pointerover">
+                            <Setter Property="Background" Value="#500000ff" />
+                        </Style>
+                    </ItemsControl.Styles>
+                </ItemsControl>
+            </ScrollViewer>
+            <Label Name="SomethingSel" Content="False" VerticalAlignment="Bottom" IsVisible="False" />
+        </Grid>
+        
     </Grid>
 </Window>

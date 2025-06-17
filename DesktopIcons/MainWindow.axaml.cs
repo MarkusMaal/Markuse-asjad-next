@@ -680,6 +680,13 @@ public partial class MainWindow : Window
         }
         cd = desktopLayout.DesktopDir;
         NavigateDirectory(cd);
+        this.Glass.Points = [new Point(0,0), new Point(Width, 0), new Point(0, Height)];
+        this.Glass.Fill = new LinearGradientBrush
+        {
+            StartPoint = new RelativePoint(new Point(Width / 2, 0), RelativeUnit.Absolute),
+            EndPoint = new RelativePoint(new Point(Width / 2, Height), RelativeUnit.Absolute),
+            GradientStops = [new GradientStop(Color.FromArgb(60, 255, 255, 255), 0.0), new GradientStop(Color.FromArgb(0, 255, 255, 255), 0.5)]
+        };
 
         if (!OperatingSystem.IsLinux())
         {

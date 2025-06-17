@@ -23,8 +23,20 @@
         PointerExited="InputElement_OnPointerExited"
         >
     <Border CornerRadius="100" Name="BgCol" >
-        <Label Name="Pic" Classes="Pic">
-            <Label.Background>Red</Label.Background>
-        </Label>
+        <Panel>
+            <Label Name="Pic" Classes="Pic">
+                <Label.Background>Red</Label.Background>
+            </Label>
+            <Polygon Name="Glass" Fill="Magenta">
+                <!-- Applies a circular opacity mask to convert the triangle into a half-circle -->
+                <Polygon.OpacityMask>
+                    <RadialGradientBrush>
+                        <GradientStop Color="White" Offset="0.0"></GradientStop>
+                        <GradientStop Color="White" Offset="1.0"></GradientStop>
+                        <GradientStop Color="Transparent" Offset="1.0"></GradientStop>
+                    </RadialGradientBrush>
+                </Polygon.OpacityMask>
+            </Polygon>
+        </Panel>
     </Border>
 </Window>

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -150,6 +151,49 @@ public partial class TopIcon : Window
         this.Pic.Height = this.Height;
         this.Pic.BackgroundSizing = BackgroundSizing.InnerBorderEdge;
         this.Pic.Background = new ImageBrush(GetResource("TopIcon" + icon));
+        this.Glass.Points = [new Point(0,0), new Point(Width, 0), new Point(0, Height)];
+        if (this.action == "special:mas")
+        {
+            this.Glass.Fill = new SolidColorBrush(Colors.Transparent);
+            Refocus();
+            return;
+        }
+        UnfocusGlass();
+        Refocus();
+    }
+
+    private void UnfocusGlass()
+    {
+        if (this.action == "special:mas")
+        {
+            this.Glass.Fill = new SolidColorBrush(Colors.Transparent);
+            return;
+        }
+        this.Glass.Fill = new LinearGradientBrush
+        {
+            StartPoint = new RelativePoint(new Point(Width / 2, 0), RelativeUnit.Absolute),
+            EndPoint = new RelativePoint(new Point(Width / 2, Height), RelativeUnit.Absolute),
+            GradientStops = [new GradientStop(Color.FromArgb(100, 255, 255, 255), 0.0), new GradientStop(Color.FromArgb(0, 255, 255, 255), 0.5)]
+        };
+    }
+
+    private void FocusGlass()
+    {
+        if (this.action == "special:mas")
+        {
+            this.Glass.Fill = new SolidColorBrush(Colors.Transparent);
+            return;
+        }
+        this.Glass.Fill = new LinearGradientBrush
+        {
+            StartPoint = new RelativePoint(new Point(Width / 2, 0), RelativeUnit.Absolute),
+            EndPoint = new RelativePoint(new Point(Width / 2, Height), RelativeUnit.Absolute),
+            GradientStops = [new GradientStop(Color.FromArgb(130, 255, 255, 255), 0.0), new GradientStop(Color.FromArgb(0, 255, 255, 255), 0.5)]
+        };
+    }
+
+    private void Refocus()
+    {
         ShowInTaskbar = true;
         ShowInTaskbar = false;
     }
@@ -184,6 +228,7 @@ public partial class TopIcon : Window
         if (this.BgCol.Background.Opacity != 0)
         {
             SetOpacity(this.BgCol.Background.Opacity + 0.25);
+            FocusGlass();
         }
     }
 
@@ -193,6 +238,7 @@ public partial class TopIcon : Window
         if (this.BgCol.Background.Opacity != 0)
         {
             SetOpacity(this.BgCol.Background.Opacity - 0.25);
+            UnfocusGlass();
         }
     }
 
