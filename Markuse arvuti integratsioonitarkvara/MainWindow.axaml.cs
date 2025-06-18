@@ -20,21 +20,45 @@ namespace Markuse_arvuti_integratsioonitarkvara
 {
     public partial class MainWindow : Window
     {
-        private bool allowCode = true;
+        public bool allowCode = true;
         private readonly App app;
         private bool initialized = false;
-        Color[] scheme;
-        readonly DispatcherTimer dispatcherTimer = new();
+        public Color[] scheme;
+        public readonly DispatcherTimer dispatcherTimer = new();
+        private Watchers watchers;
         public MainWindow()
         {
             try
             {
                 app = (App)Application.Current;
                 InitializeComponent();
+                if (File.Exists(app.mas_root + "/scheme.cfg")) {
+                    scheme = LoadTheme();
+                    this.Backglass.Fill = new SolidColorBrush(Color.FromArgb(128, scheme[0].R, scheme[0].G, scheme[0].B));
+                    if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) +
+                                    "/Android.lnk"))
+                    {
+                        this.DeviceLabel.Content = "markuse tahvelarvuti asjad";
+                        this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_tablet);
+                    }
+
+                    if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
+                                         "/.masv"))
+                    {
+                        this.DeviceLabel.Content = "markuse virtuaalarvuti asjad";
+                        this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_virtualpc);
+                    }
+                    else
+                    {
+                        this.DeviceLabel.Content = "markuse arvuti asjad";
+                        this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_computers);
+                    }
+                }
                 if (app.dev)
                 {
                     return;
                 }
+                this.watchers = new Watchers(this, app.mas_root);
 
                 new Thread(() =>
                 {
@@ -64,27 +88,6 @@ namespace Markuse_arvuti_integratsioonitarkvara
                             }
                         });
                         scheme = LoadTheme();
-                        Dispatcher.UIThread.Post(() =>
-                        {
-                            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) +
-                                            "/Android.lnk"))
-                            {
-                                this.DeviceLabel.Content = "markuse tahvelarvuti asjad";
-                                this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_tablet);
-                            }
-
-                            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-                                                 "/.masv"))
-                            {
-                                this.DeviceLabel.Content = "markuse virtuaalarvuti asjad";
-                                this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_virtualpc);
-                            }
-                            else
-                            {
-                                this.DeviceLabel.Content = "markuse arvuti asjad";
-                                this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_computers);
-                            }
-                        });
                         InitTimers();
                     }
                     else if (app.croot)
@@ -166,6 +169,15 @@ namespace Markuse_arvuti_integratsioonitarkvara
             }
         }
 
+        public void CheckVerifile()
+        {
+            if (app.vf.MakeAttestation() != "VERIFIED")
+            {
+                Console.WriteLine("Verifile kontroll nurjus, programmi sulgemine");
+                Environment.Exit(255);
+            }
+        }
+
         private void GeneralTimer(object? sender, EventArgs e)
         {
             initialized = true;
@@ -175,47 +187,26 @@ namespace Markuse_arvuti_integratsioonitarkvara
             {
                 dispatcherTimer.Interval = TimeSpan.FromMilliseconds(Program.config.PollRate);
             }
-            this.IsVisible = false;
-            if (app.vf.MakeAttestation() != "VERIFIED")
+            if (Program.config.AllowScheduledTasks)
             {
-                Console.WriteLine("Verifile kontroll nurjus, programmi sulgemine");
-                Environment.Exit(255);
+                CheckEvents();
+                HideMe();
+            } else
+            {
+                ReloadMenu();
+                HideMe();
+                dispatcherTimer.Stop();
             }
-            if (OperatingSystem.IsMacOS()) {
+        }
+
+        private void HideMe()
+        {
+            this.IsVisible = false;
+            if (OperatingSystem.IsMacOS())
+            {
                 this.WindowState = WindowState.Minimized;
                 this.Width = 0;
                 this.Height = 0;
-            }
-            ReloadMenu();
-            scheme = LoadTheme();
-            ApplyTheme();
-            CheckLogFiles();
-            CheckEvents();
-        }
-
-        private void CheckLogFiles()
-        {
-            if (File.Exists(app.mas_root + "/showabout.txt"))
-            {
-                File.Delete(app.mas_root + "/showabout.txt");
-                //teaveMarkuseAsjadeKohtaToolStripMenuItem.PerformClick();
-            }
-            // M.A.I.A. ligipääsu taotlemine
-            if (File.Exists(app.mas_root + @"/maia/request_permission.maia") || File.Exists(app.mas_root + "/maia/request_permission.mai"))
-            {
-                if (allowCode)
-                {
-                    ShowCode sc = new()
-                    {
-                        bg = scheme[0],
-                        fg = scheme[1]
-                    };
-                    sc.Show();
-                }
-                else
-                {
-                    try { File.Delete(app.mas_root + "/maia/request_permission.maia"); } catch (Exception) when (!Debugger.IsAttached) { File.Delete(app.mas_root + "/maia/request_permission.mai"); }
-                }
             }
         }
 
@@ -230,7 +221,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
         }
 
 
-        private void ReloadMenu()
+        public void ReloadMenu()
         {
             if ((app.GetTrayIcon() == null) || !app.GetTrayIcon().IsVisible) {
                 return;
@@ -534,16 +525,23 @@ namespace Markuse_arvuti_integratsioonitarkvara
         }
 
         /* Loads mas theme */
-        Color[] LoadTheme()
+        public Color[] LoadTheme()
         {
-            string[] bgfg = File.ReadAllText(app.mas_root + "/scheme.cfg").Split(';');
-            string[] bgs = bgfg[0].ToString().Split(':');
-            string[] fgs = bgfg[1].ToString().Split(':');
-            Color[] cols = [Color.FromArgb(255, byte.Parse(bgs[0]), byte.Parse(bgs[1]), byte.Parse(bgs[2])), Color.FromArgb(255, byte.Parse(fgs[0]), byte.Parse(fgs[1]), byte.Parse(fgs[2]))];
-            return cols;
+            while (true)
+            {
+                try
+                {
+                    string[] bgfg = File.ReadAllText(app.mas_root + "/scheme.cfg").Split(';');
+                    string[] bgs = bgfg[0].ToString().Split(':');
+                    string[] fgs = bgfg[1].ToString().Split(':');
+                    Color[] cols = [Color.FromArgb(255, byte.Parse(bgs[0]), byte.Parse(bgs[1]), byte.Parse(bgs[2])), Color.FromArgb(255, byte.Parse(fgs[0]), byte.Parse(fgs[1]), byte.Parse(fgs[2]))];
+                    return cols;
+                }
+                catch { Thread.Sleep(100);  continue; }
+            }
         }
 
-        private void ApplyTheme()
+        public void ApplyTheme()
         {
             try
             {

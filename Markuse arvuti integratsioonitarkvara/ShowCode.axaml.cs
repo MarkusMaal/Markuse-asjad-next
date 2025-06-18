@@ -37,7 +37,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
             devType = log_content[0];
             devIP = log_content[1];
             string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            Random r = new Random();
+            Random r = new();
             string code = "";
             for (int i = 0; i < 8; i++)
             {
@@ -63,6 +63,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
             {
                 File.Delete(string.Format(app.mas_root + "/maia/{0}.{1}.maia", devType, devIP.Replace(".", "_")));
                 File.Delete(app.mas_root + "/maia/close_popup.maia");
+                waitForClose.Stop();
                 this.Close();
             }
             else
@@ -72,6 +73,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 if (timeLeft == 0)
                 {
                     File.Delete(string.Format(app.mas_root + "/maia/{0}.{1}.maia", devType, devIP.Replace(".", "_")));
+                    waitForClose.Stop();
                     this.Close();
                 }
             }
@@ -95,6 +97,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
         private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
             File.Delete(string.Format(app.mas_root + "/maia/{0}.{1}.maia", devType, devIP.Replace(".", "_")));
+            waitForClose.Stop();
             this.Close();
         }
     }
