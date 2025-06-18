@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
@@ -22,16 +23,26 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         public ShowCode()
         {
+            Program.CodeOpen = true;
             InitializeComponent();
             if (app.dev)
             {
                 return;
             }
             string[] log_content;
+            Thread.Sleep(1000); // wait for server to finish writing the request_permission.maia file before continuing
             string fileName = app.mas_root + "/maia/request_permission.maia";
             if (File.Exists(app.mas_root + "/maia/request_permission.mai"))
             {
                 fileName = app.mas_root + "/maia/request_permission.mai";
+            }
+
+            if (!File.Exists(fileName))
+            {
+                waitForClose.Tick += new EventHandler(WaitForClose);
+                waitForClose.Interval = new TimeSpan(0, 0, 1);
+                waitForClose.Start();
+                return;
             }
             log_content = File.ReadAllText(fileName).Split(';');
             devType = log_content[0];
@@ -53,6 +64,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         private void WaitForClose(object? sender, EventArgs e)
         {
+            if (ReferenceEquals(CodeText.Content, "AAAAAAAA")) this.Close(); // no valid code, so close immediately
             if (!initialized)
             {
                 this.Background = new SolidColorBrush(bg);
@@ -64,6 +76,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 File.Delete(string.Format(app.mas_root + "/maia/{0}.{1}.maia", devType, devIP.Replace(".", "_")));
                 File.Delete(app.mas_root + "/maia/close_popup.maia");
                 waitForClose.Stop();
+                Program.CodeOpen = false;
                 this.Close();
             }
             else
@@ -74,6 +87,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 {
                     File.Delete(string.Format(app.mas_root + "/maia/{0}.{1}.maia", devType, devIP.Replace(".", "_")));
                     waitForClose.Stop();
+                    Program.CodeOpen = false;
                     this.Close();
                 }
             }
@@ -98,6 +112,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
         {
             File.Delete(string.Format(app.mas_root + "/maia/{0}.{1}.maia", devType, devIP.Replace(".", "_")));
             waitForClose.Stop();
+            Program.CodeOpen = false;
             this.Close();
         }
     }

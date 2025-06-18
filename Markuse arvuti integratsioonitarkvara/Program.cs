@@ -22,6 +22,8 @@ namespace Markuse_arvuti_integratsioonitarkvara
             PollRate = 5000
         };
 
+        public static bool CodeOpen = false;
+
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.

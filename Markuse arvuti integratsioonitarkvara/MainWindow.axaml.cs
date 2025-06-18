@@ -171,11 +171,14 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         public void CheckVerifile()
         {
-            if (app.vf.MakeAttestation() != "VERIFIED")
+            if (app.vf.MakeAttestation() == "VERIFIED") return;
+            if (app.vf.MakeAttestation() == "BYPASS")
             {
-                Console.WriteLine("Verifile kontroll nurjus, programmi sulgemine");
-                Environment.Exit(255);
+                app.vf = new Verifile();
+                if (app.vf.MakeAttestation() == "VERIFIED") return;
             }
+            Console.WriteLine("Verifile kontroll nurjus, programmi sulgemine");
+            Environment.Exit(255);
         }
 
         private void GeneralTimer(object? sender, EventArgs e)
@@ -543,6 +546,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
 
         public void ApplyTheme()
         {
+            if (!OperatingSystem.IsWindows()) return;
             try
             {
                 new Thread(() =>

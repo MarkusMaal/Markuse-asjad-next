@@ -32,11 +32,10 @@ namespace Markuse_arvuti_integratsioonitarkvara
                                    | NotifyFilters.CreationTime
                                    | NotifyFilters.DirectoryName
                                    | */NotifyFilters.FileName
-                                   | NotifyFilters.LastAccess
+                                   /*| NotifyFilters.LastAccess*/
                                    | NotifyFilters.LastWrite
                                    /*| NotifyFilters.Security*/
                                    | NotifyFilters.Size;
-            watcher.Created += fn;
             watcher.Changed += fn;
             watcher.Error += new ErrorEventHandler(OnError);
             watcher.Filter = filename;
@@ -124,18 +123,22 @@ namespace Markuse_arvuti_integratsioonitarkvara
         {
             try
             {
-                if (!e.FullPath.EndsWith(BackForwardSlash("\\request_permission.maia"))) return;
+                if (!e.FullPath.EndsWith(BackForwardSlash("\\request_permission.maia")) || (e.ChangeType == WatcherChangeTypes.Deleted)) return;
                 // M.A.I.A. ligipääsu taotlemine
                 if (File.Exists(mas_root + @"/maia/request_permission.maia") || File.Exists(mas_root + "/maia/request_permission.mai"))
                 {
                     if (uiForm.allowCode)
                     {
-                        ShowCode sc = new()
+                        if (Program.CodeOpen) return;
+                        Dispatcher.UIThread.Post(() =>
                         {
-                            bg = uiForm.scheme[0],
-                            fg = uiForm.scheme[1]
-                        };
-                        sc.Show();
+                            ShowCode sc = new()
+                            {
+                                bg = uiForm.scheme[0],
+                                fg = uiForm.scheme[1]
+                            };
+                            sc.Show(); 
+                        });
                     }
                     else
                     {
