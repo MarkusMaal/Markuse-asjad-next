@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasCommon", "MasCommon\MasC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashUnlock", "FlashUnlock\FlashUnlock.csproj", "{C0B94464-3F79-D8D2-ADCE-32F83A151C32}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineGeneraator", "MineGeneraator\MineGeneraator.csproj", "{9AFDFC31-79B8-4D4A-ACDB-CB83FD46EC75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{C0B94464-3F79-D8D2-ADCE-32F83A151C32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0B94464-3F79-D8D2-ADCE-32F83A151C32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0B94464-3F79-D8D2-ADCE-32F83A151C32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AFDFC31-79B8-4D4A-ACDB-CB83FD46EC75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AFDFC31-79B8-4D4A-ACDB-CB83FD46EC75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AFDFC31-79B8-4D4A-ACDB-CB83FD46EC75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AFDFC31-79B8-4D4A-ACDB-CB83FD46EC75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
