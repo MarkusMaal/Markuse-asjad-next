@@ -10,10 +10,23 @@ namespace MineGeneraator
         public static void Main(string[] args)
         {
             PadFill("Otsin .mine.json faile...");
-            _ = OperatingSystem.IsWindows() ? RecurseFolders(Environment.GetEnvironmentVariable("HOMEDRIVE", EnvironmentVariableTarget.Machine) ?? string.Empty) :  RecurseFolders("/");
+            if (args.Length == 0)
+            {
+                _ = OperatingSystem.IsWindows() ? RecurseFolders(Environment.GetEnvironmentVariable("HOMEDRIVE") ?? string.Empty) : RecurseFolders("/");
+            } else
+            {
+                _ = RecurseFolders(args[0]);
+            }
             PadFill("Kustutan olemasoleva Mine kataloogi...");
-            if (Directory.Exists(MineRoot)) Directory.Delete(MineRoot, true);
-            Directory.CreateDirectory(MineRoot);
+            if (OperatingSystem.IsWindows()) MineRoot = MineRoot.Replace("/", "\\");
+            try
+            {
+                if (Directory.Exists(MineRoot)) Directory.Delete(MineRoot, true);
+                Directory.CreateDirectory(MineRoot);
+            } catch
+            {
+                // ignored
+            }
             foreach (var dir in CheckDirs)
             {
                 var fa = new FolderAlias();

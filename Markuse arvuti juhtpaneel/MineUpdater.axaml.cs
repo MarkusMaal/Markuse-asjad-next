@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
@@ -43,6 +44,17 @@ public partial class MineUpdater : Window
                 RedirectStandardOutput = true,
                 UseShellExecute = false
             };
+            if (OperatingSystem.IsWindows())
+            {
+                foreach (var di in DriveInfo.GetDrives())
+                {
+                    // draiv vastab Markuse kaustad nõutele
+                    if (File.Exists($"{di.RootDirectory.FullName}.userdata\\users.txt"))
+                    {
+                        p.StartInfo.Arguments = di.RootDirectory.FullName;
+                    }
+                }
+            }
             p.Start();
             while (!p.HasExited)
             {
