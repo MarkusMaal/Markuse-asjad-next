@@ -1,4 +1,6 @@
-﻿namespace MineGeneraator
+﻿using System.Diagnostics;
+
+namespace MineGeneraator
 {
     internal static class Program
     {
@@ -40,6 +42,16 @@
                 MakeSymlinks(prefix + FinalName + " - ", fa, new DirectoryInfo(root.FullName+ "/" + fa.name));
             }
             PadFill($"{root.FullName} => {MineRoot}{prefix}{FinalName}");
+            if (OperatingSystem.IsWindows())
+            {
+                var psi = new ProcessStartInfo("cmd.exe", "/C mklink /J \"" + MineRoot.Replace("/", "\\") + prefix.Replace("/", "\\") + FinalName + "\" \"" + root.FullName.Replace("/", "\\") + "\"")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                Process.Start(psi);
+                return;
+            }
             File.CreateSymbolicLink(MineRoot + prefix + FinalName, root.FullName);
         }
 
