@@ -9,7 +9,7 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <ApplicationIcon>mas.ico</ApplicationIcon>
     <Company>$(Authors)</Company>
-    <AssemblyVersion>2.5.2.0</AssemblyVersion>
+    <AssemblyVersion>2.5.3.0</AssemblyVersion>
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     <PublishTrimmed>true</PublishTrimmed>
     <ApplicationIcon>Assets/mas.ico</ApplicationIcon>

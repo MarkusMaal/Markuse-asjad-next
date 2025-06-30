@@ -36,7 +36,7 @@ namespace Markuse_arvuti_juhtpaneel
         string[] locations;
         bool freezeTimer = false;
         private bool preventWrites = true;
-        readonly string whatNew = "+ Markuse arvuti asjad kasutavad nüüd MasCommon teeki\n+ Lisanduvad Verifile kontrollid, et vältida ootamatuid kokkujooksmisi";
+        readonly string whatNew = "+ \"Mine\" kausta uuendamise funktsioon\n+ Klaasiefekt teabelehel väljaande ristkülikul";
         private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true, TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default};
         private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = MasConfigSourceGenerationContext.Default };
         private List<string> desktopIcons = [];
@@ -294,6 +294,7 @@ namespace Markuse_arvuti_juhtpaneel
             hints["Terminal"] = "Käivitab terminali (terminal)";
             hints["Ooterežiimi seaded"] = "Avab akna, kus saate kohandada ooterežiimi seadeid";
             hints["Laadi andmed uuesti"] = "Laadib seadistused uuesti, juhul, kui need peaksid olema muutunud";
+            hints["Genereeri \"Mine\" kaust"] = "Uuendab Mine " + (OperatingSystem.IsWindows() ? "kausta" : "kataloogi") + " vastavalt .mine.json failide sisule.";
             foreach (var um in GetUniverse())
             {
                 hints[um] = "Markuse asjad universum!";
@@ -2071,6 +2072,15 @@ namespace Markuse_arvuti_juhtpaneel
         private void CloseButton_OnClick(object? sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void RegenMine_OnClick(object? sender, RoutedEventArgs e)
+        {
+            new MineUpdater
+            {
+                Background = this.Background,
+                Foreground = this.Foreground
+            }.ShowDialog(this);
         }
     }
 }

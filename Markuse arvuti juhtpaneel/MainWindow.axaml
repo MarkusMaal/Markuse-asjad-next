@@ -41,6 +41,7 @@
             <Button Name="RestartMasButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="RestartMas">Taaskäivita Markuse asjad</Button>
             <Button Name="ScreensaverSettingsButton" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="ScreensaverSettingsButton_OnClick">Ooterežiimi seaded</Button>
             <Button Name="ReloadInfo" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="ReloadInfo_OnClick">Laadi andmed uuesti</Button>
+            <Button Name="RegenMine" PointerEntered="InfoText" PointerExited="DefaultInfo" Click="RegenMine_OnClick">Genereeri "Mine" kaust</Button>
           </WrapPanel>
           <Label Name="WinUtilsLabel">Windowsi tarvikud</Label>
           <WrapPanel Classes="Left">
@@ -211,7 +212,17 @@
               <Panel Margin="0,10">
                 <StackPanel>
                   <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
-                    <Rectangle Name="EditionBox" Fill="Gray" MinWidth="100" MinHeight="100">
+                    <Panel>
+                      <Rectangle Name="EditionBox" Fill="Gray" MinWidth="100" MinHeight="100">
+                      </Rectangle>
+                      <Polygon Name="Glass" Points="0,0 100,0 0,100">
+                        <Polygon.Fill>
+                          <LinearGradientBrush StartPoint="50,0" EndPoint="50,100">
+                            <GradientStop Color="#80FFFFFF" Offset="0.0"></GradientStop>
+                            <GradientStop Color="Transparent" Offset="0.6"></GradientStop>
+                          </LinearGradientBrush>
+                        </Polygon.Fill>
+                      </Polygon>
                       <ToolTip.Tip>
                         <StackPanel>
                           <TextBlock FontSize="16">Värvid tähistavad kindlat väljaannet:</TextBlock>
@@ -223,7 +234,7 @@
                           <TextBlock><Run Text="Hall" Foreground="Gray" /> - Tundmatu väljaanne</TextBlock>
                         </StackPanel>
                       </ToolTip.Tip>
-                    </Rectangle>
+                    </Panel>
                     <StackPanel Margin="0">
                       <Label Name="MasName" Margin="15,-5" FontSize="25" FontWeight="SemiLight" VerticalAlignment="Top" ToolTip.Tip="Kuvab mis liiki Markuse asjaga on tegemist.">Markuse arvuti asjad</Label>
                       <Label Name="MasEditionLabel" Margin="15,3" FontSize="18" FontWeight="SemiLight" VerticalAlignment="Top" ToolTip.Tip="Väljaanne tekstina.">Tundmatu väljaanne</Label>
