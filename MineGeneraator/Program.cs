@@ -7,9 +7,9 @@
         private static string MineRoot = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/Mine/";
         public static void Main(string[] args)
         {
-            Console.WriteLine("Otsin .mine.json faile...");
+            PadFill("Otsin .mine.json faile...");
             _ = OperatingSystem.IsWindows() ? RecurseFolders(Environment.GetEnvironmentVariable("HOMEDRIVE", EnvironmentVariableTarget.Machine) ?? string.Empty) :  RecurseFolders("/");
-            Console.WriteLine("Kustutan olemasoleva Mine kataloogi...");
+            PadFill("Kustutan olemasoleva Mine kataloogi...");
             if (Directory.Exists(MineRoot)) Directory.Delete(MineRoot, true);
             Directory.CreateDirectory(MineRoot);
             foreach (var dir in CheckDirs)
@@ -20,6 +20,18 @@
             }
         }
 
+        private static void PadFill(string str)
+        {
+            var outText = $"{str}";
+            var spaces = "";
+            for (var i = 0; i < Console.WindowWidth - outText.Length; i++) spaces += " ";
+            if (outText.Length > Console.WindowWidth - 3)
+            {
+                outText = $"{str[..(Console.WindowWidth - 5)]}...";
+            }
+            Console.Write($"\r{outText}{spaces}");
+        }
+
         private static void MakeSymlinks(string prefix, FolderAlias folder, DirectoryInfo root)
         {
             var FinalName = (folder.alias != "" ? folder.alias : folder.name).Replace("$PWD", root.Name);
@@ -27,7 +39,7 @@
             {
                 MakeSymlinks(prefix + FinalName + " - ", fa, new DirectoryInfo(root.FullName+ "/" + fa.name));
             }
-            Console.WriteLine($"{root.FullName} => {MineRoot}{prefix}{FinalName}");
+            PadFill($"{root.FullName} => {MineRoot}{prefix}{FinalName}");
             File.CreateSymbolicLink(MineRoot + prefix + FinalName, root.FullName);
         }
 
@@ -35,10 +47,7 @@
         {
             try
             {
-                var outText = $"{path}";
-                var spaces = "";
-                for (var i = 0; i < Console.WindowWidth - outText.Length; i++) spaces += " ";
-                Console.Write($"\r{outText}{spaces}");
+                PadFill(path);
                 foreach (var dir in Directory.GetDirectories(path))
                 {
                     var cloop = false;
