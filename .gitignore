@@ -367,3 +367,6 @@ out/
 
 # DevTool settings
 DevTool.json
+
+# build log
+build.log

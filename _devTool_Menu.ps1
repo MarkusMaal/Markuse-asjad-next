@@ -79,7 +79,7 @@ function ShowHint {
 		$Sel = 1
 	}
 	$hint = $Hints[$Sel-1]
-	$str = "`r`nDevTool v1.4"
+	$str = "`r`nDevTool v1.4.1"
 	if ($IsMacOS) {
 		$str += " (macOS)"
 	}
