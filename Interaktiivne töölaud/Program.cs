@@ -20,6 +20,7 @@ namespace Interaktiivne_töölaud
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
-                .LogToTrace();
+                .LogToTrace()
+                .With(new MacOSPlatformOptions { DisableDefaultApplicationMenuItems = true});
     }
 }

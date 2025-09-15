@@ -2082,5 +2082,21 @@ namespace Markuse_arvuti_juhtpaneel
                 Foreground = this.Foreground
             }.ShowDialog(this);
         }
+
+        private void Window_KeyDown(object? sender, KeyEventArgs e)
+        {
+            if ((e.KeyModifiers & KeyModifiers.Alt) != 0)
+            {
+                TabsControl.SelectedIndex = e.Key switch
+                {
+                    Key.A => 0,
+                    Key.M => 1,
+                    Key.K => 2,
+                    Key.D => 3,
+                    Key.T => 4,
+                    _ => TabsControl.SelectedIndex
+                };
+            }
+        }
     }
 }

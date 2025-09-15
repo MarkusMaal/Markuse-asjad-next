@@ -1,9 +1,13 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Interaktiivne_töölaud.App"
-             RequestedThemeVariant="Dark">
+             RequestedThemeVariant="Dark"
+             Name="Interaktiivne töölaud">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
+    <NativeMenu.Menu>
+      <NativeMenu />
+    </NativeMenu.Menu>
     <Application.Styles>
         <SimpleTheme />
         <Style Selector="Button.Hand">

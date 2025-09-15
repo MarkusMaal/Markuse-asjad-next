@@ -48,7 +48,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace()
-                .With(new MacOSPlatformOptions { ShowInDock = false });
+                .With(new MacOSPlatformOptions { ShowInDock = false, DisableDefaultApplicationMenuItems = true });
             }
             catch (Exception ex) when (!Debugger.IsAttached)  {
                 CatchErrors(ex, "Program.BuildAvaloniaApp");

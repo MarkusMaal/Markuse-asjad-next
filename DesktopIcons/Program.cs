@@ -18,5 +18,5 @@ class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace()
-            .With(new MacOSPlatformOptions { ShowInDock = false});
+            .With(new MacOSPlatformOptions { ShowInDock = false, DisableDefaultApplicationMenuItems = true});
 }

@@ -20,6 +20,7 @@ namespace Markuse_arvuti_ooterežiim
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
-                .LogToTrace();
+                .LogToTrace()
+                .With(new MacOSPlatformOptions { DisableDefaultApplicationMenuItems = true});
     }
 }

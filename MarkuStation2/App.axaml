@@ -3,7 +3,11 @@
              x:Class="MarkuStation2.App" Name="MarkuStation 2"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="Välju" Gesture="Meta+Q" Click="NativeMenuItem_OnClick"></NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
     <Application.Styles>
         <SimpleTheme />
     </Application.Styles>
