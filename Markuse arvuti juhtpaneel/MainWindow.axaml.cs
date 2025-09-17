@@ -36,7 +36,7 @@ namespace Markuse_arvuti_juhtpaneel
         string[] locations;
         bool freezeTimer = false;
         private bool preventWrites = true;
-        readonly string whatNew = "+ Uus teema";
+        readonly string whatNew = "* Parandatud Linuxis teemaga seotud rike";
         private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true, TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default};
         private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = MasConfigSourceGenerationContext.Default };
         private List<string> desktopIcons = [];

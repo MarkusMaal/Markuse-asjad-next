@@ -7,7 +7,7 @@
              xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>
-      <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
+      <styling:FluentAvaloniaTheme PreferSystemTheme="False" PreferUserAccentColor="True" />
     </Application.Styles>
     <TrayIcon.Icons>
       <TrayIcons>

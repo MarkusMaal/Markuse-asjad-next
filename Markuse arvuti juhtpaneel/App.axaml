@@ -1,7 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Markuse_arvuti_juhtpaneel.App"
-             RequestedThemeVariant="Light" 
+             RequestedThemeVariant="Dark" 
              xmlns:msBoxControls="clr-namespace:MsBox.Avalonia.Controls;assembly=MsBox.Avalonia"
              xmlns:markuseArvutiJuhtpaneel="clr-namespace:Markuse_arvuti_juhtpaneel"
              Name="Markuse arvuti juhtpaneel"
@@ -15,7 +15,7 @@
         </NativeMenu>
      </NativeMenu.Menu>
     <Application.Styles>
-        <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
+        <styling:FluentAvaloniaTheme PreferSystemTheme="False" PreferUserAccentColor="True" />
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
         
         <!-- Some overrides for MsBox.Avalonia styling (standard view only) -->
