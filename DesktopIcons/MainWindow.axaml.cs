@@ -231,7 +231,7 @@ public partial class MainWindow : Window
                                             theme.R.ToString("X").PadLeft(2, '0') +
                                             theme.G.ToString("X").PadLeft(2, '0') +
                                             theme.B.ToString("X").PadLeft(2, '0')))
-                                        { Opacity = 0.5 };
+                                        { Opacity = 0.85 };
                                 }
 
                                 foreach (var window in specialWindows)
@@ -240,7 +240,7 @@ public partial class MainWindow : Window
                                             theme.R.ToString("X").PadLeft(2, '0') +
                                             theme.G.ToString("X").PadLeft(2, '0') +
                                             theme.B.ToString("X").PadLeft(2, '0')))
-                                        { Opacity = 0.5 };
+                                        { Opacity = 0.85 };
                                 }
                             });
 
@@ -449,7 +449,7 @@ public partial class MainWindow : Window
             myparent = this,
             Pic =
             {
-                Opacity = 0.25
+                Opacity = 0.75
             }
         };
         logoWindow = tI;
@@ -476,7 +476,7 @@ public partial class MainWindow : Window
                     Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') +
                                                                  theme.G.ToString("X").PadLeft(2, '0') +
                                                                  theme.B.ToString("X").PadLeft(2, '0')))
-                        { Opacity = 0.5 }
+                        { Opacity = 0.75 }
                 },
                 WindowStartupLocation = WindowStartupLocation.Manual,
                 Position = new PixelPoint(me.LocationX > 0 ? me.LocationX : offset_left, me.LocationY > 0 ? me.LocationY : offset_top),
@@ -488,7 +488,7 @@ public partial class MainWindow : Window
                 myparent = this,
                 Pic =
                 {
-                    Opacity = 0.75
+                    Opacity = 0.85
                 }
             };
             specialWindows[i] = tI;
@@ -540,7 +540,7 @@ public partial class MainWindow : Window
                     break;
                 }
                 TopIcon tI = new TopIcon();
-                tI.BgCol.Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') + theme.G.ToString("X").PadLeft(2, '0') + theme.B.ToString("X").PadLeft(2, '0'))) { Opacity = 0.5 };
+                tI.BgCol.Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') + theme.G.ToString("X").PadLeft(2, '0') + theme.B.ToString("X").PadLeft(2, '0'))) { Opacity = 0.75 };
                 tI.WindowStartupLocation = WindowStartupLocation.Manual;
                 tI.Position = new PixelPoint(locations[i].X > 0 ? locations[i].X : offset_left, locations[i].Y > 0 ? locations[i].Y : offset_top);
                 tI.Width = icon_size;
