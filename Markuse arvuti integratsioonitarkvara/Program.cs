@@ -2,10 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using MasCommon;
 
 namespace Markuse_arvuti_integratsioonitarkvara
@@ -23,6 +20,8 @@ namespace Markuse_arvuti_integratsioonitarkvara
         };
 
         public static bool CodeOpen = false;
+
+        public static Features? FeatureSet = null;
 
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -73,5 +72,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
             Process.Start(new ProcessStartInfo(exePath!) { UseShellExecute = true });
             Environment.Exit(0);
         }
+
+        public record Features(bool DesktopIcons, bool InteractiveDesktop, bool IntegrationProgram, bool ClassicStart, bool IsRooted, bool RemoteDesktop, bool WindowsX, bool LiveTuner, bool GroupPolicy);
     }
 }

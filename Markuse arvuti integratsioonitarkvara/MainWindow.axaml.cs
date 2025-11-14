@@ -1,11 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Documents;
-using Avalonia.Controls.Primitives;
-using Avalonia.Dialogs.Internal;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Metadata;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using System;
@@ -186,6 +182,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
             initialized = true;
             app.ResetTrayIcon();
             Program.config.Load(app.mas_root);
+            
             if (dispatcherTimer.Interval < new TimeSpan(0, 0, 5))
             {
                 dispatcherTimer.Interval = TimeSpan.FromMilliseconds(Program.config.PollRate);
@@ -258,6 +255,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         n.Header = flashLocked ? "Lülita mälupulga lukustus välja" : "Lülita mälupulga lukustus sisse";
                         break;
                     case "Käivita Projekt ITS":
+                        n.IsVisible = Program.FeatureSet.InteractiveDesktop;
                         break;
                     case "Värviskeem":
                         foreach (NativeMenuItemBase snmi in n.Menu.Items)
@@ -332,6 +330,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         break;
                     case "Kuva kõik töölauaikoonid":
                     case "Peida need töölauaikoonid":
+                        n.IsVisible = Program.FeatureSet.DesktopIcons;
                         if (!initialized)
                         {
                             n.Click += (object? sender, EventArgs e) =>
@@ -369,6 +368,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         }
                         break;
                     case "Juurutamine":
+                        n.IsVisible = !Program.FeatureSet.IsRooted;
                         if (!initialized) {
                             n.Click += (object? sender, EventArgs e) => {
                                 RerootForm rf = new();
@@ -380,6 +380,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                         }
                         break;
                     case "M.A.I.A. serveri haldamine":
+                        n.IsVisible = Program.FeatureSet.RemoteDesktop;
 
                         foreach (NativeMenuItemBase snmi in n.Menu.Items)
                         {

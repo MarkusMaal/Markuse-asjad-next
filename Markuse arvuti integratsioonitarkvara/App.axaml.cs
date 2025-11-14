@@ -1,19 +1,13 @@
 using Avalonia;
-using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using MasCommon;
 
 namespace Markuse_arvuti_integratsioonitarkvara
@@ -117,6 +111,23 @@ namespace Markuse_arvuti_integratsioonitarkvara
                     {
                         if (File.Exists(mas_root + "/edition.txt") && !bad)
                         {
+                            
+                            var reader = File.OpenRead(Path.Combine(mas_root, "edition.txt"));
+                            var buffer =  new byte[reader.Length];
+                            reader.ReadExactly(buffer, 0, buffer.Length);
+                            var editionInfo = Encoding.UTF8.GetString(buffer);
+
+                            Program.FeatureSet = new Program.Features(
+                                editionInfo.Contains("RM"), 
+                                editionInfo.Contains("TS"), 
+                                editionInfo.Contains("IP"), 
+                                editionInfo.Contains("CS"), 
+                                editionInfo.Contains("MM"), 
+                                editionInfo.Contains("RD"), 
+                                editionInfo.Contains("WX"), 
+                                editionInfo.Contains("LT"), 
+                                editionInfo.Contains("GP")
+                            );
                             attestation = vf.MakeAttestation();
                             switch (attestation)
                             {

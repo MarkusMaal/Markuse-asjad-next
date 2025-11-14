@@ -36,7 +36,7 @@ namespace Markuse_arvuti_juhtpaneel
         string[] locations;
         bool freezeTimer = false;
         private bool preventWrites = true;
-        readonly string whatNew = "* Parandatud Linuxis teemaga seotud rike";
+        readonly string whatNew = "+ Lülita teatud funktsioonid sisse/välja sõltuvalt sellest, millised funktsioonid on märgitud edition.txt failis\n+ Lisatud Verifile 2.1 räsi";
         private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true, TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default};
         private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = MasConfigSourceGenerationContext.Default };
         private List<string> desktopIcons = [];
@@ -78,6 +78,10 @@ namespace Markuse_arvuti_juhtpaneel
                 if (TabsControl.SelectedIndex != 0)
                 {
                     TabsControl.SelectedIndex--;
+                    if (DoWeSkipTab())
+                    {
+                        TabsControl.SelectedIndex --;
+                    }
                 }
                 else
                 {
@@ -89,12 +93,25 @@ namespace Markuse_arvuti_juhtpaneel
                 if (TabsControl.SelectedIndex != TabsControl.Items.Count - 1)
                 {
                     TabsControl.SelectedIndex += 1;
+                    if (DoWeSkipTab())
+                    {
+                        TabsControl.SelectedIndex += 1;
+                    }
                 }
                 else
                 {
                     TabsControl.SelectedIndex = 0;
                 }
             }
+
+        }
+
+        private bool DoWeSkipTab()
+        {
+            return ((TabsControl.SelectedIndex == 1) && !File.Exists(Path.Combine(masRoot, "Markuse asjad",
+                       "MarkuStation2" + (OperatingSystem.IsWindows() ? ".exe" : "")))) ||
+                   ((TabsControl.SelectedIndex == 3) &&
+                    !File.ReadAllText(Path.Combine(masRoot, "edition.txt")).Contains("TS"));
         }
 
         /* Avaleht */
@@ -932,6 +949,10 @@ namespace Markuse_arvuti_juhtpaneel
                 lbi.Content = line;
                 GameList.Items.Add(lbi);
             }
+
+            TabMarkuStation.IsVisible = File.Exists(Path.Combine(masRoot, "Markuse asjad",
+                "MarkuStation2" + (OperatingSystem.IsWindows() ? ".exe" : "")));
+            TabMarkuStation.IsEnabled = TabMarkuStation.IsVisible;
             file = File.ReadAllText(masRoot + "/ms_exec.txt");
             file = file.Substring(0, file.Length - 2);
             locations = file.Split('\n').Skip(1).ToArray();
@@ -1541,6 +1562,7 @@ namespace Markuse_arvuti_juhtpaneel
             FeatWX.Source = cross;
             FeatLT.Source = cross;
             FeatGP.Source = cross;
+            DesktopTab.IsVisible = false;
             foreach (var feature in features)
             {
                 switch (feature)
@@ -1550,6 +1572,7 @@ namespace Markuse_arvuti_juhtpaneel
                         break;
                     case "TS":
                         FeatTS.Source = check;
+                        DesktopTab.IsVisible = true;
                         break;
                     case "RM":
                         FeatRM.Source = check;
@@ -1745,7 +1768,11 @@ namespace Markuse_arvuti_juhtpaneel
             new Thread(() =>
             {
                 Thread.Sleep(200);
-                Dispatcher.UIThread.Post(() => { DesktopTab.IsEnabled = true;});
+                Dispatcher.UIThread.Post(() =>
+                {
+                    DesktopTab.IsEnabled = File.ReadAllText(Path.Combine(masRoot, "edition.txt")).Contains("TS-");
+                    DesktopTab.IsVisible = DesktopTab.IsEnabled;
+                });
                 preventWrites = false;
             }) {IsBackground = true}.Start();   
         }
@@ -2090,9 +2117,9 @@ namespace Markuse_arvuti_juhtpaneel
                 TabsControl.SelectedIndex = e.Key switch
                 {
                     Key.A => 0,
-                    Key.M => 1,
+                    Key.M => File.Exists(Path.Combine(masRoot, "Markuse asjad", "MarkuStation2" + (OperatingSystem.IsWindows() ? ".exe" : ""))) ? 1 : TabsControl.SelectedIndex,
                     Key.K => 2,
-                    Key.D => 3,
+                    Key.D => File.ReadAllText(Path.Combine(masRoot, "edition.txt")).Contains("TS") ? 3 : TabsControl.SelectedIndex,
                     Key.T => 4,
                     _ => TabsControl.SelectedIndex
                 };
