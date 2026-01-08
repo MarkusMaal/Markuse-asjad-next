@@ -9,7 +9,7 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <ApplicationIcon>mas.ico</ApplicationIcon>
     <Company>$(Authors)</Company>
-    <AssemblyVersion>2.6.2.0</AssemblyVersion>
+    <AssemblyVersion>2.6.2.1</AssemblyVersion>
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     <PublishTrimmed>true</PublishTrimmed>
     <ApplicationIcon>Assets/mas.ico</ApplicationIcon>
@@ -48,9 +48,8 @@
     <UpToDateCheckInput Remove="MarkuStation_Edit.axaml" />
   </ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Include="Assets\failure.gif" />
-  </ItemGroup>
-  <ItemGroup>
+      <AvaloniaResource Include="Assets\failure.gif" />
+      <AvaloniaResource Include="Assets\success.gif" />
     <AvaloniaResource Include="Assets\mas_web.png" />
   </ItemGroup>
   <ItemGroup>

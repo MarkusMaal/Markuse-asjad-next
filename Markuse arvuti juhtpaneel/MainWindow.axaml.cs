@@ -23,6 +23,7 @@ using MasCommon;
 using MsBox.Avalonia.Enums;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
+using Avalonia.Platform;
 using Avalonia.VisualTree;
 
 namespace Markuse_arvuti_juhtpaneel
@@ -767,7 +768,7 @@ namespace Markuse_arvuti_juhtpaneel
         private void InitResources()
         {
             Bitmap icon;
-            using (var ms = new MemoryStream(Properties.Resources.mas_web))
+            using (var ms = AssetLoader.Open(new Uri("avares://Markuse arvuti juhtpaneel/Assets/mas_web.png")))
             {
                 icon = new Bitmap(ms);
             }
@@ -1507,11 +1508,11 @@ namespace Markuse_arvuti_juhtpaneel
             }
             Bitmap cross;
             Bitmap check;
-            using (var ms = new MemoryStream(Properties.Resources.failure))
+            using (var ms = AssetLoader.Open(new Uri("avares://Markuse arvuti juhtpaneel/Assets/failure.gif")))
             {
                 cross = new Bitmap(ms);
             }
-            using (var ms = new MemoryStream(Properties.Resources.success))
+            using (var ms = AssetLoader.Open(new Uri("avares://Markuse arvuti juhtpaneel/Assets/success.gif")))
             {
                 check = new Bitmap(ms);
             }

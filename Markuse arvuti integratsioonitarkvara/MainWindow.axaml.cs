@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Avalonia.Platform;
 using MasCommon;
 
 namespace Markuse_arvuti_integratsioonitarkvara
@@ -35,19 +36,19 @@ namespace Markuse_arvuti_integratsioonitarkvara
                                     "/Android.lnk"))
                     {
                         this.DeviceLabel.Content = "markuse tahvelarvuti asjad";
-                        this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_tablet);
+                        this.DevicePicture.Source = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/mas_tablet.png")));
                     }
 
                     if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
                                          "/.masv"))
                     {
                         this.DeviceLabel.Content = "markuse virtuaalarvuti asjad";
-                        this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_virtualpc);
+                        this.DevicePicture.Source = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/mas_virtualpc.png")));
                     }
                     else
                     {
                         this.DeviceLabel.Content = "markuse arvuti asjad";
-                        this.DevicePicture.Source = app.GetResource(Properties.Resources.mas_computers);
+                        this.DevicePicture.Source = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/mas_computers.png")));
                     }
                 }
                 if (app.dev)
@@ -104,7 +105,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                     }
                 }).Start();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!Debugger.IsAttached)
             {
                 var exePath = Environment.ProcessPath;
                 Process.Start(new ProcessStartInfo(exePath!) { UseShellExecute = true });
@@ -400,14 +401,14 @@ namespace Markuse_arvuti_integratsioonitarkvara
                                     if (!running)
                                     {
                                         sm.Header = "Käivita";
-                                        sm.Icon = app.GetResource(Properties.Resources._new);
+                                        sm.Icon = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/new.bmp")));
                                         sm.Click -= StartMaia;
                                         sm.Click += StartMaia;
                                     }
                                     else
                                     {
                                         sm.Header = "Peata";
-                                        sm.Icon = app.GetResource(Properties.Resources.failure);
+                                        sm.Icon = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/failure.gif")));
                                         sm.Click -= StopMaia;
                                         sm.Click += StopMaia;
                                     }

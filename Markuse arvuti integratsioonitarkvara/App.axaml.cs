@@ -173,12 +173,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
             p.Start();
         }
 
-        public Bitmap GetResource(byte[] resource) {
+        public Bitmap GetResource(Stream resource) {
             Bitmap icon;
-            using (var ms = new MemoryStream(resource))
-            {
-                icon = new Bitmap(ms);
-            }
+            using var ms = resource;
+            icon = new Bitmap(ms);
+            ms.Close();
             return icon;
         }
 

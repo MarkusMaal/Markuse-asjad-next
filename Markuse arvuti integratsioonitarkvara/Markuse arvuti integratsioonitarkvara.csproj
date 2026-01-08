@@ -9,64 +9,12 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <ApplicationIcon>mas_computers.ico</ApplicationIcon>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Resources\br.png" />
-    <None Remove="Resources\failure.gif" />
-    <None Remove="Resources\folder.png" />
-    <None Remove="Resources\folder1.png" />
-    <None Remove="Resources\MarkuStation_awesome.png" />
-    <None Remove="Resources\mas_computers.png" />
-    <None Remove="Resources\mas_flash.png" />
-    <None Remove="Resources\mas_gadgets.png" />
-    <None Remove="Resources\mas_general.png" />
-    <None Remove="Resources\mas_its_symmetric.png" />
-    <None Remove="Resources\mas_optical.png" />
-    <None Remove="Resources\mas_sync.png" />
-    <None Remove="Resources\mas_virtualpc.png" />
-    <None Remove="Resources\mas_vpc.png" />
-    <None Remove="Resources\mas_vpc_full.png" />
-    <None Remove="Resources\mas_web.png" />
-    <None Remove="Resources\new.bmp" />
-    <None Remove="Resources\noteicon.png" />
-    <None Remove="Resources\pending.gif" />
-    <None Remove="Resources\root_idc_key.png" />
-    <None Remove="Resources\theming.png" />
-    <None Remove="Resources\unknown.png" />
-    <None Remove="Resources\update.png" />
-    <None Remove="Resources\user_black.png" />
-    <None Remove="Resources\user_blue.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\br.png" />
-    <EmbeddedResource Include="Resources\failure.gif" />
-    <EmbeddedResource Include="Resources\folder.png" />
-    <EmbeddedResource Include="Resources\folder1.png" />
-    <EmbeddedResource Include="Resources\MarkuStation_awesome.png" />
-    <EmbeddedResource Include="Resources\mas_computers.png" />
-    <EmbeddedResource Include="Resources\mas_flash.png" />
-    <EmbeddedResource Include="Resources\mas_gadgets.png" />
-    <EmbeddedResource Include="Resources\mas_general.png" />
-    <EmbeddedResource Include="Resources\mas_its_symmetric.png" />
-    <EmbeddedResource Include="Resources\mas_optical.png" />
-    <EmbeddedResource Include="Resources\mas_sync.png" />
-    <EmbeddedResource Include="Resources\mas_virtualpc.png" />
-    <EmbeddedResource Include="Resources\mas_vpc.png" />
-    <EmbeddedResource Include="Resources\mas_vpc_full.png" />
-    <EmbeddedResource Include="Resources\mas_web.png" />
-    <EmbeddedResource Include="Resources\new.bmp" />
-    <EmbeddedResource Include="Resources\noteicon.png" />
-    <EmbeddedResource Include="Resources\pending.gif" />
-    <EmbeddedResource Include="Resources\root_idc_key.png" />
-    <EmbeddedResource Include="Resources\theming.png" />
-    <EmbeddedResource Include="Resources\unknown.png" />
-    <EmbeddedResource Include="Resources\update.png" />
-    <EmbeddedResource Include="Resources\user_black.png" />
-    <EmbeddedResource Include="Resources\user_blue.png" />
-    <AvaloniaResource Include="Resources\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="mas_computers.ico" />
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="mas_computers.ico" />
+    </ItemGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Resources/**" />
+    </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.6" />
