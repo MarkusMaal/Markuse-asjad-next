@@ -475,7 +475,7 @@ namespace Markuse_arvuti_juhtpaneel
             Program.FgCol = this.Foreground;
             var IB = new ImageBrush(new Bitmap(masRoot + "/bg_common.png"))
             {
-                Stretch = Stretch.Fill
+                Stretch = Stretch.UniformToFill
             };
             this.Styles.Add(new Style(x => x.OfType<Button>())
             {
