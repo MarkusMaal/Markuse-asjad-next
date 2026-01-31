@@ -19,18 +19,23 @@ public partial class MineUpdater : Window
     {
         InitializeComponent();
     }
+    
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
 
     private void UpdateStatusText(string data)
     {
         Dispatcher.UIThread.Post(() =>
         {
-            StatusText.Text = data;
+            this.GetControl<TextBlock>("StatusText").Text = data;
         });
     }
 
     private void Control_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        if (!OperatingSystem.IsWindows()) SearchDirs.Content = "Uute kataloogide otsimine";
+        if (!OperatingSystem.IsWindows()) this.GetControl<Label>("SearchDirs").Content = "Uute kataloogide otsimine";
         if (Design.IsDesignMode) return;
         var t = new Thread(() =>
         {
@@ -48,7 +53,7 @@ public partial class MineUpdater : Window
             {
                 foreach (var di in DriveInfo.GetDrives())
                 {
-                    // draiv vastab Markuse kaustad nõutele
+                    // draiv vastab Markuse kaustad nï¿½utele
                     if (File.Exists($"{di.RootDirectory.FullName}.userdata\\users.txt"))
                     {
                         p.StartInfo.Arguments = di.RootDirectory.FullName;

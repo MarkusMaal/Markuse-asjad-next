@@ -14,6 +14,11 @@ public partial class Run : Window
         InitializeComponent();
     }
 
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
     private void Cancel_Click(object? sender, RoutedEventArgs e)
     {
         this.Close();
@@ -36,6 +41,6 @@ public partial class Run : Window
 
     private void Window_Loaded(object? sender, RoutedEventArgs e)
     {
-        ProgName.Focus();
+        this.GetControl<TextBox>("ProgName").Focus();
     }
 }

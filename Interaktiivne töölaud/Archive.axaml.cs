@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using System;
 using System.IO;
 using System.Text;
+using Avalonia.Markup.Xaml;
 
 namespace Interaktiivne_töölaud;
 
@@ -13,6 +14,8 @@ public partial class Archive : Window
         InitializeComponent();
     }
 
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+    
     private void Return_Click(object? sender, RoutedEventArgs e)
     {
         Office ofc = new();
@@ -22,7 +25,7 @@ public partial class Archive : Window
 
     private void Show_DriveList(object? sender, Avalonia.Input.PointerEventArgs e)
     {
-        DriveList.Items.Clear();
+        this.GetControl<ListBox>("DriveList").Items.Clear();
         foreach (DriveInfo driveInfo in DriveInfo.GetDrives())
         {
             if (!driveInfo.IsReady)
@@ -54,21 +57,21 @@ public partial class Archive : Window
 	                    sb.Append(" (Muu)");
 	                    break;
 	            }
-	            DriveList.Items.Add(sb.ToString());
+                this.GetControl<ListBox>("DriveList").Items.Add(sb.ToString());
             } catch {
 
             }
         }
-        DrivesButton.IsVisible = false;
-        DriveList.IsVisible = true;
+        this.GetControl<Button>("DrivesButton").IsVisible = false;
+        this.GetControl<ListBox>("DriveList").IsVisible = true;
     }
 
     private void OpenDrive(object? sender, Avalonia.Input.TappedEventArgs e)
     {
-        if (DriveList.SelectedItems?.Count > 0)
+        if (this.GetControl<ListBox>("DriveList").SelectedItems?.Count > 0)
         {
             StringBuilder mount = new();
-            foreach (string word in DriveList.SelectedItems[0].ToString().Split(' '))
+            foreach (string word in this.GetControl<ListBox>("DriveList").SelectedItems[0].ToString().Split(' '))
             {
                 if (word == "-")
                 {
@@ -137,7 +140,7 @@ public partial class Archive : Window
 
     private void ListBox_PointerExited_1(object? sender, Avalonia.Input.PointerEventArgs e)
     {
-        DrivesButton.IsVisible = true;
-        DriveList.IsVisible = false;
+        this.GetControl<Button>("DrivesButton").IsVisible = true;
+        this.GetControl<ListBox>("DriveList").IsVisible = false;
     }
 }

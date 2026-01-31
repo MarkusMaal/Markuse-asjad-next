@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
 
 namespace FlashUnlock;
 
@@ -9,6 +10,7 @@ public partial class Filler : Window
     {
         InitializeComponent();
     }
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
     private void Control_OnLoaded(object? sender, RoutedEventArgs e)
     {

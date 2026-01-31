@@ -21,6 +21,11 @@ public partial class SettingsWindow : Window
         InitializeComponent();
     }
 
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
     private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         this.Close();
@@ -50,26 +55,26 @@ public partial class SettingsWindow : Window
                 ImageWidth = 128
             };
         }
-        AnimationEasingBox.SelectedIndex = (int)screensaverOptions.AnimationEasing;
-        AnimationIntervalBox.Value = (decimal?)screensaverOptions.AnimationInterval;
-        BackgroundLocation.Text = screensaverOptions.BackgroundPath;
-        BackgroundCheck.IsChecked = screensaverOptions.DisplayBackground;
-        IconLocation.Text = screensaverOptions.ImagePath;
-        ImageCheck.IsChecked = screensaverOptions.CustomImage;
-        ImageWidthBox.Text = screensaverOptions.ImageWidth.ToString();
+        this.GetControl<ComboBox>("AnimationEasingBox").SelectedIndex = (int)screensaverOptions.AnimationEasing;
+        this.GetControl<NumericUpDown>("AnimationIntervalBox").Value = (decimal?)screensaverOptions.AnimationInterval;
+        this.GetControl<TextBox>("BackgroundLocation").Text = screensaverOptions.BackgroundPath;
+        this.GetControl<CheckBox>("BackgroundCheck").IsChecked = screensaverOptions.DisplayBackground;
+        this.GetControl<TextBox>("IconLocation").Text = screensaverOptions.ImagePath;
+        this.GetControl<CheckBox>("ImageCheck").IsChecked = screensaverOptions.CustomImage;
+        this.GetControl<NumericUpDown>("ImageWidthBox").Text = screensaverOptions.ImageWidth.ToString();
     }
 
     private void OKButton_OnClick(object? sender, RoutedEventArgs e)
     {
         screensaverOptions = new ScreensaverOptions
         {
-            AnimationEasing = (ScreensaverOptions.Easing)AnimationEasingBox.SelectedIndex,
-            AnimationInterval = (double)AnimationIntervalBox.Value!,
-            BackgroundPath = BackgroundLocation.Text ?? "",
-            ImagePath = IconLocation.Text ?? "",
-            DisplayBackground = BackgroundCheck.IsChecked ?? false,
-            CustomImage = ImageCheck.IsChecked ?? false,
-            ImageWidth = int.Parse(ImageWidthBox.Text ?? "128")
+            AnimationEasing = (ScreensaverOptions.Easing)this.GetControl<ComboBox>("AnimationEasingBox").SelectedIndex,
+            AnimationInterval = (double)this.GetControl<NumericUpDown>("AnimationIntervalBox").Value!,
+            BackgroundPath = this.GetControl<TextBox>("BackgroundLocation").Text ?? "",
+            ImagePath = this.GetControl<TextBox>("IconLocation").Text ?? "",
+            DisplayBackground = this.GetControl<CheckBox>("BackgroundCheck").IsChecked ?? false,
+            CustomImage = this.GetControl<CheckBox>("ImageCheck").IsChecked ?? false,
+            ImageWidth = int.Parse(this.GetControl<NumericUpDown>("ImageWidthBox").Text ?? "128")
         };
         screensaverOptions.Save(masRoot);
         this.Close();
@@ -77,12 +82,12 @@ public partial class SettingsWindow : Window
 
     private void ImageCheck_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        CustomIconGrid.IsEnabled = (bool)ImageCheck.IsChecked!;
+        this.GetControl<Grid>("CustomIconGrid").IsEnabled = (bool)this.GetControl<CheckBox>("ImageCheck").IsChecked!;
     }
 
     private void BackgroundCheck_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        BackgroundLocationGrid.IsEnabled = (bool)BackgroundCheck.IsChecked!;
+        this.GetControl<Grid>("BackgroundLocationGrid").IsEnabled = (bool)this.GetControl<CheckBox>("BackgroundCheck").IsChecked!;
     }
 
     private async void FileBrowserShow(string currentLocation, TextBox output, string windowTitle = "Markuse arvuti ooterežiim")
@@ -109,11 +114,11 @@ public partial class SettingsWindow : Window
 
     private void BrowseBgButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        FileBrowserShow(BackgroundLocation.Text ?? "", BackgroundLocation, "Vali taustapilt..");
+        FileBrowserShow(this.GetControl<TextBox>("BackgroundLocation").Text ?? "", this.GetControl<TextBox>("BackgroundLocation"), "Vali taustapilt..");
     }
 
     private void BrowseIconButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        FileBrowserShow(IconLocation.Text ?? "", IconLocation, "Vali ikoon..");
+        FileBrowserShow(this.GetControl<TextBox>("IconLocation").Text ?? "", this.GetControl<TextBox>("IconLocation"), "Vali ikoon..");
     }
 }

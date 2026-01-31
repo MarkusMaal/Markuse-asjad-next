@@ -16,6 +16,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Avalonia.Markup.Xaml;
 
 namespace FlashUnlock;
 
@@ -46,6 +47,7 @@ public partial class MainWindow : Window
         this.Position = Screens.All[0].WorkingArea.Position;
         InitializeComponent();
     }
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
     private void FlashFinder_Tick(object? sender, EventArgs e)
     {
@@ -126,14 +128,14 @@ public partial class MainWindow : Window
                     }
                 }.Start();
             }
-            clockLabel.Content = DateTime.Now.Hour.ToString().PadLeft(2, '0') + ":" + DateTime.Now.Minute.ToString().PadLeft(2, '0');
+            this.GetControl<Label>("clockLabel").Content = DateTime.Now.Hour.ToString().PadLeft(2, '0') + ":" + DateTime.Now.Minute.ToString().PadLeft(2, '0');
             if (first_time || !dev_killswitch)
             {
-                label1.Content = "Autentimiseks sisestage Markuse mälupulk...";
+                this.GetControl<Label>("label1").Content = "Autentimiseks sisestage Markuse mälupulk...";
             }
             if ((new_devices.Count > last_devices.Count) && (last_devices.Count > 0))
             {
-                label1.Content = "Vale seade, proovige uuesti";
+                this.GetControl<Label>("label1").Content = "Vale seade, proovige uuesti";
                 last_devices.Clear();
                 foreach (string device in new_devices)
                 {
@@ -144,7 +146,7 @@ public partial class MainWindow : Window
             {
                 if (last_devices.Count > new_devices.Count)
                 {
-                    label1.Content = "Eemaldasite seadme";
+                    this.GetControl<Label>("label1").Content = "Eemaldasite seadme";
                 }
                 last_devices.Clear();
                 foreach (string device in new_devices)
@@ -157,7 +159,7 @@ public partial class MainWindow : Window
         else
         {
             killTaskmgr.Stop();
-            label1.Content = "Lahti lukustamine...";
+            this.GetControl<Label>("label1").Content = "Lahti lukustamine...";
             Process[] processes = [];
             if (OperatingSystem.IsWindows())
             {
@@ -201,7 +203,7 @@ public partial class MainWindow : Window
         }
         else if (File.Exists($"{cdrive}/.mas/stop_authenticate"))
         {
-            label1.Content = "Mälupulga lukustust ei saa välja lülitada enne autentimist!";
+            this.GetControl<Label>("label1").Content = "Mälupulga lukustust ei saa välja lülitada enne autentimist!";
         }
     }
 
@@ -213,7 +215,7 @@ public partial class MainWindow : Window
             bg_data = File.ReadAllText(cdrive + "/.mas/scheme.cfg").Split(';')[0].Split(':').Take(3).ToArray();
             this.Foreground = new SolidColorBrush(Color.FromArgb(255, byte.Parse(theme_data[0]), byte.Parse(theme_data[1]), byte.Parse(theme_data[2])));
             this.Background = new SolidColorBrush(Color.FromArgb(255, byte.Parse(bg_data[0]), byte.Parse(bg_data[1]), byte.Parse(bg_data[2])));
-            this.InnerGrid.Background = new ImageBrush(new Bitmap(cdrive + "/.mas/bg_common.png")) { Stretch = Stretch.Fill };
+            this.GetControl<Grid>("InnerGrid").Background = new ImageBrush(new Bitmap(cdrive + "/.mas/bg_common.png")) { Stretch = Stretch.Fill };
         }
         catch
         {
@@ -263,8 +265,8 @@ public partial class MainWindow : Window
                 fillers.Add(new Filler());
                 fillers[i].Foreground = this.Foreground;
                 fillers[i].Background = this.Background;
-                fillers[i].label1.Content = "Ekraan " + (i + 2).ToString() + " lukustatud";
-                fillers[i].InnerGrid.Background = this.InnerGrid.Background;
+                fillers[i].GetControl<Label>("label1").Content = "Ekraan " + (i + 2).ToString() + " lukustatud";
+                fillers[i].GetControl<Grid>("InnerGrid").Background = this.GetControl<Grid>("InnerGrid").Background;
             }
         }
     }
@@ -316,25 +318,25 @@ public partial class MainWindow : Window
         {
             killTaskmgr.IsEnabled = false;
             this.Topmost = false;
-            label1.Content = "Arendaja režiim aktiveeriti";
+            this.GetControl<Label>("label1").Content = "Arendaja režiim aktiveeriti";
         }
         else if (e.Key == Avalonia.Input.Key.Escape)
         {
-            label1.Content = "Te ei ole arendaja, killswitchi ignoreeriti";
+            this.GetControl<Label>("label1").Content = "Te ei ole arendaja, killswitchi ignoreeriti";
         }
         else if (e.Key == Avalonia.Input.Key.M)
         {
-            label1.Content = GetLocalIPAddress();
+            this.GetControl<Label>("label1").Content = GetLocalIPAddress();
         }
         else if (e.Key == Avalonia.Input.Key.T)
         {
             if (killTaskmgr.IsEnabled)
             {
-                label1.Content = "Tegumihalduri blokk on aktiivne";
+                this.GetControl<Label>("label1").Content = "Tegumihalduri blokk on aktiivne";
             }
             else
             {
-                label1.Content = "Tegumihalduri blokk pole aktiivne";
+                this.GetControl<Label>("label1").Content = "Tegumihalduri blokk pole aktiivne";
             }
         }
         else if (e.Key == Avalonia.Input.Key.E)
@@ -342,22 +344,22 @@ public partial class MainWindow : Window
             var processes = Process.GetProcessesByName("explorer");
             if (processes.Length == 0)
             {
-                label1.Content = "Windowsi liides on peatatud";
+                this.GetControl<Label>("label1").Content = "Windowsi liides on peatatud";
             }
             else
             {
-                label1.Content = "Windowsi liides on avatud";
+                this.GetControl<Label>("label1").Content = "Windowsi liides on avatud";
             }
         }
         else if (e.Key == Avalonia.Input.Key.D)
         {
             if (disable_post_unlock)
             {
-                label1.Content = "Tavaline avamismeetod";
+                this.GetControl<Label>("label1").Content = "Tavaline avamismeetod";
             }
             else
             {
-                label1.Content = "Keela pärast avamist";
+                this.GetControl<Label>("label1").Content = "Keela pärast avamist";
             }
             disable_post_unlock = !disable_post_unlock;
         }

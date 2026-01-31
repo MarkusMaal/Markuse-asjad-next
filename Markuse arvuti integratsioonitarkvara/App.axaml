@@ -2,8 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Markuse_arvuti_integratsioonitarkvara.App"
              RequestedThemeVariant="Dark" Name="Markuse arvuti integratsioonitarkvara"
-             xmlns:local="using:Markuse_arvuti_integratsioonitarkvara"
-             xmlns:r="clr-namespace:Markuse_arvuti_integratsioonitarkvara.Properties"
              xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>

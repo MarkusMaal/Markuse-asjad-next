@@ -25,6 +25,7 @@ public partial class FlashDevices : Window
     {
         InitializeComponent();
     }
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
     private void Window_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
@@ -48,7 +49,7 @@ public partial class FlashDevices : Window
                 }
                 Dispatcher.UIThread.Post(() =>
                 {
-                    comboBox1.Items.Add($"{usbRegistry.Vid:X4}:{usbRegistry.Pid:X4} - {name} ({usbRegistry.SymbolicName})");
+                    this.GetControl<ComboBox>("comboBox1").Items.Add($"{usbRegistry.Vid:X4}:{usbRegistry.Pid:X4} - {name} ({usbRegistry.SymbolicName})");
                 });
             }
         });
@@ -69,7 +70,7 @@ public partial class FlashDevices : Window
 
     private void Button_Click_1(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        File.WriteAllText(cdrive + "/.mas/flash_authenticate", comboBox1.Items[comboBox1.SelectedIndex].ToString().Split('(')[1].Replace(")", ""));
+        File.WriteAllText(cdrive + "/.mas/flash_authenticate", this.GetControl<ComboBox>("comboBox1").Items[this.GetControl<ComboBox>("comboBox1").SelectedIndex].ToString().Split('(')[1].Replace(")", ""));
         resultOK = true;
         this.Close();
     }

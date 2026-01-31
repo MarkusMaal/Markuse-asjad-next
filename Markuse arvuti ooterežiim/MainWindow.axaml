@@ -28,6 +28,7 @@
     </Style>
   </Window.Styles>
   <Window.Resources>
+    <!-- Your IDE may highlight x:SetterTargetType to be an unresolved symbol, but it will not actually prevent compilation, it's a bug in the syntax highlighting -->
     <Animation Duration="{Binding Duration}" x:Key="LogoAnimation" Easing="{Binding Easing}"
                x:SetterTargetType="Grid" PlaybackDirection="Normal" FillMode="Forward">
       <KeyFrame Cue="0%">

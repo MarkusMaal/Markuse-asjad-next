@@ -12,6 +12,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Avalonia.Markup.Xaml;
+using LibVLCSharp.Avalonia;
 
 namespace MarkuStation2
 {
@@ -73,7 +75,7 @@ namespace MarkuStation2
             if (ms_games.Count > 0)
             {
                 nodata = false;
-                NoData.IsVisible = false;
+                this.GetControl<Label>("NoData").IsVisible = false;
             }
 
             if (File.Exists(mas_root + "/setting.txt"))
@@ -83,7 +85,7 @@ namespace MarkuStation2
                 legacyIntro = (settings.Length > 3) && (settings[3] == "true"); // we check length for backwards compatibility reasons
                 if (!playIntros)
                 {
-                    VideoPlayer.IsVisible = false;
+                    this.GetControl<VideoView>("VideoPlayer").IsVisible = false;
                 }
             }
             foreach (Process p in Process.GetProcesses())
@@ -106,9 +108,9 @@ namespace MarkuStation2
                 switch (currentMenu)
                 {
                     case "startup":
-                        if (!((VideoPlayer?.MediaPlayer?.IsPlaying ?? false) || VideoPlayer?.MediaPlayer?.State != VLCState.Ended) || (!running) || (!playIntros))
+                        if (!((this.GetControl<VideoView>("VideoPlayer")?.MediaPlayer?.IsPlaying ?? false) || this.GetControl<VideoView>("VideoPlayer")?.MediaPlayer?.State != VLCState.Ended) || (!running) || (!playIntros))
                         {
-                            VideoPlayer.MediaPlayer.Media = null;
+                            this.GetControl<VideoView>("VideoPlayer").MediaPlayer.Media = null;
                             mp2.Media = null;
                             File.Delete(mas_root + "/_temp.mp4");
                             File.Delete(mas_root + "/_temp.wav");
@@ -117,25 +119,25 @@ namespace MarkuStation2
                                 mp2.Media = new(_libVLC, mas_root + "/_amb.wav");
                                 mp2.Play();
                             }
-                            VideoPlayer.IsVisible = false;
+                            this.GetControl<VideoView>("VideoPlayer").IsVisible = false;
                             currentMenu = "enter";
                             timer.Interval = new TimeSpan(64000);
-                            Dot1.Opacity = 0;
-                            Dot2.Opacity = 0;
-                            Dot3.Opacity = 0;
-                            Dot4.Opacity = 0;
-                            Dot1.RenderTransform = new RotateTransform(angle, 200, 0);
-                            Dot2.RenderTransform = new RotateTransform(angle2, 200, 0);
-                            Dot3.RenderTransform = new RotateTransform(angle3, 200, 0);
-                            Dot4.RenderTransform = new RotateTransform(angle4, 200, 0);
+                            this.GetControl<Image>("Dot1").Opacity = 0;
+                            this.GetControl<Image>("Dot2").Opacity = 0;
+                            this.GetControl<Image>("Dot3").Opacity = 0;
+                            this.GetControl<Image>("Dot4").Opacity = 0;
+                            this.GetControl<Image>("Dot1").RenderTransform = new RotateTransform(angle, 200, 0);
+                            this.GetControl<Image>("Dot2").RenderTransform = new RotateTransform(angle2, 200, 0);
+                            this.GetControl<Image>("Dot3").RenderTransform = new RotateTransform(angle3, 200, 0);
+                            this.GetControl<Image>("Dot4").RenderTransform = new RotateTransform(angle4, 200, 0);
                             if (this.Width > 2560) // the user has an ultra-wide monitor, add some padding to left and right to make the corner text more accessible
                             {
                                 int offsetX = (int)(this.Width / 4);
-                                MenuHotkeys.Margin = new Thickness(0,0,15 + offsetX,10);
-                                BottomRightText1.Margin = new Thickness(0,0,15 + offsetX,10);
-                                BottomRightText2.Margin = new Thickness(0,0,15 + offsetX,10);
-                                GameName.Margin = new Thickness(20,20,15 + offsetX,20);
-                                BrowserTitle.Margin = new Thickness(20 + offsetX,20,20,20);
+                                this.GetControl<StackPanel>("MenuHotkeys").Margin = new Thickness(0,0,15 + offsetX,10);
+                                this.GetControl<StackPanel>("BottomRightText1").Margin = new Thickness(0,0,15 + offsetX,10);
+                                this.GetControl<StackPanel>("BottomRightText2").Margin = new Thickness(0,0,15 + offsetX,10);
+                                this.GetControl<Label>("GameName").Margin = new Thickness(20,20,15 + offsetX,20);
+                                this.GetControl<Label>("BrowserTitle").Margin = new Thickness(20 + offsetX,20,20,20);
                             }
                         }
                         break;
@@ -145,15 +147,15 @@ namespace MarkuStation2
                         {
                             opacity = 100;
                         }
-                        Dot1.Opacity = opacity/ 100.0;
-                        Dot2.Opacity = opacity / 100.0;
-                        Dot3.Opacity = opacity / 100.0;
-                        Dot4.Opacity = opacity / 100.0;
+                        this.GetControl<Image>("Dot1").Opacity = opacity/ 100.0;
+                        this.GetControl<Image>("Dot2").Opacity = opacity / 100.0;
+                        this.GetControl<Image>("Dot3").Opacity = opacity / 100.0;
+                        this.GetControl<Image>("Dot4").Opacity = opacity / 100.0;
                         RotateCircle();
                         if ((opacity == 100))
                         {
-                            Menu.IsVisible = true;
-                            MenuHotkeys.IsVisible = true;
+                            this.GetControl<StackPanel>("Menu").IsVisible = true;
+                            this.GetControl<StackPanel>("MenuHotkeys").IsVisible = true;
                             currentMenu = "main";
                             return;
                         }
@@ -168,12 +170,12 @@ namespace MarkuStation2
                         }
                         if (sel == 0)
                         {
-                            BrowserSel.Foreground = new SolidColorBrush(Colors.DeepSkyBlue);
-                            ConfigSel.Foreground = new SolidColorBrush(Colors.WhiteSmoke);
+                            this.GetControl<Label>("BrowserSel").Foreground = new SolidColorBrush(Colors.DeepSkyBlue);
+                            this.GetControl<Label>("ConfigSel").Foreground = new SolidColorBrush(Colors.WhiteSmoke);
                         } else
                         {
-                            BrowserSel.Foreground = new SolidColorBrush(Colors.WhiteSmoke);
-                            ConfigSel.Foreground = new SolidColorBrush(Colors.DeepSkyBlue);
+                            this.GetControl<Label>("BrowserSel").Foreground = new SolidColorBrush(Colors.WhiteSmoke);
+                            this.GetControl<Label>("ConfigSel").Foreground = new SolidColorBrush(Colors.DeepSkyBlue);
                         }
                         RotateCircle();
                         break;
@@ -193,21 +195,21 @@ namespace MarkuStation2
                         {
                             opacity -= 1;
                         }
-                        Menu.IsVisible = false;
-                        KeyEsc.IsVisible = false;
-                        KeyReturn.Opacity = opacity / 100.0;
-                        FunkyDots.Opacity = opacity / 100.0;
+                        this.GetControl<StackPanel>("Menu").IsVisible = false;
+                        this.GetControl<Label>("KeyEsc").IsVisible = false;
+                        this.GetControl<Label>("KeyReturn").Opacity = opacity / 100.0;
+                        this.GetControl<StackPanel>("FunkyDots").Opacity = opacity / 100.0;
                         if (!mp.IsPlaying && (opacity == 0))
                         {
-                            MenuHotkeys.IsVisible = false;
+                            this.GetControl<StackPanel>("MenuHotkeys").IsVisible = false;
                             currentMenu = "fade_browser";
-                            Browser.IsVisible = true;
+                            this.GetControl<Panel>("Browser").IsVisible = true;
                             opacity = 0;
-                            WhiteDot.Margin = new Avalonia.Thickness(-this.Width / 2, 0, 0, 0);
+                            this.GetControl<Image>("WhiteDot").Margin = new Avalonia.Thickness(-this.Width / 2, 0, 0, 0);
                             if (!nodata)
                             {
-                                Label noDataLabel = NoData;
-                                GamePanel.Children.Clear();
+                                Label noDataLabel = this.GetControl<Label>("NoData");
+                                this.GetControl<WrapPanel>("GamePanel").Children.Clear();
                                 Bitmap icon;
                                 using (var ms = new MemoryStream(Properties.Resources.MarkuStation_awesome))
                                 {
@@ -223,14 +225,14 @@ namespace MarkuStation2
                                         Name = kvp.Key,
                                     };
 
-                                    GamePanel.Children.Add(sImage);
+                                    this.GetControl<WrapPanel>("GamePanel").Children.Add(sImage);
                                 }
-                                GamePanel.Children.Add(noDataLabel);
+                                this.GetControl<WrapPanel>("GamePanel").Children.Add(noDataLabel);
                                 browser_idx = 0;
-                                GameName.IsVisible = true;
-                                GameName.Content = ms_games.First().Key;
-                                WhiteDot.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
-                                WhiteDot.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
+                                this.GetControl<Label>("GameName").IsVisible = true;
+                                this.GetControl<Label>("GameName").Content = ms_games.First().Key;
+                                this.GetControl<Image>("WhiteDot").HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
+                                this.GetControl<Image>("WhiteDot").VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
                             }
                         }
                         break;
@@ -241,62 +243,62 @@ namespace MarkuStation2
                         }
                         if (opacity == 0)
                         {
-                            Browser.Opacity = 0;
-                            Browser.IsVisible = false;
-                            Dot1.IsVisible = true;
-                            Dot2.IsVisible = true;
-                            Dot3.IsVisible = true;
-                            Dot4.IsVisible = true;
+                            this.GetControl<Panel>("Browser").Opacity = 0;
+                            this.GetControl<Panel>("Browser").IsVisible = false;
+                            this.GetControl<Image>("Dot1").IsVisible = true;
+                            this.GetControl<Image>("Dot2").IsVisible = true;
+                            this.GetControl<Image>("Dot3").IsVisible = true;
+                            this.GetControl<Image>("Dot4").IsVisible = true;
                             mp2.Media = new(_libVLC, mas_root + "/_amb.wav");
                             mp2.Play();
                             currentMenu = "return_menu";
                         }
-                        Browser.Opacity = opacity / 100.0;
+                        this.GetControl<Panel>("Browser").Opacity = opacity / 100.0;
                         break;
                     case "return_menu":
                         if (opacity < 100)
                         {
                             opacity += 1;
                         }
-                        FunkyDots.Opacity = opacity / 100.0;
+                        this.GetControl<StackPanel>("FunkyDots").Opacity = opacity / 100.0;
                         if (opacity == 100)
                         {
                             currentMenu = "main";
-                            KeyEsc.Opacity = 1;
-                            KeyReturn.Opacity = 1;
-                            Menu.IsVisible = true;
-                            KeyEsc.IsVisible = true;
-                            KeyReturn.IsVisible = true;
-                            FunkyDots.IsVisible = true;
-                            MenuHotkeys.IsVisible = true;
+                            this.GetControl<Label>("KeyEsc").Opacity = 1;
+                            this.GetControl<Label>("KeyReturn").Opacity = 1;
+                            this.GetControl<StackPanel>("Menu").IsVisible = true;
+                            this.GetControl<Label>("KeyEsc").IsVisible = true;
+                            this.GetControl<Label>("KeyReturn").IsVisible = true;
+                            this.GetControl<StackPanel>("FunkyDots").IsVisible = true;
+                            this.GetControl<StackPanel>("MenuHotkeys").IsVisible = true;
                         }
                         RotateCircle();
                         break;
                     case "fade_browser":
                         opacity += 1;
-                        Browser.Opacity = opacity / 100.0;
+                        this.GetControl<Panel>("Browser").Opacity = opacity / 100.0;
                         if (opacity == 100)
                         {
                             if (ms_games.Count > 0)
                             {
-                                Image firstEl = (Image)GamePanel.Children[0];
+                                Image firstEl = (Image)this.GetControl<WrapPanel>("GamePanel").Children[0];
                                 MoveCircle(GetAbsolutePosition(firstEl));
                             }
-                            WhiteDot.ZIndex = -1;
-                            Browser.Opacity = 1;
+                            this.GetControl<Image>("WhiteDot").ZIndex = -1;
+                            this.GetControl<Panel>("Browser").Opacity = 1;
                             currentMenu = "browser";
                         }
                         break;
                     case "fade_version":
                         opacity -= 5;
-                        MenuHotkeys.Opacity = opacity / 100.0;
-                        Menu.Opacity = opacity / 100.0;
-                        Version.Opacity = 1.0 - (opacity / 100.0);
+                        this.GetControl<StackPanel>("MenuHotkeys").Opacity = opacity / 100.0;
+                        this.GetControl<StackPanel>("Menu").Opacity = opacity / 100.0;
+                        this.GetControl<Panel>("Version").Opacity = 1.0 - (opacity / 100.0);
                         if (opacity == 0)
                         {
-                            Version.Opacity = 1;
-                            MenuHotkeys.Opacity = 0;
-                            Menu.Opacity = 0;
+                            this.GetControl<Panel>("Version").Opacity = 1;
+                            this.GetControl<StackPanel>("MenuHotkeys").Opacity = 0;
+                            this.GetControl<StackPanel>("Menu").Opacity = 0;
                             currentMenu = "version";
                         }
                         RotateCircle();
@@ -309,14 +311,14 @@ namespace MarkuStation2
                             mp.Play();
                         }
                         opacity += 5;
-                        MenuHotkeys.Opacity = opacity / 100.0;
-                        Menu.Opacity = opacity / 100.0;
-                        Version.Opacity = 1.0 - (opacity / 100.0);
+                        this.GetControl<StackPanel>("MenuHotkeys").Opacity = opacity / 100.0;
+                        this.GetControl<StackPanel>("Menu").Opacity = opacity / 100.0;
+                        this.GetControl<Panel>("Version").Opacity = 1.0 - (opacity / 100.0);
                         if (opacity >= 100)
                         {
-                            Version.Opacity = 0;
-                            MenuHotkeys.Opacity = 1;
-                            Menu.Opacity = 1;
+                            this.GetControl<Panel>("Version").Opacity = 0;
+                            this.GetControl<StackPanel>("MenuHotkeys").Opacity = 1;
+                            this.GetControl<StackPanel>("Menu").Opacity = 1;
                             currentMenu = "main";
                         }
                         RotateCircle();
@@ -332,21 +334,21 @@ namespace MarkuStation2
                         {
                             if (playIntros)
                             {
-                                VideoPlayer.MediaPlayer.Media = new(_libVLC, mas_root + "/_temp.mp4");
+                                this.GetControl<VideoView>("VideoPlayer").MediaPlayer.Media = new(_libVLC, mas_root + "/_temp.mp4");
                                 mp2.Media = new(_libVLC, mas_root + "/_temp.wav");
-                                VideoPlayer.IsVisible = true;
-                                VideoPlayer.MediaPlayer.Play();
+                                this.GetControl<VideoView>("VideoPlayer").IsVisible = true;
+                                this.GetControl<VideoView>("VideoPlayer").MediaPlayer.Play();
                                 mp2.Play();
                             }
                             currentMenu = "prepare_game";
                         }
                         opacity--;
-                        Browser.Opacity = opacity / 100.0;
+                        this.GetControl<Panel>("Browser").Opacity = opacity / 100.0;
                         break;
                     case "prepare_game":
-                        if (!((VideoPlayer?.MediaPlayer?.IsPlaying ?? false) || VideoPlayer?.MediaPlayer?.State != VLCState.Ended) || !playIntros)
+                        if (!((this.GetControl<VideoView>("VideoPlayer")?.MediaPlayer?.IsPlaying ?? false) || this.GetControl<VideoView>("VideoPlayer")?.MediaPlayer?.State != VLCState.Ended) || !playIntros)
                         {
-                            VideoPlayer.MediaPlayer.Media.Dispose();
+                            this.GetControl<VideoView>("VideoPlayer").MediaPlayer.Media.Dispose();
                             mp.Media.Dispose();
                             if (File.Exists(ms_games[ms_games.Keys.ToArray()[browser_idx]]))
                             {
@@ -363,16 +365,21 @@ namespace MarkuStation2
                                 Close();
                             } else
                             {
-                                VideoPlayer.IsVisible = false;
+                                this.GetControl<VideoView>("VideoPlayer").IsVisible = false;
                                 currentMenu = "fade_browser";
                                 moveCircle.Stop();
                                 browser_idx = 0;
-                                GameName.Content = ms_games.Keys.First();
+                                this.GetControl<Label>("GameName").Content = ms_games.Keys.First();
                             }
                         }
                         break;
                 }
             };
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
 
         public void MoveCircle(Point p, bool slowly = false)
@@ -387,31 +394,31 @@ namespace MarkuStation2
                 moveCircle.Tick += (object? sender, EventArgs e) =>
                 {
                     bool adjusted = false;
-                    double marginX = WhiteDot.Margin.Left;
-                    double marginY = WhiteDot.Margin.Top;
-                    if (WhiteDot.Margin.Left < p.X)
+                    double marginX = this.GetControl<Image>("WhiteDot").Margin.Left;
+                    double marginY = this.GetControl<Image>("WhiteDot").Margin.Top;
+                    if (this.GetControl<Image>("WhiteDot").Margin.Left < p.X)
                     {
                         marginX += 1;
                         adjusted = true;
                     }
-                    else if (WhiteDot.Margin.Left > p.X)
+                    else if (this.GetControl<Image>("WhiteDot").Margin.Left > p.X)
                     {
                         marginX += -1;
                         adjusted = true;
                     }
-                    if (WhiteDot.Margin.Top < p.Y)
+                    if (this.GetControl<Image>("WhiteDot").Margin.Top < p.Y)
                     {
                         marginY += 1;
                         adjusted = true;
                     }
-                    else if (WhiteDot.Margin.Top > p.Y)
+                    else if (this.GetControl<Image>("WhiteDot").Margin.Top > p.Y)
                     {
                         marginY += -1;
                         adjusted = true;
                     }
                     if (adjusted)
                     {
-                        WhiteDot.Margin = new Thickness(marginX, marginY, 0, 0);
+                        this.GetControl<Image>("WhiteDot").Margin = new Thickness(marginX, marginY, 0, 0);
                     } else
                     {
                         moveCircle.Stop();
@@ -422,7 +429,7 @@ namespace MarkuStation2
                 moveCircle.Start();
             } else
             {
-                WhiteDot.Margin = new Thickness(p.X, p.Y, 0, 0);
+                this.GetControl<Image>("WhiteDot").Margin = new Thickness(p.X, p.Y, 0, 0);
             }
         }
 
@@ -442,22 +449,22 @@ namespace MarkuStation2
             {
                 if (!invert)
                 {
-                    WhiteDot.RenderTransform = new TranslateTransform(circle_offset, circle_offset);
+                    this.GetControl<Image>("WhiteDot").RenderTransform = new TranslateTransform(circle_offset, circle_offset);
                     circle_offset += 1;
-                    if (circle_offset > this.Height + WhiteDot.Height)
+                    if (circle_offset > this.Height + this.GetControl<Image>("WhiteDot").Height)
                     {
                         invert = !invert;
-                        WhiteDot.Margin = new Avalonia.Thickness(0, 0, -this.Width / 4, 0);
+                        this.GetControl<Image>("WhiteDot").Margin = new Avalonia.Thickness(0, 0, -this.Width / 4, 0);
                     }
                 }
                 else
                 {
-                    WhiteDot.RenderTransform = new TranslateTransform(-circle_offset, circle_offset);
+                    this.GetControl<Image>("WhiteDot").RenderTransform = new TranslateTransform(-circle_offset, circle_offset);
                     circle_offset -= 1;
-                    if (circle_offset < -WhiteDot.Height)
+                    if (circle_offset < -this.GetControl<Image>("WhiteDot").Height)
                     {
                         invert = !invert;
-                        WhiteDot.Margin = new Avalonia.Thickness(-this.Width / 2, 0, 0, 0);
+                        this.GetControl<Image>("WhiteDot").Margin = new Avalonia.Thickness(-this.Width / 2, 0, 0, 0);
                     }
                 }
             } else
@@ -470,7 +477,7 @@ namespace MarkuStation2
                         invert = !invert;
                         circle_offset = 100;
                     }
-                    WhiteDot.Opacity = circle_offset / 100.0;
+                    this.GetControl<Image>("WhiteDot").Opacity = circle_offset / 100.0;
                 }
                 else
                 {
@@ -480,7 +487,7 @@ namespace MarkuStation2
                         invert = !invert;
                         circle_offset = 0;
                     }
-                    WhiteDot.Opacity = circle_offset / 100.0;
+                    this.GetControl<Image>("WhiteDot").Opacity = circle_offset / 100.0;
                 }
             }
         }
@@ -495,10 +502,10 @@ namespace MarkuStation2
             angle3 = angle3 > 359 ? angle3 - 360 : angle3;
             angle4 += rand.Next(1, 3);
             angle4 = angle4 > 359 ? angle4 - 360 : angle4;
-            Dot1.RenderTransform = new RotateTransform(angle, 200, 0);
-            Dot2.RenderTransform = new RotateTransform(angle2, 200, 0);
-            Dot3.RenderTransform = new RotateTransform(angle3, 200, 0);
-            Dot4.RenderTransform = new RotateTransform(angle4, 200, 0);
+            this.GetControl<Image>("Dot1").RenderTransform = new RotateTransform(angle, 200, 0);
+            this.GetControl<Image>("Dot2").RenderTransform = new RotateTransform(angle2, 200, 0);
+            this.GetControl<Image>("Dot3").RenderTransform = new RotateTransform(angle3, 200, 0);
+            this.GetControl<Image>("Dot4").RenderTransform = new RotateTransform(angle4, 200, 0);
         }
 
         private static byte[] GetStreamBytes(UnmanagedMemoryStream ms)
@@ -522,9 +529,9 @@ namespace MarkuStation2
         private void Window_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
             timer.Start();
-            VideoPlayer.MediaPlayer = mp;
+            this.GetControl<VideoView>("VideoPlayer").MediaPlayer = mp;
             mp2.Media = new(_libVLC, mas_root + "/_temp.wav");
-            VideoPlayer.MediaPlayer.Media = new(_libVLC, mas_root + "/_temp.mp4");
+            this.GetControl<VideoView>("VideoPlayer").MediaPlayer.Media = new(_libVLC, mas_root + "/_temp.mp4");
 
             // hide mouse cursor
             new Thread(() =>
@@ -538,7 +545,7 @@ namespace MarkuStation2
             }).Start();
             if (running && playIntros)
             {
-                VideoPlayer.MediaPlayer.Play();
+                this.GetControl<VideoView>("VideoPlayer").MediaPlayer.Play();
                 mp2.Play();
             }
         }
@@ -561,8 +568,8 @@ namespace MarkuStation2
                         Enter();
                         break;
                     case Avalonia.Input.Key.Escape:
-                        VersionContent.IsVisible = true;
-                        ConfigContent.IsVisible = false;
+                        this.GetControl<StackPanel>("VersionContent").IsVisible = true;
+                        this.GetControl<Label>("ConfigContent").IsVisible = false;
                         currentMenu = "enter_version";
                         break;
                 }
@@ -583,8 +590,8 @@ namespace MarkuStation2
                             {
                                 browser_idx = ms_games.Count - 1;
                             }
-                            GameName.Content = ms_games.Keys.ToArray()[browser_idx];
-                            MoveCircle(GetAbsolutePosition(GamePanel.Children[browser_idx]));
+                            this.GetControl<Label>("GameName").Content = ms_games.Keys.ToArray()[browser_idx];
+                            MoveCircle(GetAbsolutePosition(this.GetControl<WrapPanel>("GamePanel").Children[browser_idx]));
                         }
                         break;
                     case Avalonia.Input.Key.Down:
@@ -597,8 +604,8 @@ namespace MarkuStation2
                             {
                                 browser_idx = 0;
                             }
-                            GameName.Content = ms_games.Keys.ToArray()[browser_idx];
-                            MoveCircle(GetAbsolutePosition(GamePanel.Children[browser_idx]));
+                            this.GetControl<Label>("GameName").Content = ms_games.Keys.ToArray()[browser_idx];
+                            MoveCircle(GetAbsolutePosition(this.GetControl<WrapPanel>("GamePanel").Children[browser_idx]));
                         }
                         break;
                     case Avalonia.Input.Key.Escape:
@@ -631,8 +638,8 @@ namespace MarkuStation2
                     mp2.Stop();
                 } else
                 {
-                    VersionContent.IsVisible = false;
-                    ConfigContent.IsVisible = true;
+                    this.GetControl<StackPanel>("VersionContent").IsVisible = false;
+                    this.GetControl<Label>("ConfigContent").IsVisible = true;
                     currentMenu = "enter_version";
                 }
             } else if ((currentMenu == "browser") && (ms_games.Count > 0))

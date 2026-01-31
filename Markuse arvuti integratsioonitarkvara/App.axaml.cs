@@ -58,7 +58,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
                     if (desktop.Args!.Contains("/e"))
                     {
                         Crash c = new();
-                        c.TechnicalData.Text = File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/mas_error.log");
+                        c.GetControl<TextBlock>("TechnicalData").Text = File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/mas_error.log");
                         desktop.MainWindow = c;
                         base.OnFrameworkInitializationCompleted();
                         return;

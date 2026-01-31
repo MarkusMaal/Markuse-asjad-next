@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using System.Diagnostics;
+using Avalonia.Markup.Xaml;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
@@ -11,6 +12,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
         public WaitInstall()
         {
             InitializeComponent();
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
 
         private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

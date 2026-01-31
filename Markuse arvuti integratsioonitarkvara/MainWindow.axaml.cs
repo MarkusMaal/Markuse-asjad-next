@@ -10,6 +10,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Avalonia.Controls.Shapes;
+using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using MasCommon;
 
@@ -31,24 +33,24 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 InitializeComponent();
                 if (File.Exists(app.mas_root + "/scheme.cfg")) {
                     scheme = LoadTheme();
-                    this.Backglass.Fill = new SolidColorBrush(Color.FromArgb(128, scheme[0].R, scheme[0].G, scheme[0].B));
+                    this.GetControl<Rectangle>("Backglass").Fill = new SolidColorBrush(Color.FromArgb(128, scheme[0].R, scheme[0].G, scheme[0].B));
                     if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) +
                                     "/Android.lnk"))
                     {
-                        this.DeviceLabel.Content = "markuse tahvelarvuti asjad";
-                        this.DevicePicture.Source = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/mas_tablet.png")));
+                        this.GetControl<Label>("DeviceLabel").Content = "markuse tahvelarvuti asjad";
+                        this.GetControl<Image>("DevicePicture").Source = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/mas_tablet.png")));
                     }
 
                     if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
                                          "/.masv"))
                     {
-                        this.DeviceLabel.Content = "markuse virtuaalarvuti asjad";
-                        this.DevicePicture.Source = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/mas_virtualpc.png")));
+                        this.GetControl<Label>("DeviceLabel").Content = "markuse virtuaalarvuti asjad";
+                        this.GetControl<Image>("DevicePicture").Source = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/mas_virtualpc.png")));
                     }
                     else
                     {
-                        this.DeviceLabel.Content = "markuse arvuti asjad";
-                        this.DevicePicture.Source = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/mas_computers.png")));
+                        this.GetControl<Label>("DeviceLabel").Content = "markuse arvuti asjad";
+                        this.GetControl<Image>("DevicePicture").Source = app.GetResource(AssetLoader.Open(new Uri("avares://Markuse arvuti integratsioonitarkvara/Resources/mas_computers.png")));
                     }
                 }
                 if (app.dev)
@@ -112,6 +114,11 @@ namespace Markuse_arvuti_integratsioonitarkvara
                 File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/mas_error.log", $"-------------------------------\n\nMarkuse arvuti integratsioonitarkvara\n\n-------------------------------\n\nTaaskäivitamise Markuse arvuti integratsioonitarkvara probleemi tõttu. Palun käivitage see programm siluriga, et asja täpsemalt uurida.\n\nTehniline info:\n\nKuupäev ja kellaaeg: {DateTime.Now}\nErand: {ex.Message}\nKuhila jälg:\n{ex.StackTrace}");
                 Environment.Exit(0);
             }
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
 
         private void InitTimers()

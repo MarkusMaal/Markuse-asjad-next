@@ -16,6 +16,11 @@ public partial class DesktopIcon_Edit : Window
         InitializeComponent();
     }
     
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+    
     private async void BrowseButtonAsync(object? sender, RoutedEventArgs e)
     {
         // source: https://docs.avaloniaui.net/docs/basics/user-interface/file-dialogs
@@ -31,7 +36,7 @@ public partial class DesktopIcon_Edit : Window
 
         if (files.Count >= 1)
         {
-            this.LocationBox.Text = Uri.UnescapeDataString(files[0].Path.AbsolutePath);
+            this.GetControl<TextBox>("LocationBox").Text = Uri.UnescapeDataString(files[0].Path.AbsolutePath);
         }
     }
 
@@ -43,8 +48,8 @@ public partial class DesktopIcon_Edit : Window
 
     private void Delete_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        NameBox.SelectedIndex = -1;
-        LocationBox.Text = "";
+        this.GetControl<ComboBox>("NameBox").SelectedIndex = -1;
+        this.GetControl<TextBox>("LocationBox").Text = "";
         DialogResult = true;
         this.Close();
     }

@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
 namespace Pidu_
 {
@@ -9,6 +10,11 @@ namespace Pidu_
             InitializeComponent();
         }
 
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+
         private void OK_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
             this.Close();
@@ -16,7 +22,7 @@ namespace Pidu_
 
         private void Window_Loaded_2(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            MessageField.Focus();
+            this.GetControl<TextBox>("MessageField").Focus();
         }
 
         private void TextBox_KeyDown(object? sender, Avalonia.Input.KeyEventArgs e)

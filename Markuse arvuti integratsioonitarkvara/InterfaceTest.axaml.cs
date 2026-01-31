@@ -62,6 +62,11 @@ public partial class InterfaceTest : Window
         }
     }
 
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
     private void Window_Closing(object? sender, Avalonia.Controls.WindowClosingEventArgs e)
     {
         Environment.Exit(0);

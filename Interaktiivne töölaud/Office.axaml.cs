@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Input;
 using System;
 using System.IO;
+using Avalonia.Markup.Xaml;
 
 namespace Interaktiivne_töölaud;
 
@@ -16,6 +17,11 @@ public partial class Office : Window
         DataContext = new OfficeModel();
         startDir ??= Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         InitializeComponent();
+    }
+
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
     }
 
     private void Return_Click(object? sender, RoutedEventArgs e)
@@ -47,7 +53,7 @@ public partial class Office : Window
     {
         OfficeModel mwm = new();
         mwm.Navigate(path);
-        TopText.Content = new DirectoryInfo(mwm.url).Name;
+        this.GetControl<Label>("TopText").Content = new DirectoryInfo(mwm.url).Name;
         this.DataContext = mwm;
     }
 
@@ -105,9 +111,9 @@ public partial class Office : Window
 
     private void DataGrid_DoubleTapped(object? sender, TappedEventArgs e)
     {
-        if (FileBrowser.SelectedItems.Count > 0)
+        if (this.GetControl<DataGrid>("FileBrowser").SelectedItems.Count > 0)
         {
-            string? selFolder = ((Folder?)FileBrowser.SelectedItems[0])?.Name;
+            string? selFolder = ((Folder?)this.GetControl<DataGrid>("FileBrowser").SelectedItems[0])?.Name;
             OfficeModel? ctx = ((OfficeModel?)DataContext);
             if ((ctx == null) || (selFolder == null))
             {
@@ -143,7 +149,7 @@ public partial class Office : Window
         PushToBackStack();
         OfficeModel mwm = new();
         mwm.Up(GetWorkingDirectory());
-        TopText.Content = new DirectoryInfo(mwm.url).Name;
+        this.GetControl<Label>("TopText").Content = new DirectoryInfo(mwm.url).Name;
         this.DataContext = mwm;
     }
 }

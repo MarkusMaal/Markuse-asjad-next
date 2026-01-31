@@ -12,6 +12,7 @@ using Avalonia;
 using Avalonia.Platform;
 using System.Threading;
 using Avalonia.Animation.Easings;
+using Avalonia.Markup.Xaml;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 
 namespace Markuse_arvuti_ooterežiim
@@ -61,8 +62,8 @@ namespace Markuse_arvuti_ooterežiim
                 scr.Save(mas_root);
             }
             InitializeComponent();
-            LogoImageR.Width = scr.ImageWidth;
-            LogoImageR.Height = scr.ImageWidth;
+            this.GetControl<Image>("LogoImageR").Width = scr.ImageWidth;
+            this.GetControl<Image>("LogoImageR").Height = scr.ImageWidth;
             MoveNow();
             
             var commonBg = $"{mas_root}/bg_common.png";
@@ -81,11 +82,11 @@ namespace Markuse_arvuti_ooterežiim
             if (scr.CustomImage && File.Exists(scr.ImagePath))
             {
                 using var ms = new FileStream(scr.ImagePath, FileMode.Open, FileAccess.Read);
-                this.LogoImageR.Source = new Bitmap(ms);
+                this.GetControl<Image>("LogoImageR").Source = new Bitmap(ms);
             }
             else
             {
-                this.LogoImageR.Source = GetResource(Properties.Resources.mas_general);
+                this.GetControl<Image>("LogoImageR").Source = GetResource(Properties.Resources.mas_general);
             }
             this.Icon = new WindowIcon(GetResource(Properties.Resources.mas_general));
 
@@ -109,6 +110,11 @@ namespace Markuse_arvuti_ooterežiim
             }
         }
 
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+
         private static Bitmap GetResource(byte[] resource)
         {
             using var ms = new MemoryStream(resource);
@@ -120,9 +126,9 @@ namespace Markuse_arvuti_ooterežiim
             if (CurrentPosition is { X: < 0, Y: < 0 })
             {
                 var primaryScreen = Screens.Primary ?? Screens.All[0];
-                var boundsX = DownRight[1] ? primaryScreen.Bounds.Width - LogoImageR.Width : 0;
-                var boundsY = DownRight[0] ? primaryScreen.Bounds.Height - LogoImageR.Height: 0;
-                CurrentPosition = new PixelPoint(r.Next(0, (int)boundsX - (int)LogoImageR.Width), r.Next(0, (int)boundsY - (int)LogoImageR.Height));
+                var boundsX = DownRight[1] ? primaryScreen.Bounds.Width - this.GetControl<Image>("LogoImageR").Width : 0;
+                var boundsY = DownRight[0] ? primaryScreen.Bounds.Height - this.GetControl<Image>("LogoImageR").Height: 0;
+                CurrentPosition = new PixelPoint(r.Next(0, (int)boundsX - (int)this.GetControl<Image>("LogoImageR").Width), r.Next(0, (int)boundsY - (int)this.GetControl<Image>("LogoImageR").Height));
             }
             var PreviousPosition = CurrentPosition;
             FigureOutNextPoint();
@@ -141,14 +147,14 @@ namespace Markuse_arvuti_ooterežiim
             mwm.Duration = TimeSpan.FromSeconds(scr.AnimationInterval);
 
             var animation = (Animation)this.Resources["LogoAnimation"];
-            animation.RunAsync(LogoImageR);
+            animation.RunAsync(this.GetControl<Image>("LogoImageR"));
         }
         
         private void FigureOutNextPoint()
         {
             var primaryScreen = Screens.Primary ?? Screens.All[0];
-            var boundsX = DownRight[1] ? primaryScreen.Bounds.Width - LogoImageR.Width : 0;
-            var boundsY = DownRight[0] ? primaryScreen.Bounds.Height - LogoImageR.Height: 0;
+            var boundsX = DownRight[1] ? primaryScreen.Bounds.Width - this.GetControl<Image>("LogoImageR").Width : 0;
+            var boundsY = DownRight[0] ? primaryScreen.Bounds.Height - this.GetControl<Image>("LogoImageR").Height: 0;
             var nextX = CurrentPosition.X;
             var nextY = CurrentPosition.Y;
             var deltaX = DownRight[1] ? 1 : -1;

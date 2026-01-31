@@ -7,6 +7,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using Avalonia.Markup.Xaml;
 
 namespace Markuse_arvuti_integratsioonitarkvara
 {
@@ -54,7 +55,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
             {
                 code += chars[r.Next(0, chars.Length)];
             }
-            CodeText.Content = code;
+            this.GetControl<Label>("CodeText").Content = code;
             File.WriteAllText(string.Format(app.mas_root + "/maia/{0}.{1}.maia", devType, devIP.Replace(".", "_")), GetHashString(devType + "__" + code));
             File.Delete(fileName);
             waitForClose.Tick += new EventHandler(WaitForClose);
@@ -62,9 +63,14 @@ namespace Markuse_arvuti_integratsioonitarkvara
             waitForClose.Start();
         }
 
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+
         private void WaitForClose(object? sender, EventArgs e)
         {
-            if (ReferenceEquals(CodeText.Content, "AAAAAAAA")) this.Close(); // no valid code, so close immediately
+            if (ReferenceEquals(this.GetControl<Label>("CodeText").Content, "AAAAAAAA")) this.Close(); // no valid code, so close immediately
             if (!initialized)
             {
                 this.Background = new SolidColorBrush(bg);
@@ -82,7 +88,7 @@ namespace Markuse_arvuti_integratsioonitarkvara
             else
             {
                 timeLeft -= 1;
-                TimerLabel.Content = timeLeft.ToString();
+                this.GetControl<Label>("TimerLabel").Content = timeLeft.ToString();
                 if (timeLeft == 0)
                 {
                     File.Delete(string.Format(app.mas_root + "/maia/{0}.{1}.maia", devType, devIP.Replace(".", "_")));

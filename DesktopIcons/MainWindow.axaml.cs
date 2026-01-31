@@ -14,6 +14,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
@@ -84,6 +85,11 @@ public partial class MainWindow : Window
             var handle = Win32Interop.GetWindowHandle(this);
             Win32Interop.SetWindowLongPtr(handle, Win32Interop.GWL_STYLE, Win32Interop.GetWindowLongPtr(handle, Win32Interop.GWL_STYLE) & ~Win32Interop.WS_MAXIMIZEBOX);
         }
+    }
+
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
     }
 
     public void ZOrderFix()
@@ -227,7 +233,7 @@ public partial class MainWindow : Window
                                                               theme.B.ToString("X").PadLeft(2, '0'));
                                 foreach (var window in iconWindows)
                                 {
-                                    ((TopIcon)window).BgCol.Background = new SolidColorBrush(Color.Parse("#a0" +
+                                    ((TopIcon)window).GetControl<Border>("BgCol").Background = new SolidColorBrush(Color.Parse("#a0" +
                                             theme.R.ToString("X").PadLeft(2, '0') +
                                             theme.G.ToString("X").PadLeft(2, '0') +
                                             theme.B.ToString("X").PadLeft(2, '0')))
@@ -236,7 +242,7 @@ public partial class MainWindow : Window
 
                                 foreach (var window in specialWindows)
                                 {
-                                    window.BgCol.Background = new SolidColorBrush(Color.Parse("#a0" +
+                                    window.GetControl<Border>("BgCol").Background = new SolidColorBrush(Color.Parse("#a0" +
                                             theme.R.ToString("X").PadLeft(2, '0') +
                                             theme.G.ToString("X").PadLeft(2, '0') +
                                             theme.B.ToString("X").PadLeft(2, '0')))
@@ -433,25 +439,20 @@ public partial class MainWindow : Window
         }
         var tI = new TopIcon
         {
-            BgCol =
-            {
-                Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') +
-                                                             theme.G.ToString("X").PadLeft(2, '0') +
-                                                             theme.B.ToString("X").PadLeft(2, '0')))
-                    { Opacity = 0 }
-            },
             WindowStartupLocation = WindowStartupLocation.Manual,
             Position = new PixelPoint((me.LocationX > 0) ? me.LocationX : padx, me.LocationY > 0 ? me.LocationY : primaryScreen.Bounds.Height - (int)(size * 1.5) - (int)(size * 0.25)),
             Width = size,
             Height = size,
             icon = me.IconA,
             action = me.Executable,
-            myparent = this,
-            Pic =
-            {
-                Opacity = 0.75
-            }
+            myparent = this
         };
+        tI.GetControl<Label>("Pic").Opacity = 0.75;
+        tI.GetControl<Border>("BgCol").Background = new SolidColorBrush(Color.Parse("#a0" +
+            theme.R.ToString("X").PadLeft(2, '0') +
+            theme.G.ToString("X").PadLeft(2, '0') +
+            theme.B.ToString("X").PadLeft(2, '0')));
+        tI.GetControl<Border>("BgCol").Opacity = 0;
         logoWindow = tI;
         if (!desktopLayout.ShowLogo) return;
         logoWindow.Show();
@@ -471,13 +472,6 @@ public partial class MainWindow : Window
         foreach (SpecialIcon me in special_icons) {
             var tI = new TopIcon
             {
-                BgCol =
-                {
-                    Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') +
-                                                                 theme.G.ToString("X").PadLeft(2, '0') +
-                                                                 theme.B.ToString("X").PadLeft(2, '0')))
-                        { Opacity = 0.75 }
-                },
                 WindowStartupLocation = WindowStartupLocation.Manual,
                 Position = new PixelPoint(me.LocationX > 0 ? me.LocationX : offset_left, me.LocationY > 0 ? me.LocationY : offset_top),
                 Width = width,
@@ -485,12 +479,14 @@ public partial class MainWindow : Window
                 icon = me.IconB,
                 alt_icon = me.IconA,
                 action = me.Executable,
-                myparent = this,
-                Pic =
-                {
-                    Opacity = 0.85
-                }
+                myparent = this
             };
+            tI.GetControl<Border>("BgCol").Background = new SolidColorBrush(Color.Parse("#a0" +
+                theme.R.ToString("X").PadLeft(2, '0') +
+                theme.G.ToString("X").PadLeft(2, '0') +
+                theme.B.ToString("X").PadLeft(2, '0')));
+            tI.GetControl<Border>("BgCol").Opacity = 0.75;
+            tI.GetControl<Label>("Pic").Opacity = 0.85;
             specialWindows[i] = tI;
             if (desktopLayout.ShowActions)
             {
@@ -540,7 +536,7 @@ public partial class MainWindow : Window
                     break;
                 }
                 TopIcon tI = new TopIcon();
-                tI.BgCol.Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') + theme.G.ToString("X").PadLeft(2, '0') + theme.B.ToString("X").PadLeft(2, '0'))) { Opacity = 0.75 };
+                tI.GetControl<Border>("BgCol").Background = new SolidColorBrush(Color.Parse("#a0" + theme.R.ToString("X").PadLeft(2, '0') + theme.G.ToString("X").PadLeft(2, '0') + theme.B.ToString("X").PadLeft(2, '0'))) { Opacity = 0.75 };
                 tI.WindowStartupLocation = WindowStartupLocation.Manual;
                 tI.Position = new PixelPoint(locations[i].X > 0 ? locations[i].X : offset_left, locations[i].Y > 0 ? locations[i].Y : offset_top);
                 tI.Width = icon_size;
@@ -657,7 +653,7 @@ public partial class MainWindow : Window
     public void NavigateDirectory(string path, bool opendir = false, string selfile = null)
     {
         SomethingSelected = false;
-        SomethingSel.Content = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
+        this.GetControl<Label>("SomethingSel").Content = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
         if (opendir && Directory.Exists(path))
         {
             Process p = new();
@@ -680,8 +676,8 @@ public partial class MainWindow : Window
         }
         cd = desktopLayout.DesktopDir;
         NavigateDirectory(cd);
-        this.Glass.Points = [new Point(0,0), new Point(Width, 0), new Point(0, Height)];
-        this.Glass.Fill = new LinearGradientBrush
+        this.GetControl<Polygon>("Glass").Points = [new Point(0,0), new Point(Width, 0), new Point(0, Height)];
+        this.GetControl<Polygon>("Glass").Fill = new LinearGradientBrush
         {
             StartPoint = new RelativePoint(new Point(Width / 2, 0), RelativeUnit.Absolute),
             EndPoint = new RelativePoint(new Point(Width / 2, Height), RelativeUnit.Absolute),

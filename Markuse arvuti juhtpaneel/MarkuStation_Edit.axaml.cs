@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using System;
+using Avalonia.Markup.Xaml;
 
 namespace Markuse_arvuti_juhtpaneel
 {
@@ -13,6 +14,11 @@ namespace Markuse_arvuti_juhtpaneel
         {
             InitializeComponent();
         }
+    
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
 
         private void Cancel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
@@ -22,8 +28,8 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void Delete_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            NameBox.Text = ";";
-            LocationBox.Text = ";";
+            this.GetControl<TextBox>("NameBox").Text = ";";
+            this.GetControl<TextBox>("LocationBox").Text = ";";
             DialogResult = true;
             this.Close();
         }
@@ -49,7 +55,7 @@ namespace Markuse_arvuti_juhtpaneel
 
             if (files.Count >= 1)
             {
-                this.LocationBox.Text = Uri.UnescapeDataString(files[0].Path.AbsolutePath);
+                this.GetControl<TextBox>("LocationBox").Text = Uri.UnescapeDataString(files[0].Path.AbsolutePath);
             }
         }
     }

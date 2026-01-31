@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -49,6 +50,11 @@ public partial class TopIcon : Window
         }
     }
 
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
     public static Bitmap GetResource(string name)
     {
         object? resource = App.Current?.Resources[name];
@@ -69,8 +75,8 @@ public partial class TopIcon : Window
         if (!myparent.locked && !special_icon) this.BeginMoveDrag(e);
         if (action == "special:apps" || (!action.StartsWith("special:")))
         {
-            opacity = this.Pic.Opacity;
-            this.Pic.Opacity = 0.75;
+            opacity = this.GetControl<Label>("Pic").Opacity;
+            this.GetControl<Label>("Pic").Opacity = 0.75;
         }
 
         if ((e.ClickCount == 2) || (e.ClickCount == 1 && special_icon))
@@ -131,7 +137,7 @@ public partial class TopIcon : Window
         down = false;
         if (action == "special:apps" || (!action.StartsWith("special:")))
         {
-            this.Pic.Opacity = opacity;
+            this.GetControl<Label>("Pic").Opacity = opacity;
         }
 
         if (!myparent.locked)
@@ -147,14 +153,14 @@ public partial class TopIcon : Window
 
     private void Control_OnLoaded(object? sender, RoutedEventArgs e)
     {
-        this.Pic.Width = this.Width;
-        this.Pic.Height = this.Height;
-        this.Pic.BackgroundSizing = BackgroundSizing.InnerBorderEdge;
-        this.Pic.Background = new ImageBrush(GetResource("TopIcon" + icon));
-        this.Glass.Points = [new Point(0,0), new Point(Width, 0), new Point(0, Height)];
+        this.GetControl<Label>("Pic").Width = this.Width;
+        this.GetControl<Label>("Pic").Height = this.Height;
+        this.GetControl<Label>("Pic").BackgroundSizing = BackgroundSizing.InnerBorderEdge;
+        this.GetControl<Label>("Pic").Background = new ImageBrush(GetResource("TopIcon" + icon));
+        this.GetControl<Polygon>("Glass").Points = [new Point(0,0), new Point(Width, 0), new Point(0, Height)];
         if (this.action == "special:mas")
         {
-            this.Glass.Fill = new SolidColorBrush(Colors.Transparent);
+            this.GetControl<Polygon>("Glass").Fill = new SolidColorBrush(Colors.Transparent);
             Refocus();
             return;
         }
@@ -166,10 +172,10 @@ public partial class TopIcon : Window
     {
         if (this.action == "special:mas")
         {
-            this.Glass.Fill = new SolidColorBrush(Colors.Transparent);
+            this.GetControl<Polygon>("Glass").Fill = new SolidColorBrush(Colors.Transparent);
             return;
         }
-        this.Glass.Fill = new LinearGradientBrush
+        this.GetControl<Polygon>("Glass").Fill = new LinearGradientBrush
         {
             StartPoint = new RelativePoint(new Point(Width / 2, 0), RelativeUnit.Absolute),
             EndPoint = new RelativePoint(new Point(Width / 2, Height), RelativeUnit.Absolute),
@@ -182,10 +188,10 @@ public partial class TopIcon : Window
     {
         if (this.action == "special:mas")
         {
-            this.Glass.Fill = new SolidColorBrush(Colors.Transparent);
+            this.GetControl<Polygon>("Glass").Fill = new SolidColorBrush(Colors.Transparent);
             return;
         }
-        this.Glass.Fill = new LinearGradientBrush
+        this.GetControl<Polygon>("Glass").Fill = new LinearGradientBrush
         {
             StartPoint = new RelativePoint(new Point(Width / 2, 0), RelativeUnit.Absolute),
             EndPoint = new RelativePoint(new Point(Width / 2, Height), RelativeUnit.Absolute),
@@ -202,7 +208,7 @@ public partial class TopIcon : Window
 
     public void ReplaceIcon(string name)
     {
-        this.Pic.Background = new ImageBrush(GetResource("TopIcon" + name));
+        this.GetControl<Label>("Pic").Background = new ImageBrush(GetResource("TopIcon" + name));
     }
 
     private void Window_OnClosing(object? sender, WindowClosingEventArgs e)
@@ -217,7 +223,7 @@ public partial class TopIcon : Window
 
     private void SetOpacity(double o)
     {
-        this.BgCol.Background = new SolidColorBrush(Color.Parse("#a0" + myparent.theme.R.ToString("X").PadLeft(2, '0') +
+        this.GetControl<Border>("BgCol").Background = new SolidColorBrush(Color.Parse("#a0" + myparent.theme.R.ToString("X").PadLeft(2, '0') +
                                                           myparent.theme.G.ToString("X").PadLeft(2, '0') +
                                                           myparent.theme.B.ToString("X").PadLeft(2, '0')))
             { Opacity = o };
@@ -225,21 +231,21 @@ public partial class TopIcon : Window
     
     private void InputElement_OnPointerEntered(object? sender, PointerEventArgs e)
     {
-        opacity = Pic.Opacity;
-        Pic.Opacity = 1;
-        if (this.BgCol.Background.Opacity != 0)
+        opacity = this.GetControl<Label>("Pic").Opacity;
+        this.GetControl<Label>("Pic").Opacity = 1;
+        if (this.GetControl<Border>("BgCol").Background.Opacity != 0)
         {
-            SetOpacity(this.BgCol.Background.Opacity + 0.25);
+            SetOpacity(this.GetControl<Border>("BgCol").Background.Opacity + 0.25);
             FocusGlass();
         }
     }
 
     private void InputElement_OnPointerExited(object? sender, PointerEventArgs e)
     {
-        Pic.Opacity = opacity;
-        if (this.BgCol.Background.Opacity != 0)
+        this.GetControl<Label>("Pic").Opacity = opacity;
+        if (this.GetControl<Border>("BgCol").Background.Opacity != 0)
         {
-            SetOpacity(this.BgCol.Background.Opacity - 0.25);
+            SetOpacity(this.GetControl<Border>("BgCol").Background.Opacity - 0.25);
             UnfocusGlass();
         }
     }

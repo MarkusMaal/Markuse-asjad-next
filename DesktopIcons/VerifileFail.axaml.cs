@@ -12,6 +12,11 @@ public partial class VerifileFail : Window
         InitializeComponent();
     }
 
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
     private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         Environment.Exit(255);

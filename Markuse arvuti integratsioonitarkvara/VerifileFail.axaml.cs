@@ -12,6 +12,11 @@ public partial class VerifileFail : Window
         InitializeComponent();
     }
 
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
     private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         this.Close();
@@ -27,10 +32,10 @@ public partial class VerifileFail : Window
         }
         if (att != "CHECK_TAMPER")
         {
-            InfoTextBlock.Text += "\n\nVeakood: VF_" + att;
+            this.GetControl<TextBlock>("InfoTextBlock").Text += "\n\nVeakood: VF_" + att;
         } else
         {
-            InfoTextBlock.Text = "Püsivuskontroll ei ole usaldusväärne, sest Verifile 2.0 räsi ei ole sobiv.\nPalun uuendage Markuse arvuti integratsioonitarkvara ja/või Verifile 2.0 tarkvara kataloogis\n\"" + rd + "\". Täpsem info standardväljundis.";
+            this.GetControl<TextBlock>("InfoTextBlock").Text = "Püsivuskontroll ei ole usaldusväärne, sest Verifile 2.0 räsi ei ole sobiv.\nPalun uuendage Markuse arvuti integratsioonitarkvara ja/või Verifile 2.0 tarkvara kataloogis\n\"" + rd + "\". Täpsem info standardväljundis.";
         }
     }
 }

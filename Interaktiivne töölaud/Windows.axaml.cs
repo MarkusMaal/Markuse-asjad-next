@@ -12,6 +12,7 @@ using System.IO;
 using Avalonia;
 using System.Text;
 using System.Collections.Generic;
+using Avalonia.Markup.Xaml;
 
 namespace Interaktiivne_töölaud;
 
@@ -30,17 +31,17 @@ public partial class Windows : Window
         dpt.Interval = new TimeSpan(0, 0, 1);
         dpt.Tick += (object? sender, EventArgs e) =>
         {
-            int selection = ProcessBox.SelectedIndex;
-            ProcessBox.Items.Clear();
+            int selection = this.GetControl<ListBox>("ProcessBox").SelectedIndex;
+            this.GetControl<ListBox>("ProcessBox").Items.Clear();
             foreach (Process p in Process.GetProcesses())
             {
                 if (p.MainWindowTitle.ToString() != "")
                 {
                     string s = p.Responding ? "Töötab" : "Ei reageeri";
-                    ProcessBox.Items.Add(p.MainWindowTitle + " (" + s + ") @" + p.ProcessName);
+                    this.GetControl<ListBox>("ProcessBox").Items.Add(p.MainWindowTitle + " (" + s + ") @" + p.ProcessName);
                 }
             }
-            ProcessBox.SelectedIndex = selection;
+            this.GetControl<ListBox>("ProcessBox").SelectedIndex = selection;
 
             // Brushes for status indicators
             SolidColorBrush ramBrush = new();
@@ -71,13 +72,18 @@ public partial class Windows : Window
                     isinternet = false;
                 }
             }
-            NetContainer.Background = new SolidColorBrush(isinternet ? Colors.Lime : (isnetwork ? Colors.Yellow : Colors.Red));
+            this.GetControl<Border>("NetContainer").Background = new SolidColorBrush(isinternet ? Colors.Lime : (isnetwork ? Colors.Yellow : Colors.Red));
 
             // apply colors
             //RamContainer.Background = ramBrush;
             //Cpu1Container.Background = cpuBrush;
         };
         InitializeComponent();
+    }
+
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
     }
 
     private void Bottom_Click(object? sender, RoutedEventArgs e)
@@ -94,7 +100,7 @@ public partial class Windows : Window
         if (run.ok)
         {
             Process p = new();
-            p.StartInfo.FileName = run.ProgName.Text;
+            p.StartInfo.FileName = run.GetControl<TextBox>("ProgName").Text;
             p.StartInfo.UseShellExecute = true;
             p.Start();
         }
@@ -203,7 +209,7 @@ public partial class Windows : Window
 
     private void CloseWindow_Click(object? sender, RoutedEventArgs e)
     {
-        string? processName = ProcessBox.SelectedItems[0]?.ToString().Split("@")[1];
+        string? processName = this.GetControl<ListBox>("ProcessBox").SelectedItems[0]?.ToString().Split("@")[1];
         if (processName == null)
         {
             return;
@@ -219,7 +225,7 @@ public partial class Windows : Window
 
     private void EndProcess_Click(object? sender, RoutedEventArgs e)
     {
-        string? processName = ProcessBox.SelectedItems[0]?.ToString().Split("@")[1];
+        string? processName = this.GetControl<ListBox>("ProcessBox").SelectedItems[0]?.ToString().Split("@")[1];
         if (processName == null)
         {
             return;

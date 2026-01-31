@@ -14,6 +14,11 @@ public partial class Playground : Window
         InitializeComponent();
     }
 
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
     private void Return_Click(object? sender, RoutedEventArgs e)
     {
         MainWindow mw = new();

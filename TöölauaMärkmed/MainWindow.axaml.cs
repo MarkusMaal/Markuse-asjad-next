@@ -7,7 +7,9 @@ using Avalonia.Threading;
 using System;
 using System.IO;
 using System.Reflection.Emit;
+using Avalonia.Markup.Xaml;
 using MasCommon;
+using Label = Avalonia.Controls.Label;
 
 namespace TöölauaMärkmed
 {
@@ -65,7 +67,7 @@ namespace TöölauaMärkmed
                                 if (fileindex == 1)
                                 {
                                     colorcode = colortype;
-                                    NoteBox.Text = File.ReadAllText(app.masRoot + "/notes/note_" + fileindex.ToString() + "_" + colortype + ".txt");
+                                    this.GetControl<TextBox>("NoteBox").Text = File.ReadAllText(app.masRoot + "/notes/note_" + fileindex.ToString() + "_" + colortype + ".txt");
                                     if (points != null)
                                     {
                                         this.Position = new PixelPoint(Convert.ToInt32(points[0]), Convert.ToInt32(points[1]));
@@ -86,7 +88,7 @@ namespace TöölauaMärkmed
                                         newnote.Width = Convert.ToInt32(points[3]);
                                     }
                                     if (fileindex > app.activeindex) { app.activeindex = fileindex; }
-                                    newnote.NoteBox.Text = File.ReadAllText(app.masRoot + "/notes/note_" + fileindex.ToString() + "_" + colortype + ".txt");
+                                    newnote.GetControl<TextBox>("NoteBox").Text = File.ReadAllText(app.masRoot + "/notes/note_" + fileindex.ToString() + "_" + colortype + ".txt");
                                     newnote.Show();
                                 }
                             }
@@ -99,31 +101,36 @@ namespace TöölauaMärkmed
             timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
             timer.Start();
             ApplyColor(colorcode ?? "y");
-            TitleBarLabel.Content = "Märkmik " + currentindex.ToString();
+            this.GetControl<Label>("TitleBarLabel").Content = "Märkmik " + currentindex.ToString();
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
 
         private void Add_Enter(object? sender, PointerEventArgs e)
         {
-            AddBtn.Background = new SolidColorBrush(Colors.Lime);
-            AddBtn.Foreground = new SolidColorBrush(Colors.Green);
+            this.GetControl<Label>("AddBtn").Background = new SolidColorBrush(Colors.Lime);
+            this.GetControl<Label>("AddBtn").Foreground = new SolidColorBrush(Colors.Green);
         }
 
         private void Add_Leave(object? sender, PointerEventArgs e)
         {
-            AddBtn.Background = new SolidColorBrush(Colors.Green);
-            AddBtn.Foreground = new SolidColorBrush(Colors.White);
+            this.GetControl<Label>("AddBtn").Background = new SolidColorBrush(Colors.Green);
+            this.GetControl<Label>("AddBtn").Foreground = new SolidColorBrush(Colors.White);
         }
 
         private void Exit_Enter(object? sender, PointerEventArgs e)
         {
-            ExitBtn.Background = new SolidColorBrush(Colors.Red);
-            ExitBtn.Foreground = new SolidColorBrush(Colors.Maroon);
+            this.GetControl<Label>("ExitBtn").Background = new SolidColorBrush(Colors.Red);
+            this.GetControl<Label>("ExitBtn").Foreground = new SolidColorBrush(Colors.Maroon);
         }
 
         private void Exit_Leave(object? sender, PointerEventArgs e)
         {
-            ExitBtn.Background = new SolidColorBrush(Colors.Maroon);
-            ExitBtn.Foreground = new SolidColorBrush(Colors.White);
+            this.GetControl<Label>("ExitBtn").Background = new SolidColorBrush(Colors.Maroon);
+            this.GetControl<Label>("ExitBtn").Foreground = new SolidColorBrush(Colors.White);
         }
 
         private void ExitNote()
@@ -223,7 +230,7 @@ namespace TöölauaMärkmed
             }
             this.colorcode = cc;
             this.Background = new SolidColorBrush(bg);
-            TitleBar.Background = new SolidColorBrush(Color.FromRgb((byte)(255 - bg.R), (byte)(255 - bg.G), (byte)(255 - bg.B)));
+            this.GetControl<Grid>("TitleBar").Background = new SolidColorBrush(Color.FromRgb((byte)(255 - bg.R), (byte)(255 - bg.G), (byte)(255 - bg.B)));
         }
 
         private void ApplyColorObj(object? sender)
@@ -277,13 +284,13 @@ namespace TöölauaMärkmed
 
         private void NoteBox_TextChanged(object? sender, TextChangedEventArgs e)
         {
-            if (NoteBox.Text?.Length > 0)
+            if (this.GetControl<TextBox>("NoteBox").Text?.Length > 0)
             {
-                TitleBarLabel.Content = "Märkmik " + currentindex.ToString() + " - " + NoteBox.Text.Split('\n')[0].ToString().Replace("\n", "").Replace("\r", "");
+                this.GetControl<Label>("TitleBarLabel").Content = "Märkmik " + currentindex.ToString() + " - " + this.GetControl<TextBox>("NoteBox").Text.Split('\n')[0].ToString().Replace("\n", "").Replace("\r", "");
             }
             else
             {
-                TitleBarLabel.Content = "Märkmik " + currentindex.ToString();
+                this.GetControl<Label>("TitleBarLabel").Content = "Märkmik " + currentindex.ToString();
             }
             string[] allcodes = { "y", "r", "g", "b", "gr", "br", "l" };
             foreach (string code in allcodes)
@@ -297,7 +304,7 @@ namespace TöölauaMärkmed
                     catch { }
                 }
             }
-            File.WriteAllText(app.masRoot + "/notes/note_" + currentindex.ToString() + "_" + colorcode + ".txt", NoteBox.Text);
+            File.WriteAllText(app.masRoot + "/notes/note_" + currentindex.ToString() + "_" + colorcode + ".txt", this.GetControl<TextBox>("NoteBox").Text);
         }
     }
 }

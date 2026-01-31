@@ -23,8 +23,11 @@ using MasCommon;
 using MsBox.Avalonia.Enums;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
+using Avalonia.Controls.Shapes;
+using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using Avalonia.VisualTree;
+using Path = System.IO.Path;
 
 namespace Markuse_arvuti_juhtpaneel
 {
@@ -37,9 +40,7 @@ namespace Markuse_arvuti_juhtpaneel
         string[] locations;
         bool freezeTimer = false;
         private bool preventWrites = true;
-        readonly string whatNew = "+ Lülita teatud funktsioonid sisse/välja sõltuvalt sellest, millised funktsioonid on märgitud edition.txt failis\n+ Lisatud Verifile 2.1 räsi";
-        private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true, TypeInfoResolver = DesktopLayoutSourceGenerationContext.Default};
-        private readonly JsonSerializerOptions _cmdSerializerOptions = new() { WriteIndented = true, TypeInfoResolver = MasConfigSourceGenerationContext.Default };
+        readonly string whatNew = "* Üleminek .NET 10-le";
         private List<string> desktopIcons = [];
         DesktopLayout? desktopLayout;
         CommonConfig config = new();
@@ -54,6 +55,11 @@ namespace Markuse_arvuti_juhtpaneel
             InitButtons();
             GetTopLevel(this).KeyDown += InputElement_OnKeyDown;
             GetTopLevel(this).KeyUp += OnKeyUp;
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
 
         private void OnKeyUp(object? sender, KeyEventArgs e)
@@ -76,32 +82,32 @@ namespace Markuse_arvuti_juhtpaneel
             if (!e.KeyModifiers.HasFlag(KeyModifiers.Control) || (e.Key != Key.Tab)) return;
             if (e.KeyModifiers.HasFlag(KeyModifiers.Shift))
             {
-                if (TabsControl.SelectedIndex != 0)
+                if (this.GetControl<TabControl>("TabsControl").SelectedIndex != 0)
                 {
-                    TabsControl.SelectedIndex--;
+                    this.GetControl<TabControl>("TabsControl").SelectedIndex--;
                     if (DoWeSkipTab())
                     {
-                        TabsControl.SelectedIndex --;
+                        this.GetControl<TabControl>("TabsControl").SelectedIndex --;
                     }
                 }
                 else
                 {
-                    TabsControl.SelectedIndex = TabsControl.Items.Count - 1;
+                    this.GetControl<TabControl>("TabsControl").SelectedIndex = this.GetControl<TabControl>("TabsControl").Items.Count - 1;
                 }
             }
             else
             {
-                if (TabsControl.SelectedIndex != TabsControl.Items.Count - 1)
+                if (this.GetControl<TabControl>("TabsControl").SelectedIndex != this.GetControl<TabControl>("TabsControl").Items.Count - 1)
                 {
-                    TabsControl.SelectedIndex += 1;
+                    this.GetControl<TabControl>("TabsControl").SelectedIndex += 1;
                     if (DoWeSkipTab())
                     {
-                        TabsControl.SelectedIndex += 1;
+                        this.GetControl<TabControl>("TabsControl").SelectedIndex += 1;
                     }
                 }
                 else
                 {
-                    TabsControl.SelectedIndex = 0;
+                    this.GetControl<TabControl>("TabsControl").SelectedIndex = 0;
                 }
             }
 
@@ -109,9 +115,9 @@ namespace Markuse_arvuti_juhtpaneel
 
         private bool DoWeSkipTab()
         {
-            return ((TabsControl.SelectedIndex == 1) && !File.Exists(Path.Combine(masRoot, "Markuse asjad",
+            return ((this.GetControl<TabControl>("TabsControl").SelectedIndex == 1) && !File.Exists(Path.Combine(masRoot, "Markuse asjad",
                        "MarkuStation2" + (OperatingSystem.IsWindows() ? ".exe" : "")))) ||
-                   ((TabsControl.SelectedIndex == 3) &&
+                   ((this.GetControl<TabControl>("TabsControl").SelectedIndex == 3) &&
                     !File.ReadAllText(Path.Combine(masRoot, "edition.txt")).Contains("TS"));
         }
 
@@ -317,12 +323,12 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 hints[um] = "Markuse asjad universum!";
             }
-            this.InfoTextBlock.Text = hints[(string?)((Button)e.Source).Content];
+            this.GetControl<TextBlock>("InfoTextBlock").Text = hints[(string?)((Button)e.Source).Content];
         }
 
         private void DefaultInfo(object? sender, PointerEventArgs e)
         {
-            this.InfoTextBlock.Text = "Siin kuvatakse teave, kui liigutate kursori teatud nupu peale.";
+            this.GetControl<TextBlock>("InfoTextBlock").Text = "Siin kuvatakse teave, kui liigutate kursori teatud nupu peale.";
         }
 
         private void ScreenshotNow(object? sender, RoutedEventArgs e) {
@@ -512,7 +518,7 @@ namespace Markuse_arvuti_juhtpaneel
                     }
                 }
             });
-            this.ErtGrid.Background = IB;
+            this.GetControl<Grid>("ErtGrid").Background = IB;
         }
 
         private void CheckTheme(object sender, EventArgs e)
@@ -566,39 +572,39 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 if (value == -2)
                 { 
-                    CollectProgress.Value = 0;
-                    LoaderLogo.IsVisible = false;
-                    FailGif.IsVisible = true;
-                    ProgressStatusLabel.HorizontalAlignment = HorizontalAlignment.Center;
-                    ProgressStatusLabel.TextWrapping = TextWrapping.Wrap;
-                    ProgressStatusLabel.MaxWidth = this.Width / 2;
-                    CollectProgress.IsVisible = false;
-                    InfoCollectLabel.Content = "Programmi laadimine nurjus";
+                    this.GetControl<ProgressBar>("CollectProgress").Value = 0;
+                    this.GetControl<Image>("LoaderLogo").IsVisible = false;
+                    this.GetControl<Image>("FailGif").IsVisible = true;
+                    this.GetControl<TextBlock>("ProgressStatusLabel").HorizontalAlignment = HorizontalAlignment.Center;
+                    this.GetControl<TextBlock>("ProgressStatusLabel").TextWrapping = TextWrapping.Wrap;
+                    this.GetControl<TextBlock>("ProgressStatusLabel").MaxWidth = this.Width / 2;
+                    this.GetControl<ProgressBar>("CollectProgress").IsVisible = false;
+                    this.GetControl<Label>("InfoCollectLabel").Content = "Programmi laadimine nurjus";
                     this.Title = "Markuse asjad";
                     if (status.Contains("VF_BYPASS"))
                     {
-                        ErrorExitButton.Content = "Ignoreeri";
-                        ErrorExitButton.Click -= ErrorExitButton_OnClick;
-                        ErrorExitButton.Click += (_, _) =>
+                        this.GetControl<Button>("ErrorExitButton").Content = "Ignoreeri";
+                        this.GetControl<Button>("ErrorExitButton").Click -= ErrorExitButton_OnClick;
+                        this.GetControl<Button>("ErrorExitButton").Click += (_, _) =>
                         {
-                            Header1.IsVisible = true;
-                            CheckSysLabel.IsVisible = false;
-                            TabsControl.IsVisible = true;
-                            TabsControl.IsEnabled = true;
+                            this.GetControl<StackPanel>("Header1").IsVisible = true;
+                            this.GetControl<StackPanel>("CheckSysLabel").IsVisible = false;
+                            this.GetControl<TabControl>("TabsControl").IsVisible = true;
+                            this.GetControl<TabControl>("TabsControl").IsEnabled = true;
                         };
                     }
 
-                    ErrorExitButton.IsVisible = true;
+                    this.GetControl<Button>("ErrorExitButton").IsVisible = true;
                 }
                 if (value != -1)
                 {
-                    CollectProgress.Value = value;
+                    this.GetControl<ProgressBar>("CollectProgress").Value = value;
                 }
                 else
                 {
-                    CollectProgress.Value += 1;
+                    this.GetControl<ProgressBar>("CollectProgress").Value += 1;
                 }
-                ProgressStatusLabel.Text = status;
+                this.GetControl<TextBlock>("ProgressStatusLabel").Text = status;
             });
         }
 
@@ -623,10 +629,10 @@ namespace Markuse_arvuti_juhtpaneel
                 config.Load(masRoot);
                 Dispatcher.UIThread.Post(() =>
                 {
-                    ShowMasLogoCheck.IsChecked = config.ShowLogo;
-                    AllowScheduledTasksCheck.IsChecked = config.AllowScheduledTasks;
-                    StartDesktopNotesCheck.IsChecked = config.AutostartNotes;
-                    IntegrationPollrate.Text = config.PollRate.ToString();
+                    this.GetControl<CheckBox>("ShowMasLogoCheck").IsChecked = config.ShowLogo;
+                    this.GetControl<CheckBox>("AllowScheduledTasksCheck").IsChecked = config.AllowScheduledTasks;
+                    this.GetControl<CheckBox>("StartDesktopNotesCheck").IsChecked = config.AutostartNotes;
+                    this.GetControl<TextBox>("IntegrationPollrate").Text = config.PollRate.ToString();
                 });
             }
             else if (File.Exists(masRoot + "/mas.cnf"))
@@ -634,10 +640,10 @@ namespace Markuse_arvuti_juhtpaneel
                 string[] cnfs = File.ReadAllText(masRoot + "/mas.cnf").Split(';');
                 Dispatcher.UIThread.Post(() =>
                 {
-                    ShowMasLogoCheck.IsChecked = cnfs[0] == "true";                  // Kuva Markuse asjade logo integratsioonitarkvara käivitumisel
-                    AllowScheduledTasksCheck.IsChecked = cnfs[1] == "true";          // Käivita töölauamärkmed arvuti käivitumisel
-                    StartDesktopNotesCheck.IsChecked = cnfs[2] == "true";            // Käivita töölauamärkmed arvuti käivitumisel 
-                    IntegrationPollrate.Text = "5000";                               // Pollimise sagedus (ms)
+                    this.GetControl<CheckBox>("ShowMasLogoCheck").IsChecked = cnfs[0] == "true";                  // Kuva Markuse asjade logo integratsioonitarkvara käivitumisel
+                    this.GetControl<CheckBox>("AllowScheduledTasksCheck").IsChecked = cnfs[1] == "true";          // Käivita töölauamärkmed arvuti käivitumisel
+                    this.GetControl<CheckBox>("StartDesktopNotesCheck").IsChecked = cnfs[2] == "true";            // Käivita töölauamärkmed arvuti käivitumisel 
+                    this.GetControl<TextBox>("IntegrationPollrate").Text = "5000";                               // Pollimise sagedus (ms)
                     config = new()
                     {
                         ShowLogo = cnfs[0] == "true",
@@ -717,29 +723,29 @@ namespace Markuse_arvuti_juhtpaneel
                         this.Title = "Markuse arvuti juhtpaneel";
                         if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/.masv"))
                         {
-                            TopLabel.Text = "markuse virtuaalarvuti juhtpaneel";
+                            this.GetControl<TextBlock>("TopLabel").Text = "markuse virtuaalarvuti juhtpaneel";
                             this.Title = "Markuse virtuaalarvuti juhtpaneel";
                         }
                         else if (IsAndroid())
                         {
-                            TopLabel.Text = "markuse tahvelarvuti juhtpaneel";
+                            this.GetControl<TextBlock>("TopLabel").Text = "markuse tahvelarvuti juhtpaneel";
                             this.Title = "Markuse tahvelarvuti juhtpaneel";
                         }
-                        DeviceCpanelLabel.Content = this.Title;
-                        MasName.Content = devPrefix[..^1];
+                        this.GetControl<Label>("DeviceCpanelLabel").Content = this.Title;
+                        this.GetControl<Label>("MasName").Content = devPrefix[..^1];
                         if (File.Exists(masRoot + "/irunning.log"))
                         {
                             // Projekt ITS aktiivne
                             WindowState = WindowState.FullScreen;
-                            CloseButton.IsVisible = true;
+                            this.GetControl<Button>("CloseButton").IsVisible = true;
                         }
-                        CollectProgress.Value = 100;
+                        this.GetControl<ProgressBar>("CollectProgress").Value = 100;
                         if (VF_STATUS != "BYPASS")
                         {
-                            CheckSysLabel.IsVisible = false;
-                            TabsControl.IsEnabled = true;
-                            TabsControl.IsVisible = true;
-                            Header1.IsVisible = true;
+                            this.GetControl<StackPanel>("CheckSysLabel").IsVisible = false;
+                            this.GetControl<TabControl>("TabsControl").IsEnabled = true;
+                            this.GetControl<TabControl>("TabsControl").IsVisible = true;
+                            this.GetControl<StackPanel>("Header1").IsVisible = true;
                         }
                         else
                         {
@@ -779,20 +785,20 @@ namespace Markuse_arvuti_juhtpaneel
         private void InitButtons() {
             if (OperatingSystem.IsLinux()) {
                 //this.FlashDriveButton.IsVisible = false;
-                this.QuickNotesButton.IsVisible = false;
-                this.RegeditButton.IsVisible = false;
-                this.CommandButton.Content = "Konsool";
-                this.TaskmgrButton.Content = "Protsessid";
-                this.DevmgmtButton.Content = "Riistvara info";
-                this.CompManButton.Content = "Käsurea utilliidid";
-                WinUtilsLabel.Content = "Linuxi tarvikud";
+                this.GetControl<Button>("QuickNotesButton").IsVisible = false;
+                this.GetControl<Button>("RegeditButton").IsVisible = false;
+                this.GetControl<Button>("CommandButton").Content = "Konsool";
+                this.GetControl<Button>("TaskmgrButton").Content = "Protsessid";
+                this.GetControl<Button>("DevmgmtButton").Content = "Riistvara info";
+                this.GetControl<Button>("CompManButton").Content = "Käsurea utilliidid";
+                this.GetControl<Label>("WinUtilsLabel").Content = "Linuxi tarvikud";
             } else if (OperatingSystem.IsWindows()) {
                 return;
             } else if (OperatingSystem.IsMacOS()) {
-                this.RegeditButton.IsVisible = false;
-                this.CommandButton.Content = "Terminal";
-                this.CompManButton.IsVisible = false;
-                WinUtilsLabel.Content = "macOS tarvikud";
+                this.GetControl<Button>("RegeditButton").IsVisible = false;
+                this.GetControl<Button>("CommandButton").Content = "Terminal";
+                this.GetControl<Button>("CompManButton").IsVisible = false;
+                this.GetControl<Label>("WinUtilsLabel").Content = "macOS tarvikud";
                 Console.WriteLine("Hoiatus: Kõik funktsioonid ei ole saadaval macOS-is");
             } else {
                 Console.WriteLine("Hoiatus: Operatsioonsüsteemi ei toetata!");
@@ -802,14 +808,14 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void Image_DoubleTapped(object? sender, Avalonia.Input.TappedEventArgs e)
         {
-            RotateObject([Logo, LoaderLogo, FailGif]);
-            if (GameNameBox.Text == null) return;
-            if (!GameNameBox.Text.Equals(Encoding.UTF8.GetString([0x4F, 0x6C, 0x67, 0x65, 0x20,
+            RotateObject([this.GetControl<Image>("Logo"), this.GetControl<Image>("LoaderLogo"), this.GetControl<Image>("FailGif")]);
+            if (this.GetControl<TextBox>("GameNameBox").Text == null) return;
+            if (!this.GetControl<TextBox>("GameNameBox").Text.Equals(Encoding.UTF8.GetString([0x4F, 0x6C, 0x67, 0x65, 0x20,
                     0x76, 0x61, 0x6C, 0x6D, 0x69, 0x73, 0x20, 0x6D, 0x69, 0x6C, 0x6C, 0x65, 0x67,
                     0x69, 0x20, 0x75, 0x73, 0x6B, 0x75, 0x6D, 0x61, 0x74, 0x75, 0x20, 0x6A, 0x61,
                     0x6F, 0x6B, 0x73, 0x21])) && (eggLevel == 0)) return;
             eggLevel++;
-            if (!GameNameBox.Text.Equals(char.ToUpper(TopLabel.Text[0]) + $"{TopLabel.Text[1..]} on lahe!")) return;
+            if (!this.GetControl<TextBox>("GameNameBox").Text.Equals(char.ToUpper(this.GetControl<TextBlock>("TopLabel").Text[0]) + $"{this.GetControl<TextBlock>("TopLabel").Text[1..]} on lahe!")) return;
             if (eggLevel % 4 != 0) return;
             var allControls = this.GetVisualDescendants();
             List<Control> controls = [];
@@ -907,7 +913,7 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void Grid_SizeChanged(object? sender, Avalonia.Controls.SizeChangedEventArgs e)
         {
-            InfoTextBlock.Width = this.Width - 20;
+            this.GetControl<TextBlock>("InfoTextBlock").Width = this.Width - 20;
         }
 
         /* MarkuStation */
@@ -923,37 +929,37 @@ namespace Markuse_arvuti_juhtpaneel
             switch (file)
             {
                 case "internal":
-                    this.MonMode.SelectedIndex = 1;
+                    this.GetControl<ComboBox>("MonMode").SelectedIndex = 1;
                     break;
                 case "external":
-                    this.MonMode.SelectedIndex = 2;
+                    this.GetControl<ComboBox>("MonMode").SelectedIndex = 2;
                     break;
                 case "extend":
-                    this.MonMode.SelectedIndex = 0;
+                    this.GetControl<ComboBox>("MonMode").SelectedIndex = 0;
                     break;
                 case "clone":
-                    this.MonMode.SelectedIndex = 3;
+                    this.GetControl<ComboBox>("MonMode").SelectedIndex = 3;
                     break;
             }
             file = File.ReadAllText(masRoot + "/setting.txt");
             string[] lines = file.Split('\n');
-            creepCheck.IsChecked = lines[0] == "true";
-            specialCheck.IsChecked = lines[1] == "true";
-            introCheck.IsChecked = lines[2] == "true";
-            legacyIntroCheck.IsChecked = (lines.Length > 3) && (lines[3] == "true");
+            this.GetControl<CheckBox>("creepCheck").IsChecked = lines[0] == "true";
+            this.GetControl<CheckBox>("specialCheck").IsChecked = lines[1] == "true";
+            this.GetControl<CheckBox>("introCheck").IsChecked = lines[2] == "true";
+            this.GetControl<CheckBox>("legacyIntroCheck").IsChecked = (lines.Length > 3) && (lines[3] == "true");
             file = File.ReadAllText(masRoot + "/ms_games.txt");
             file = file.Substring(0, file.Length - 2);
-            GameList.Items.Clear();
+            this.GetControl<ListBox>("GameList").Items.Clear();
             foreach (string line in file.Split('\n').Skip(1))
             {
                 ListBoxItem lbi = new ListBoxItem();
                 lbi.Content = line;
-                GameList.Items.Add(lbi);
+                this.GetControl<ListBox>("GameList").Items.Add(lbi);
             }
 
-            TabMarkuStation.IsVisible = File.Exists(Path.Combine(masRoot, "Markuse asjad",
+            this.GetControl<TabItem>("TabMarkuStation").IsVisible = File.Exists(Path.Combine(masRoot, "Markuse asjad",
                 "MarkuStation2" + (OperatingSystem.IsWindows() ? ".exe" : "")));
-            TabMarkuStation.IsEnabled = TabMarkuStation.IsVisible;
+            this.GetControl<TabItem>("TabMarkuStation").IsEnabled = this.GetControl<TabItem>("TabMarkuStation").IsVisible;
             file = File.ReadAllText(masRoot + "/ms_exec.txt");
             file = file.Substring(0, file.Length - 2);
             locations = file.Split('\n').Skip(1).ToArray();
@@ -996,7 +1002,7 @@ namespace Markuse_arvuti_juhtpaneel
 
             if (files.Count >= 1)
             {
-                this.LocationBox.Text = Uri.UnescapeDataString(files[0].Path.AbsolutePath);
+                this.GetControl<TextBox>("LocationBox").Text = Uri.UnescapeDataString(files[0].Path.AbsolutePath);
             }
         }
 
@@ -1007,51 +1013,45 @@ namespace Markuse_arvuti_juhtpaneel
             {
                 new_locations[i] = locations[i];
             }
-            new_locations[locations.Length] = (LocationBox.Text ?? "") + ";";
+            new_locations[locations.Length] = (this.GetControl<TextBox>("LocationBox").Text ?? "") + ";";
             ListBoxItem lbi = new ListBoxItem();
-            lbi.Content = GameNameBox.Text ?? "";
+            lbi.Content = this.GetControl<TextBox>("GameNameBox").Text ?? "";
             if ((lbi.Content == "") || (new_locations[locations.Length] == ""))
             {
                 MessageBoxShow("Palun täitke kõik väljad!", "Mängu lisamine", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
                 return;
             }
             locations = new_locations;
-            GameList.Items.Add(lbi);
-            LocationBox.Text = "";
-            GameNameBox.Text = "";
+            this.GetControl<ListBox>("GameList").Items.Add(lbi);
+            this.GetControl<TextBox>("LocationBox").Text = "";
+            this.GetControl<TextBox>("GameNameBox").Text = "";
         }
 
         private async void MsGameEdit(object? sender, TappedEventArgs e)
         {
-            if (GameList.SelectedItems?.Count > 0)
+            if (this.GetControl<ListBox>("GameList").SelectedItems?.Count > 0)
             {
                 string? SelectedGame;
-                if (GameList.Selection.SelectedItems[0] is string)
+                if (this.GetControl<ListBox>("GameList").Selection.SelectedItems[0] is string)
                 {
-                    SelectedGame = GameList.Selection.SelectedItems[0] as string;
+                    SelectedGame = this.GetControl<ListBox>("GameList").Selection.SelectedItems[0] as string;
                 } else
                 {
-                    SelectedGame = ((ListBoxItem)GameList.Selection.SelectedItems[0]).Content.ToString();
+                    SelectedGame = ((ListBoxItem)this.GetControl<ListBox>("GameList").Selection.SelectedItems[0]).Content.ToString();
                 }
-                string GameLocation = locations[GameList.SelectedIndex];
+                string GameLocation = locations[this.GetControl<ListBox>("GameList").SelectedIndex];
                 GameLocation = GameLocation.Substring(0, GameLocation.Length - 1);
                 var mse = new MarkuStation_Edit
                 {
-                    NameBox =
-                    {
-                        Text = SelectedGame
-                    },
-                    LocationBox =
-                    {
-                        Text = GameLocation
-                    },
                     Background = this.Background,
                     Foreground = this.Foreground
                 };
+                mse.GetControl<TextBox>("NameBox").Text = SelectedGame;
+                mse.GetControl<TextBox>("LocationBox").Text = GameLocation;
                 await mse.ShowDialog(this).WaitAsync(new CancellationToken(false));
-                if (mse.DialogResult && (mse.LocationBox.Text == ";") && (mse.NameBox.Text == ";"))
+                if (mse.DialogResult && (mse.GetControl<TextBox>("LocationBox").Text == ";") && (mse.GetControl<TextBox>("NameBox").Text == ";"))
                 {
-                    int Deletable = GameList.SelectedIndex;
+                    int Deletable = this.GetControl<ListBox>("GameList").SelectedIndex;
                     string[] new_games = new string[locations.Length - 1];
                     int i = 0;
                     foreach (string location in locations)
@@ -1064,14 +1064,14 @@ namespace Markuse_arvuti_juhtpaneel
                         i++;
                     }
                     locations = new_games;
-                    GameList.Items.RemoveAt(Deletable);
+                    this.GetControl<ListBox>("GameList").Items.RemoveAt(Deletable);
                     _ = MessageBoxShow("Üksus eemaldati edukalt! Vajutage \"Salvesta muudatused\", et list rakendada.", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success);
                 }
                 else if (mse.DialogResult)
                 {
-                    int Modifiable = GameList.SelectedIndex;
-                    locations[Modifiable] = mse.LocationBox.Text + ";";
-                    GameList.Items[Modifiable] = mse.NameBox.Text;
+                    int Modifiable = this.GetControl<ListBox>("GameList").SelectedIndex;
+                    locations[Modifiable] = mse.GetControl<TextBox>("LocationBox").Text + ";";
+                    this.GetControl<ListBox>("GameList").Items[Modifiable] = mse.GetControl<TextBox>("NameBox").Text;
                     _ = MessageBoxShow("Üksus muudeti edukalt! Vajutage \"Salvesta muudatused\", et list rakendada.", "Markuse arvuti juhtpaneel", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success);
                 }
             }
@@ -1080,7 +1080,7 @@ namespace Markuse_arvuti_juhtpaneel
         private void MsSaveConfig(object? sender, RoutedEventArgs e)
         {
             string scrntype = "extend";
-            switch (MonMode.SelectedIndex)
+            switch (this.GetControl<ComboBox>("MonMode").SelectedIndex)
             {
                 case 1:
                     scrntype = "internal";
@@ -1097,7 +1097,7 @@ namespace Markuse_arvuti_juhtpaneel
             File.WriteAllText(masRoot + @"/ms_display.txt", scrntype + Environment.NewLine);
             StringBuilder? builder = new StringBuilder();
             builder.Append("* MarkuStation mängude loetelu *").Append("\n");
-            foreach (var lvi in GameList.Items)
+            foreach (var lvi in this.GetControl<ListBox>("GameList").Items)
             {
                 string? val;
                 if (lvi is ListBoxItem)
@@ -1133,14 +1133,14 @@ namespace Markuse_arvuti_juhtpaneel
             temp = temp + "\n";
             File.WriteAllText(masRoot + "/ms_exec.txt", temp, Encoding.UTF8);
             temp = "";
-            if (creepCheck.IsChecked == true) { temp = "true"; }
-            if (creepCheck.IsChecked == false) { temp = "false"; }
-            if (specialCheck.IsChecked == true) { temp += "\ntrue"; }
-            if (specialCheck.IsChecked == false) { temp += "\nfalse"; }
-            if (introCheck.IsChecked == true) { temp += "\ntrue"; }
-            if (introCheck.IsChecked == false) { temp += "\nfalse"; }
-            if (legacyIntroCheck.IsChecked == true) { temp += "\ntrue"; }
-            if (legacyIntroCheck.IsChecked == false) { temp += "\nfalse"; }
+            if (this.GetControl<CheckBox>("creepCheck").IsChecked == true) { temp = "true"; }
+            if (this.GetControl<CheckBox>("creepCheck").IsChecked == false) { temp = "false"; }
+            if (this.GetControl<CheckBox>("specialCheck").IsChecked == true) { temp += "\ntrue"; }
+            if (this.GetControl<CheckBox>("specialCheck").IsChecked == false) { temp += "\nfalse"; }
+            if (this.GetControl<CheckBox>("introCheck").IsChecked == true) { temp += "\ntrue"; }
+            if (this.GetControl<CheckBox>("introCheck").IsChecked == false) { temp += "\nfalse"; }
+            if (this.GetControl<CheckBox>("legacyIntroCheck").IsChecked == true) { temp += "\ntrue"; }
+            if (this.GetControl<CheckBox>("legacyIntroCheck").IsChecked == false) { temp += "\nfalse"; }
             File.WriteAllText(masRoot + "/setting.txt", temp);
             temp = "";
         }
@@ -1149,13 +1149,13 @@ namespace Markuse_arvuti_juhtpaneel
         private void ConfigCheck(object? sender, RoutedEventArgs e)
         {
             // check if poll rate is numeric
-            if (!int.TryParse(IntegrationPollrate.Text ?? "", out int pollRate)) return;
+            if (!int.TryParse(this.GetControl<TextBox>("IntegrationPollrate").Text ?? "", out int pollRate)) return;
 
             // backwards compatibility
             string saveprog = "";
-            saveprog += (bool)ShowMasLogoCheck.IsChecked! ? "true;" : "false;";
-            saveprog += (bool)AllowScheduledTasksCheck.IsChecked! ? "true;" : "false;";
-            saveprog += (bool)StartDesktopNotesCheck.IsChecked! ? "true;" : "false;";
+            saveprog += (bool)this.GetControl<CheckBox>("ShowMasLogoCheck").IsChecked! ? "true;" : "false;";
+            saveprog += (bool)this.GetControl<CheckBox>("AllowScheduledTasksCheck").IsChecked! ? "true;" : "false;";
+            saveprog += (bool)this.GetControl<CheckBox>("StartDesktopNotesCheck").IsChecked! ? "true;" : "false;";
             try
             {
                 File.WriteAllText(masRoot + "/mas.cnf", saveprog);
@@ -1163,20 +1163,20 @@ namespace Markuse_arvuti_juhtpaneel
                 // new method
                 config = new()
                 {
-                    AllowScheduledTasks = AllowScheduledTasksCheck.IsChecked ?? false,
-                    AutostartNotes = StartDesktopNotesCheck.IsChecked ?? false,
-                    ShowLogo = ShowMasLogoCheck.IsChecked ?? false,
+                    AllowScheduledTasks = this.GetControl<CheckBox>("AllowScheduledTasksCheck").IsChecked ?? false,
+                    AutostartNotes = this.GetControl<CheckBox>("StartDesktopNotesCheck").IsChecked ?? false,
+                    ShowLogo = this.GetControl<CheckBox>("ShowMasLogoCheck").IsChecked ?? false,
                     PollRate = pollRate,
                 };
                 config.Save(masRoot);
             }
             catch
             {
-                AllowScheduledTasksCheck.IsEnabled = false;
-                StartDesktopNotesCheck.IsEnabled = false;
-                ShowMasLogoCheck.IsEnabled = false;
-                IntegrationPollrate.IsEnabled = false;
-                ConfigNoticeLabel.Content = "Neid sätteid ei saa hetkel muuta. Olge kindlad, et kirjutamise ligipääs failidele mas.cnf ja Config.json oleks saadaval.";
+                this.GetControl<CheckBox>("AllowScheduledTasksCheck").IsEnabled = false;
+                this.GetControl<CheckBox>("StartDesktopNotesCheck").IsEnabled = false;
+                this.GetControl<CheckBox>("ShowMasLogoCheck").IsEnabled = false;
+                this.GetControl<TextBox>("IntegrationPollrate").IsEnabled = false;
+                this.GetControl<Label>("ConfigNoticeLabel").Content = "Neid sätteid ei saa hetkel muuta. Olge kindlad, et kirjutamise ligipääs failidele mas.cnf ja Config.json oleks saadaval.";
                 LaunchError = true;
                 return;
             }
@@ -1185,9 +1185,9 @@ namespace Markuse_arvuti_juhtpaneel
         private void ReloadThumbs()
         {
             if (Program.Launcherror) return; // avoid further errors in case something went wrong
-            ThumbDesktop.Source = new Bitmap(masRoot + "/bg_desktop.png");
-            ThumbLockscreen.Source = new Bitmap(masRoot + "/bg_login.png");
-            ThumbMiniversion.Source = new Bitmap(masRoot + "/bg_uncommon.png");
+            this.GetControl<Image>("ThumbDesktop").Source = new Bitmap(masRoot + "/bg_desktop.png");
+            this.GetControl<Image>("ThumbLockscreen").Source = new Bitmap(masRoot + "/bg_login.png");
+            this.GetControl<Image>("ThumbMiniversion").Source = new Bitmap(masRoot + "/bg_uncommon.png");
         }
 
         private void ChangeDesktop(object? sender, TappedEventArgs e)
@@ -1221,7 +1221,7 @@ namespace Markuse_arvuti_juhtpaneel
             string filename = files[0].Path.AbsolutePath;
             if (OperatingSystem.IsWindows())
             {
-                ThumbDesktop.Source = null;
+                this.GetControl<Image>("ThumbDesktop").Source = null;
                 foreach (Process p in Process.GetProcesses())
                 {
                     if ((p.ProcessName == "Markuse arvuti integratsioonitarkvara.exe") || (p.ProcessName == "Markuse arvuti integratsioonitarkvara.EXE") || (p.ProcessName == "Markuse arvuti integratsioonitarkvara"))
@@ -1249,7 +1249,7 @@ namespace Markuse_arvuti_juhtpaneel
                 pr.Start();
                 if (File.Exists(masRoot + "/bg_desktop.png"))
                 {
-                    ThumbDesktop.Source = new Bitmap(masRoot + "/bg_desktop.png");
+                    this.GetControl<Image>("ThumbDesktop").Source = new Bitmap(masRoot + "/bg_desktop.png");
                 }
                 foreach (var p in Process.GetProcesses())
                 {
@@ -1259,7 +1259,7 @@ namespace Markuse_arvuti_juhtpaneel
                     }
                 }
             } else if (OperatingSystem.IsLinux()) {
-                ThumbDesktop.Source = null;
+                this.GetControl<Image>("ThumbDesktop").Source = null;
                 // move existing background image
                 RunCommand("mv", "\"" + masRoot + "/bg_desktop.png\" \"" + masRoot + "/bg_desktop.temp\"");
                 // replace background image
@@ -1277,7 +1277,7 @@ namespace Markuse_arvuti_juhtpaneel
                 RunCommand("sh", masRoot + "/change_bg.sh");
                 if (File.Exists(masRoot + "/bg_desktop.png"))
                 {
-                    ThumbDesktop.Source = new Bitmap(masRoot + "/bg_desktop.png");
+                    this.GetControl<Image>("ThumbDesktop").Source = new Bitmap(masRoot + "/bg_desktop.png");
                 }
             } else
             {
@@ -1299,12 +1299,12 @@ namespace Markuse_arvuti_juhtpaneel
                 return;
             }
             var filename = files[0].Path.AbsolutePath;
-            ThumbLockscreen.Source = null;
+            this.GetControl<Image>("ThumbLockscreen").Source = null;
             File.Delete(masRoot + "/bg_login.png");
             File.Copy(filename, masRoot + "/bg_login.png");
             if (File.Exists(masRoot + "/bg_desktop.png"))
             {
-                ThumbLockscreen.Source = new Bitmap(masRoot + "/bg_login.png");
+                this.GetControl<Image>("ThumbLockscreen").Source = new Bitmap(masRoot + "/bg_login.png");
             }
         }
 
@@ -1322,12 +1322,12 @@ namespace Markuse_arvuti_juhtpaneel
                 return;
             }
             var filename = files[0].Path.AbsolutePath;
-            ThumbMiniversion.Source = null;
+            this.GetControl<Image>("ThumbMiniversion").Source = null;
             File.Delete(masRoot + "/bg_uncommon.png");
             File.Copy(filename, masRoot + "/bg_uncommon.png");
             if (File.Exists(masRoot + "/bg_uncommon.png"))
             {
-                ThumbMiniversion.Source = new Bitmap(masRoot + "/bg_uncommon.png");
+                this.GetControl<Image>("ThumbMiniversion").Source = new Bitmap(masRoot + "/bg_uncommon.png");
             }
         }
 
@@ -1345,9 +1345,9 @@ namespace Markuse_arvuti_juhtpaneel
                         p.Kill();
                     }
                 }
-                ThumbDesktop.Source = null;
-                ThumbLockscreen.Source = null;
-                ThumbMiniversion.Source = null;
+                this.GetControl<Image>("ThumbDesktop").Source = null;
+                this.GetControl<Image>("ThumbLockscreen").Source = null;
+                this.GetControl<Image>("ThumbMiniversion").Source = null;
                 string rootBackSlash = masRoot.Replace("/", "\\");
                 //võta kasutusele ajutine taustapilt
                 var pr = new Process();
@@ -1413,7 +1413,7 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void EditScheds(object sender, RoutedEventArgs e)
         {
-            if (AllowScheduledTasksCheck.IsChecked ?? false)
+            if (this.GetControl<CheckBox>("AllowScheduledTasksCheck").IsChecked ?? false)
             {
                 if (File.Exists(masRoot + "/events.txt"))
                 {
@@ -1453,19 +1453,16 @@ namespace Markuse_arvuti_juhtpaneel
             if (Program.Launcherror) return;
             var cpd = new ColorPickerDialog
             {
-                Color =
-                {
-                    Color = scheme[0]
-                },
                 Background = this.Background,
                 Foreground = this.Foreground
             };
+            cpd.GetControl<ColorView>("Color").Color = scheme[0];
             await cpd.ShowDialog(this);
-            this.scheme[0] = cpd.Color.Color;
+            this.scheme[0] = cpd.GetControl<ColorView>("Color").Color;
             if (cpd.result)
             {
                 freezeTimer = true;
-                await File.WriteAllTextAsync(masRoot + "/scheme.cfg", cpd.Color.Color.R.ToString() + ":" + cpd.Color.Color.G.ToString() + ":" + cpd.Color.Color.B.ToString() + ":;" + this.scheme[1].R + ":" + this.scheme[1].G + ":" + this.scheme[1].B + ":;");
+                await File.WriteAllTextAsync(masRoot + "/scheme.cfg", cpd.GetControl<ColorView>("Color").Color.R.ToString() + ":" + cpd.GetControl<ColorView>("Color").Color.G.ToString() + ":" + cpd.GetControl<ColorView>("Color").Color.B.ToString() + ":;" + this.scheme[1].R + ":" + this.scheme[1].G + ":" + this.scheme[1].B + ":;");
                 freezeTimer = false;
                 LoadTheme();
                 ApplyTheme();
@@ -1478,19 +1475,16 @@ namespace Markuse_arvuti_juhtpaneel
             if (Program.Launcherror) return;
             var cpd = new ColorPickerDialog
             {
-                Color =
-                {
-                    Color = scheme[1]
-                },
                 Background = this.Background,
                 Foreground = this.Foreground
             };
+            cpd.GetControl<ColorView>("Color").Color = scheme[1];
             await cpd.ShowDialog(this);
-            this.scheme[1] = cpd.Color.Color;
+            this.scheme[1] = cpd.GetControl<ColorView>("Color").Color;
             if (cpd.result)
             {
                 freezeTimer = true;
-                await File.WriteAllTextAsync(masRoot + "/scheme.cfg", this.scheme[0].R.ToString() + ":" + this.scheme[0].G.ToString() + ":" + this.scheme[0].B.ToString() + ":;" + cpd.Color.Color.R + ":" + cpd.Color.Color.G + ":" + cpd.Color.Color.B + ":;");
+                await File.WriteAllTextAsync(masRoot + "/scheme.cfg", this.scheme[0].R.ToString() + ":" + this.scheme[0].G.ToString() + ":" + this.scheme[0].B.ToString() + ":;" + cpd.GetControl<ColorView>("Color").Color.R + ":" + cpd.GetControl<ColorView>("Color").Color.G + ":" + cpd.GetControl<ColorView>("Color").Color.B + ":;");
                 freezeTimer = false;
                 LoadTheme();
                 ApplyTheme();
@@ -1519,24 +1513,24 @@ namespace Markuse_arvuti_juhtpaneel
             string[] masVer = File.ReadAllLines(masRoot + "/edition.txt");
             string edition = masVer[1];
             FileInfo fi = new FileInfo(masRoot + "/edition.txt");
-            MasEditionLabel.Content = edition;
+            this.GetControl<Label>("MasEditionLabel").Content = edition;
             switch (edition)
             {
                 case "Basic":
                 case "Basic+":
-                    EditionBox.Fill = new SolidColorBrush(Colors.Yellow);
+                    this.GetControl<Rectangle>("EditionBox").Fill = new SolidColorBrush(Colors.Yellow);
                     break;
                 case "Starter":
-                    EditionBox.Fill = new SolidColorBrush(Colors.Lime);
+                    this.GetControl<Rectangle>("EditionBox").Fill = new SolidColorBrush(Colors.Lime);
                     break;
                 case "Premium":
-                    EditionBox.Fill = new SolidColorBrush(Colors.DarkRed);
+                    this.GetControl<Rectangle>("EditionBox").Fill = new SolidColorBrush(Colors.DarkRed);
                     break;
                 case "Pro":
-                    EditionBox.Fill = new SolidColorBrush(Colors.DeepSkyBlue);
+                    this.GetControl<Rectangle>("EditionBox").Fill = new SolidColorBrush(Colors.DeepSkyBlue);
                     break;
                 case "Ultimate":
-                    EditionBox.Fill = new SolidColorBrush(Colors.BlueViolet);
+                    this.GetControl<Rectangle>("EditionBox").Fill = new SolidColorBrush(Colors.BlueViolet);
                     break;
             }
             var editionDetails = new StringBuilder();
@@ -1552,55 +1546,55 @@ namespace Markuse_arvuti_juhtpaneel
             editionDetails.AppendLine();
             editionDetails.AppendLine("Kinnituskood: " + masVer[9]);
             editionDetails.AppendLine("Olek: " + vf.MakeAttestation());
-            EditionDetails.Text = editionDetails.ToString();
+            this.GetControl<TextBlock>("EditionDetails").Text = editionDetails.ToString();
             var features = masVer[8].Split('-');
-            FeatTS.Source = cross;
-            FeatRM.Source = cross;
-            FeatIP.Source = cross;
-            FeatCS.Source = cross;
-            FeatMM.Source = cross;
-            FeatRD.Source = cross;
-            FeatWX.Source = cross;
-            FeatLT.Source = cross;
-            FeatGP.Source = cross;
-            DesktopTab.IsVisible = false;
+            this.GetControl<Image>("FeatTS").Source = cross;
+            this.GetControl<Image>("FeatRM").Source = cross;
+            this.GetControl<Image>("FeatIP").Source = cross;
+            this.GetControl<Image>("FeatCS").Source = cross;
+            this.GetControl<Image>("FeatMM").Source = cross;
+            this.GetControl<Image>("FeatRD").Source = cross;
+            this.GetControl<Image>("FeatWX").Source = cross;
+            this.GetControl<Image>("FeatLT").Source = cross;
+            this.GetControl<Image>("FeatGP").Source = cross;
+            this.GetControl<TabItem>("DesktopTab").IsVisible = false;
             foreach (var feature in features)
             {
                 switch (feature)
                 {
                     case "MM":
-                        FeatMM.Source = check;
+                        this.GetControl<Image>("FeatMM").Source = check;
                         break;
                     case "TS":
-                        FeatTS.Source = check;
-                        DesktopTab.IsVisible = true;
+                        this.GetControl<Image>("FeatTS").Source = check;
+                        this.GetControl<TabItem>("DesktopTab").IsVisible = true;
                         break;
                     case "RM":
-                        FeatRM.Source = check;
+                        this.GetControl<Image>("FeatRM").Source = check;
                         break;
                     case "IP":
-                        FeatIP.Source = check;
+                        this.GetControl<Image>("FeatIP").Source = check;
                         break;
                     case "CS":
-                        FeatCS.Source = check;
+                        this.GetControl<Image>("FeatCS").Source = check;
                         break;
                     case "WX":
-                        FeatWX.Source = check;
+                        this.GetControl<Image>("FeatWX").Source = check;
                         break;
                     case "RD":
-                        FeatRD.Source = check;
+                        this.GetControl<Image>("FeatRD").Source = check;
                         break;
                     case "LT":
-                        FeatLT.Source = check;
+                        this.GetControl<Image>("FeatLT").Source = check;
                         break;
                     case "GP":
-                        FeatGP.Source = check;
+                        this.GetControl<Image>("FeatGP").Source = check;
                         break;
                 }
             }
-            WhatNewLabel.Text += "\n" + whatNew;
+            this.GetControl<TextBlock>("WhatNewLabel").Text += "\n" + whatNew;
             var fullVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString().Split(".");
-            CpanelVersionLabel.Content = fullVersion[2] != "0" ? $"versioon {fullVersion[0]}.{fullVersion[1]}.{fullVersion[2]}" : $"versioon {fullVersion[0]}.{fullVersion[1]}";
+            this.GetControl<Label>("CpanelVersionLabel").Content = fullVersion[2] != "0" ? $"versioon {fullVersion[0]}.{fullVersion[1]}.{fullVersion[2]}" : $"versioon {fullVersion[0]}.{fullVersion[1]}";
         }
 
         private void ComputerInfoClicked(object sender, RoutedEventArgs e)
@@ -1650,22 +1644,22 @@ namespace Markuse_arvuti_juhtpaneel
                 p.Start();
                 Dispatcher.UIThread.Post(() =>
                 {
-                    ErtGrid.IsEnabled = false;
+                    this.GetControl<Grid>("ErtGrid").IsEnabled = false;
                     WindowState = WindowState.Minimized;
                     IsVisible = false;
                 });
                 p.WaitForExit();
                 Dispatcher.UIThread.Post(() =>
                 {
-                    ErtGrid.Background = null;
-                    ErtGrid.IsEnabled = true;
+                    this.GetControl<Grid>("ErtGrid").Background = null;
+                    this.GetControl<Grid>("ErtGrid").IsEnabled = true;
                     WindowState = ps;
                     IsVisible = true;
-                    WhatNewLabel.Text = "Mis on uut?";
-                    TabsControl.IsEnabled = false;
-                    TabsControl.IsVisible = false;
-                    Header1.IsVisible = false;
-                    CheckSysLabel.IsVisible = true;
+                    this.GetControl<TextBlock>("WhatNewLabel").Text = "Mis on uut?";
+                    this.GetControl<TabControl>("TabsControl").IsEnabled = false;
+                    this.GetControl<TabControl>("TabsControl").IsVisible = false;
+                    this.GetControl<StackPanel>("Header1").IsVisible = false;
+                    this.GetControl<StackPanel>("CheckSysLabel").IsVisible = true;
                 });
                 CollectInfo();
             }).Start();
@@ -1678,7 +1672,7 @@ namespace Markuse_arvuti_juhtpaneel
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             InitTimers();
-            //TabMarkuStation.IsVisible = !IsAppleSilicon(); // LibVLC is currently unsupported on Apple Silicon, so any Markus' stuff that leverages it (incl. MarkuStation 2) will not work.
+            //this.GetControl<TabItem>("TabMarkuStation").IsVisible = !IsAppleSilicon(); // LibVLC is currently unsupported on Apple Silicon, so any Markus' stuff that leverages it (incl. MarkuStation 2) will not work.
         }
 
         private void Locked_IsCheckedChanged(object? sender, RoutedEventArgs e)
@@ -1726,16 +1720,16 @@ namespace Markuse_arvuti_juhtpaneel
         private void SaveDesktopSettings()
         {
             if (preventWrites) return;
-            var jsonData = JsonSerializer.Serialize(desktopLayout, _serializerOptions);
+            var jsonData = JsonSerializer.Serialize(desktopLayout, App._serializerOptions);
             try
             {
                 File.WriteAllText(masRoot + "/DesktopIcons.json", jsonData, encoding: Encoding.UTF8);
             }
             catch
             {
-                DesktopTab.IsEnabled = false;
-                DesktopTab.IsSelected = false;
-                TabPrimary.IsSelected = true;
+                this.GetControl<TabItem>("DesktopTab").IsEnabled = false;
+                this.GetControl<TabItem>("DesktopTab").IsSelected = false;
+                this.GetControl<TabItem>("TabPrimary").IsSelected = true;
                 MessageBoxShow("Sätete salvestamine nurjus. Olge kindlad, et teil oleks kirjutamise ligipääs failile \"DesktopIcons.json\".", "Markuse arvuti juhtpaneel", ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error);
             }
         }
@@ -1754,25 +1748,25 @@ namespace Markuse_arvuti_juhtpaneel
         {
             preventWrites = true;
             LoadDesktopSettings();
-            DesktopIconCountX.Text = desktopLayout.IconCountX.ToString();
-            DesktopIconCountY.Text = desktopLayout.IconCountY.ToString();
-            DesktopLockedCheck.IsChecked = desktopLayout.LockIcons;
-            DesktopActionCheck.IsChecked = desktopLayout.ShowActions;
-            DesktopIconPadding.Text = desktopLayout.IconPadding.ToString();
-            DesktopIconSize.Text = desktopLayout.IconSize.ToString();
-            DesktopLogoCheck.IsChecked = desktopLayout.ShowLogo;
-            DesktopApps.Items.Clear();
+            this.GetControl<TextBox>("DesktopIconCountX").Text = desktopLayout.IconCountX.ToString();
+            this.GetControl<TextBox>("DesktopIconCountY").Text = desktopLayout.IconCountY.ToString();
+            this.GetControl<CheckBox>("DesktopLockedCheck").IsChecked = desktopLayout.LockIcons;
+            this.GetControl<CheckBox>("DesktopActionCheck").IsChecked = desktopLayout.ShowActions;
+            this.GetControl<TextBox>("DesktopIconPadding").Text = desktopLayout.IconPadding.ToString();
+            this.GetControl<TextBox>("DesktopIconSize").Text = desktopLayout.IconSize.ToString();
+            this.GetControl<CheckBox>("DesktopLogoCheck").IsChecked = desktopLayout.ShowLogo;
+            this.GetControl<ListBox>("DesktopApps").Items.Clear();
             foreach (var di in desktopLayout.Children)
             {
-                DesktopApps.Items.Add(di.Icon + ": " + di.Executable);
+                this.GetControl<ListBox>("DesktopApps").Items.Add(di.Icon + ": " + di.Executable);
             }
             new Thread(() =>
             {
                 Thread.Sleep(200);
                 Dispatcher.UIThread.Post(() =>
                 {
-                    DesktopTab.IsEnabled = File.ReadAllText(Path.Combine(masRoot, "edition.txt")).Contains("TS-");
-                    DesktopTab.IsVisible = DesktopTab.IsEnabled;
+                    this.GetControl<TabItem>("DesktopTab").IsEnabled = File.ReadAllText(Path.Combine(masRoot, "edition.txt")).Contains("TS-");
+                    this.GetControl<TabItem>("DesktopTab").IsVisible = this.GetControl<TabItem>("DesktopTab").IsEnabled;
                 });
                 preventWrites = false;
             }) {IsBackground = true}.Start();   
@@ -1795,22 +1789,22 @@ namespace Markuse_arvuti_juhtpaneel
             var uri = li.Content?.ToString().Split(": ")[1];
             foreach (var s in desktopIcons)
             {
-                dEdit.NameBox.Items.Add(s);   
+                dEdit.GetControl<ComboBox>("NameBox").Items.Add(s);   
             }
-            dEdit.NameBox.SelectedItem = dEdit.NameBox.Items[desktopIcons.IndexOf(icon)];
-            dEdit.LocationBox.Text = uri;
+            dEdit.GetControl<ComboBox>("NameBox").SelectedItem = dEdit.GetControl<ComboBox>("NameBox").Items[desktopIcons.IndexOf(icon)];
+            dEdit.GetControl<TextBox>("LocationBox").Text = uri;
             dEdit.Background = this.Background;
             dEdit.Foreground = this.Foreground;
             await dEdit.ShowDialog(this).WaitAsync(new CancellationToken(false));
             if (!dEdit.DialogResult) return;
-            if (dEdit.NameBox.SelectedIndex != -1)
+            if (dEdit.GetControl<ComboBox>("NameBox").SelectedIndex != -1)
             {
-                desktopLayout.Children[DesktopApps.SelectedIndex].Icon = dEdit.NameBox.SelectedItem.ToString()!;
-                desktopLayout.Children[DesktopApps.SelectedIndex].Executable = dEdit.LocationBox.Text;
+                desktopLayout.Children[this.GetControl<ListBox>("DesktopApps").SelectedIndex].Icon = dEdit.GetControl<ComboBox>("NameBox").SelectedItem.ToString()!;
+                desktopLayout.Children[this.GetControl<ListBox>("DesktopApps").SelectedIndex].Executable = dEdit.GetControl<TextBox>("LocationBox").Text;
             }
             else
             {
-                desktopLayout.Children = desktopLayout.Children.Where(w => w != desktopLayout.Children[DesktopApps.SelectedIndex]).ToArray();
+                desktopLayout.Children = desktopLayout.Children.Where(w => w != desktopLayout.Children[this.GetControl<ListBox>("DesktopApps").SelectedIndex]).ToArray();
             }
             SaveDesktopSettings();
             SendDesktopIconCommand("Reset", "true");
@@ -1918,12 +1912,12 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void ReloadInfo_OnClick(object? sender, RoutedEventArgs e)
         {
-            WhatNewLabel.Text = "Mis on uut?";
-            TabsControl.IsEnabled = false;
-            TabsControl.IsVisible = false;
-            Header1.IsVisible = false;
-            CheckSysLabel.IsVisible = true;
-            this.ErtGrid.Background = null;
+            this.GetControl<TextBlock>("WhatNewLabel").Text = "Mis on uut?";
+            this.GetControl<TabControl>("TabsControl").IsEnabled = false;
+            this.GetControl<TabControl>("TabsControl").IsVisible = false;
+            this.GetControl<StackPanel>("Header1").IsVisible = false;
+            this.GetControl<StackPanel>("CheckSysLabel").IsVisible = true;
+            this.GetControl<Grid>("ErtGrid").Background = null;
             ThreadStart ts = CollectInfo;
             var t = new Thread(ts)
             {
@@ -1942,20 +1936,20 @@ namespace Markuse_arvuti_juhtpaneel
             var dEdit = new DesktopIcon_Edit();
             foreach (var s in desktopIcons)
             {
-                dEdit.NameBox.Items.Add(s);   
+                dEdit.GetControl<ComboBox>("NameBox").Items.Add(s);   
             }
 
             dEdit.Background = this.Background;
             dEdit.Foreground = this.Foreground;
-            dEdit.DeleteButton.IsVisible = false;
+            dEdit.GetControl<Button>("DeleteButton").IsVisible = false;
             await dEdit.ShowDialog(this).WaitAsync(new CancellationToken(false));
             if (!dEdit.DialogResult) return;
             try
             {
                 desktopLayout.Children = desktopLayout.Children.Append(new DesktopIcon
                 {
-                    Icon = dEdit.NameBox.SelectedItem.ToString()!,
-                    Executable = dEdit.LocationBox.Text!,
+                    Icon = dEdit.GetControl<ComboBox>("NameBox").SelectedItem.ToString()!,
+                    Executable = dEdit.GetControl<TextBox>("LocationBox").Text!,
                     LocationX = -1,
                     LocationY = -1
                 }).ToArray();
@@ -2023,14 +2017,14 @@ namespace Markuse_arvuti_juhtpaneel
                 p.Start();
                 Dispatcher.UIThread.Post(() =>
                 {
-                    ErtGrid.IsEnabled = false;
+                    this.GetControl<Grid>("ErtGrid").IsEnabled = false;
                     IsVisible = false;
                     WindowState = WindowState.Minimized;
                 });
                 p.WaitForExit();
                 Dispatcher.UIThread.Post(() =>
                 {
-                    ErtGrid.IsEnabled = true;
+                    this.GetControl<Grid>("ErtGrid").IsEnabled = true;
                     WindowState = ps;
                     IsVisible = true;
                 });
@@ -2050,8 +2044,8 @@ namespace Markuse_arvuti_juhtpaneel
         {
             if (e.Key is Key.LeftAlt or Key.RightAlt)
             {
-                TipLabel.IsVisible = true;
-                CloseButton.IsVisible = false;
+                this.GetControl<TextBlock>("TipLabel").IsVisible = true;
+                this.GetControl<Button>("CloseButton").IsVisible = false;
             }
             pressedKeys.Add(e.Key);
             if (pressedKeys.Count <= 10) return;
@@ -2093,8 +2087,8 @@ namespace Markuse_arvuti_juhtpaneel
 
         private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
         {
-            TipLabel.IsVisible = false;
-            CloseButton.IsVisible = File.Exists(masRoot + "/irunning.log");
+            this.GetControl<TextBlock>("TipLabel").IsVisible = false;
+            this.GetControl<Button>("CloseButton").IsVisible = File.Exists(masRoot + "/irunning.log");
         }
 
         private void CloseButton_OnClick(object? sender, RoutedEventArgs e)
@@ -2115,14 +2109,14 @@ namespace Markuse_arvuti_juhtpaneel
         {
             if ((e.KeyModifiers & KeyModifiers.Alt) != 0)
             {
-                TabsControl.SelectedIndex = e.Key switch
+                this.GetControl<TabControl>("TabsControl").SelectedIndex = e.Key switch
                 {
                     Key.A => 0,
-                    Key.M => File.Exists(Path.Combine(masRoot, "Markuse asjad", "MarkuStation2" + (OperatingSystem.IsWindows() ? ".exe" : ""))) ? 1 : TabsControl.SelectedIndex,
+                    Key.M => File.Exists(Path.Combine(masRoot, "Markuse asjad", "MarkuStation2" + (OperatingSystem.IsWindows() ? ".exe" : ""))) ? 1 : this.GetControl<TabControl>("TabsControl").SelectedIndex,
                     Key.K => 2,
-                    Key.D => File.ReadAllText(Path.Combine(masRoot, "edition.txt")).Contains("TS") ? 3 : TabsControl.SelectedIndex,
+                    Key.D => File.ReadAllText(Path.Combine(masRoot, "edition.txt")).Contains("TS") ? 3 : this.GetControl<TabControl>("TabsControl").SelectedIndex,
                     Key.T => 4,
-                    _ => TabsControl.SelectedIndex
+                    _ => this.GetControl<TabControl>("TabsControl").SelectedIndex
                 };
             }
         }

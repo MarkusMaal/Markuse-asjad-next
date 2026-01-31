@@ -12,6 +12,10 @@ public partial class ColorPickerDialog : Window
     {
         InitializeComponent();
     }
+    private void InitializeComponent()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
 
     private void Confirm(object sender, RoutedEventArgs e)
     {

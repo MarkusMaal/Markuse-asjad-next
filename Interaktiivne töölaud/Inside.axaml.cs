@@ -19,6 +19,8 @@ public partial class Inside : Window
     {
         InitializeComponent();
     }
+    
+    private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
     private void ExitHouse_Click(object? sender, RoutedEventArgs e)
     {

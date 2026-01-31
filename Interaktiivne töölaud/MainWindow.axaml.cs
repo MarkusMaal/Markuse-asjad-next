@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System;
 using System.Diagnostics;
+using Avalonia.Markup.Xaml;
 using MasCommon;
 
 namespace Interaktiivne_töölaud
@@ -25,6 +26,7 @@ namespace Interaktiivne_töölaud
                 Environment.Exit(255);
             }
         }
+        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
         private void Enter_PointerReleased(object? sender, RoutedEventArgs e)
         {

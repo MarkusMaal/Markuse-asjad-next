@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using Avalonia;
 using System.IO;
+using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
 namespace Markuse_arvuti_integratsioonitarkvara
@@ -29,6 +30,12 @@ namespace Markuse_arvuti_integratsioonitarkvara
             this.Foreground = new SolidColorBrush(scheme[1]);
             
         }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+        
         /* Loads mas theme */
         Color[] LoadTheme()
         {
@@ -69,62 +76,62 @@ namespace Markuse_arvuti_integratsioonitarkvara
             name = attribs[10].ToString();
             if (edition == "Pro")
             {
-                EditionBox.SelectedIndex = 1;
+                this.GetControl<ComboBox>("EditionBox").SelectedIndex = 1;
             }
             else if (edition == "Ultimate")
             {
-                EditionBox.SelectedIndex = 0;
+                this.GetControl<ComboBox>("EditionBox").SelectedIndex = 0;
             }
             else if (edition == "Premium")
             {
-                EditionBox.SelectedIndex = 2;
+                this.GetControl<ComboBox>("EditionBox").SelectedIndex = 2;
             }
             else
             {
-                EditionBox.SelectedIndex = 3;
+                this.GetControl<ComboBox>("EditionBox").SelectedIndex = 3;
             }
-            VersionBox.Text = version;
-            BuildBox.Text = build;
-            NameBox.Text = name;
-            label11.Content = "PIN kood: " + pin + " (automaatne väli)";
-            label7.Content = "Juurutaja: " + Environment.UserName + " (automaatne väli)";
-            label9.Content = "Tuuma versioon: " + Environment.OSVersion.Version.Major.ToString() + "." + Environment.OSVersion.Version.Minor.ToString() + " (automaatne väli)";
-            DXBox.IsChecked = false;
-            ITBox.IsChecked = false;
-            WXBox.IsChecked = false;
-            GPBox.IsChecked = false;
-            CSBox.IsChecked = false;
-            RDBox.IsChecked = false;
-            LTBox.IsChecked = false;
+            this.GetControl<TextBox>("VersionBox").Text = version;
+            this.GetControl<TextBox>("BuildBox").Text = build;
+            this.GetControl<TextBox>("NameBox").Text = name;
+            this.GetControl<Label>("label11").Content = "PIN kood: " + pin + " (automaatne väli)";
+            this.GetControl<Label>("label7").Content = "Juurutaja: " + Environment.UserName + " (automaatne väli)";
+            this.GetControl<Label>("label9").Content = "Tuuma versioon: " + Environment.OSVersion.Version.Major.ToString() + "." + Environment.OSVersion.Version.Minor.ToString() + " (automaatne väli)";
+            this.GetControl<CheckBox>("DXBox").IsChecked = false;
+            this.GetControl<CheckBox>("ITBox").IsChecked = false;
+            this.GetControl<CheckBox>("WXBox").IsChecked = false;
+            this.GetControl<CheckBox>("GPBox").IsChecked = false;
+            this.GetControl<CheckBox>("CSBox").IsChecked = false;
+            this.GetControl<CheckBox>("RDBox").IsChecked = false;
+            this.GetControl<CheckBox>("LTBox").IsChecked = false;
             foreach (string element in features)
             {
                 if ((element == "DX") || (element == "RM"))
                 {
-                    DXBox.IsChecked = true;
+                    this.GetControl<CheckBox>("DXBox").IsChecked = true;
                 }
                 else if (element == "IT")
                 {
-                    ITBox.IsChecked = true;
+                    this.GetControl<CheckBox>("ITBox").IsChecked = true;
                 }
                 else if (element == "WX")
                 {
-                    WXBox.IsChecked = true;
+                    this.GetControl<CheckBox>("WXBox").IsChecked = true;
                 }
                 else if (element == "GP")
                 {
-                    GPBox.IsChecked = true;
+                    this.GetControl<CheckBox>("GPBox").IsChecked = true;
                 }
                 else if (element == "CS")
                 {
-                    CSBox.IsChecked = true;
+                    this.GetControl<CheckBox>("CSBox").IsChecked = true;
                 }
                 else if (element == "RD")
                 {
-                    RDBox.IsChecked = true;
+                    this.GetControl<CheckBox>("RDBox").IsChecked = true;
                 }
                 else if (element == "LT")
                 {
-                    LTBox.IsChecked = true;
+                    this.GetControl<CheckBox>("LTBox").IsChecked = true;
                 }
             }
 
@@ -135,15 +142,15 @@ namespace Markuse_arvuti_integratsioonitarkvara
             try
             {
                 string feats = "IP-";
-                NameBox.Text = NameBox.Text.Replace("ä", "2").Replace("õ", "?").Replace("ü", "_y_").Replace("ö", "9");
-                if (ITBox.IsChecked == true) { feats += "IT-"; }
-                if (WXBox.IsChecked == true) { feats += "WX-"; }
-                if (GPBox.IsChecked == true) { feats += "GP-"; }
-                if (DXBox.IsChecked == true) { feats += "RM-"; }
-                if (CSBox.IsChecked == true) { feats += "CS-"; }
-                if (RDBox.IsChecked == true) { feats += "RD-"; }
-                if (LTBox.IsChecked == true) { feats += "LT-"; }
-                if (TSMMBox.IsChecked == true) { feats += "TS-MM"; }
+                this.GetControl<TextBox>("NameBox").Text = this.GetControl<TextBox>("NameBox").Text.Replace("ä", "2").Replace("õ", "?").Replace("ü", "_y_").Replace("ö", "9");
+                if (this.GetControl<CheckBox>("ITBox").IsChecked == true) { feats += "IT-"; }
+                if (this.GetControl<CheckBox>("WXBox").IsChecked == true) { feats += "WX-"; }
+                if (this.GetControl<CheckBox>("GPBox").IsChecked == true) { feats += "GP-"; }
+                if (this.GetControl<CheckBox>("DXBox").IsChecked == true) { feats += "RM-"; }
+                if (this.GetControl<CheckBox>("CSBox").IsChecked == true) { feats += "CS-"; }
+                if (this.GetControl<CheckBox>("RDBox").IsChecked == true) { feats += "RD-"; }
+                if (this.GetControl<CheckBox>("LTBox").IsChecked == true) { feats += "LT-"; }
+                if (this.GetControl<CheckBox>("TSMMBox").IsChecked == true) { feats += "TS-MM"; }
                 string rooter = Environment.UserName;
                 string win = Environment.OSVersion.Version.Major.ToString() + "." + Environment.OSVersion.Version.Minor.ToString();
                 //if (File.Exists("\\mas\\edition.bak")) { File.Delete("\\mas\\edition.bak"); }
