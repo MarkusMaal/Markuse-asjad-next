@@ -96,7 +96,7 @@ Juhul kui kasutate macOS-i, genereerib _devTool_Menu.ps1 skript teie jaoks .app 
 
 Kui kasutate Apple Silicon süsteemi, kompileeritakse MarkuStation2 ja Pidu! projektid x64 režiimis. Selleks, et neid rakendusi käivitada peab arvutis olema Rosetta ühilduvuskiht paigaldatud. Teeme seda seepärast, et LibVLC ei ole Apple Silicon Mac-ide jaoks saadaval.
 
-## Aknareeglid Linuxi jaoks
+## KDE Plasma aknareeglid (Linux)
 
 Kui kasutate DesktopIcons rakendust Linuxis, siis võite märgata, et need ikoonid ei püsi akende taga. Selleks, et seda parandada, peate konfigureerima enda aknahalduri vastavate reeglitega.
 
