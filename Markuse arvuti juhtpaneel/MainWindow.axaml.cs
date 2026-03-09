@@ -957,9 +957,14 @@ namespace Markuse_arvuti_juhtpaneel
                 this.GetControl<ListBox>("GameList").Items.Add(lbi);
             }
 
-            this.GetControl<TabItem>("TabMarkuStation").IsVisible = File.Exists(Path.Combine(masRoot, "Markuse asjad",
-                "MarkuStation2" + (OperatingSystem.IsWindows() ? ".exe" : "")));
-            this.GetControl<TabItem>("TabMarkuStation").IsEnabled = this.GetControl<TabItem>("TabMarkuStation").IsVisible;
+            if (this.GetControl<TabItem>("TabMarkuStation").IsVisible)
+            {
+                this.GetControl<TabItem>("TabMarkuStation").IsVisible = File.Exists(Path.Combine(masRoot, "Markuse asjad",
+                    "MarkuStation2" + (OperatingSystem.IsWindows() ? ".exe" : "")));
+                this.GetControl<TabItem>("TabMarkuStation").IsEnabled =
+                    this.GetControl<TabItem>("TabMarkuStation").IsVisible;
+            }
+
             file = File.ReadAllText(masRoot + "/ms_exec.txt");
             file = file.Substring(0, file.Length - 2);
             locations = file.Split('\n').Skip(1).ToArray();
@@ -1558,6 +1563,15 @@ namespace Markuse_arvuti_juhtpaneel
             this.GetControl<Image>("FeatLT").Source = cross;
             this.GetControl<Image>("FeatGP").Source = cross;
             this.GetControl<TabItem>("DesktopTab").IsVisible = false;
+            if (masVer[4] == "No")
+            {
+                for (var i = 0; i < 4; i++)
+                {
+                    this.GetControl<TabControl>("TabsControl").Items.RemoveAt(0);
+                }
+                this.GetControl<TabControl>("TabsControl").SelectedIndex = 4;
+                Program.Launcherror = true;
+            }
             foreach (var feature in features)
             {
                 switch (feature)
