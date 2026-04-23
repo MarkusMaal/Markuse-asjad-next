@@ -8,7 +8,6 @@
         Width="410" Height="163"
         WindowStartupLocation="Manual" Position="70,30"
         CanResize="False" ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1">
   <StackPanel Margin="15,10">
     <Label FontSize="16" Margin="-2,0,0,3">Paigaldusrežiim</Label>

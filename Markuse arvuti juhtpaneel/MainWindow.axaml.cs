@@ -40,7 +40,7 @@ namespace Markuse_arvuti_juhtpaneel
         string[] locations;
         bool freezeTimer = false;
         private bool preventWrites = true;
-        readonly string whatNew = "* Üleminek .NET 10-le";
+        readonly string whatNew = "* Üleminek Avalonia 12-le\n- Eemaldatud Fluent teema";
         private List<string> desktopIcons = [];
         DesktopLayout? desktopLayout;
         CommonConfig config = new();

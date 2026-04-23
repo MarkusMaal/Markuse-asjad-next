@@ -61,6 +61,7 @@ namespace Markuse_arvuti_ooterežiim
                 };
                 scr.Save(mas_root);
             }
+            
             InitializeComponent();
             this.GetControl<Image>("LogoImageR").Width = scr.ImageWidth;
             this.GetControl<Image>("LogoImageR").Height = scr.ImageWidth;

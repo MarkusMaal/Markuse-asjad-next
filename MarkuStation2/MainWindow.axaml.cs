@@ -435,7 +435,7 @@ namespace MarkuStation2
 
         public static Point GetAbsolutePosition(Control control) // chatgpt helped a bit with this
         {
-            if (control.GetVisualRoot() is not Control topLevel)
+            if (GetTopLevel(control) is not Control topLevel)
             {
                 return new Point(0, 0);
             }

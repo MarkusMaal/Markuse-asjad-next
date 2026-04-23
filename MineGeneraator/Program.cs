@@ -1,4 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MineGeneraator
 {
@@ -66,6 +71,7 @@ namespace MineGeneraator
                 return;
             }
             File.CreateSymbolicLink(MineRoot + prefix + FinalName, root.FullName);
+
         }
 
         private static int RecurseFolders(string path)
@@ -75,6 +81,37 @@ namespace MineGeneraator
                 PadFill(path);
                 foreach (var dir in Directory.GetDirectories(path))
                 {
+                    
+                    var directoryInfo = new DirectoryInfo(dir);
+                    if (directoryInfo.Attributes.HasFlag(FileAttributes.ReparsePoint))
+                    {
+                        continue;
+                    }
+                    if (OperatingSystem.IsLinux() && File.Exists(Path.Join(dir, ".xdg_comments.json")))
+                    {
+                        using var r = new StreamReader(Path.Join(dir, ".xdg_comments.json"));
+                        var json = r.ReadToEnd();
+                        dynamic? items = JsonConvert.DeserializeObject(json);
+                        if (items != null)
+                        {
+                            foreach (var item in items)
+                            {
+                                var key = ((JProperty)item).Name;
+                                var value = ((JProperty)item).Value.ToString();
+                                var psi = new ProcessStartInfo("setfattr",
+                                    $"--name=user.xdg.comment --value=\"{value}\" \"{Path.Join(dir, key)}\"")
+                                {
+                                    CreateNoWindow = true,
+                                    UseShellExecute = true
+                                };
+                                new Process
+                                {
+                                    StartInfo = psi
+                                }.Start();
+                            }
+                        }
+                    }
+
                     var cloop = false;
                     foreach (var s in BlackListedDirs)
                     {
@@ -83,15 +120,11 @@ namespace MineGeneraator
                     if (cloop) continue;
                     if (dir.Contains("/.")) continue;
                     if (dir.Contains("/markuse asjad/markuse asjad/")) continue;
-                    var directoryInfo = new DirectoryInfo(dir);
-                    if (directoryInfo.Attributes.HasFlag(FileAttributes.ReparsePoint))
-                    {
-                        continue;
-                    }
                     if (File.Exists(dir + "/.mine.json"))
                     {
                         CheckDirs.Add(directoryInfo);
                     }
+
                     RecurseFolders(dir);
                 }
 

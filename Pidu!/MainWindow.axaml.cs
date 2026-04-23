@@ -47,7 +47,7 @@ namespace Pidu_
             {
                 //Console.WriteLine("Windows/Mac paranduste aktiveerimine...");
                 this.ExtendClientAreaToDecorationsHint = false;
-                this.SystemDecorations = SystemDecorations.None;
+                this.WindowDecorations = WindowDecorations.None;
             }
             timer.Tick += (object? sender, EventArgs e) =>
             {
@@ -149,8 +149,7 @@ namespace Pidu_
             if (!Program.streamMode) return;
             this.WindowState = WindowState.Normal;
             this.ExtendClientAreaToDecorationsHint = false;
-            this.ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.Default;
-            this.SystemDecorations = SystemDecorations.Full;
+            this.WindowDecorations = WindowDecorations.Full;
             this.GetControl<Button>("MinimizeButton").Content = "";
             this.GetControl<Button>("MinimizeButton").Padding = new Thickness(0,5);
             this.GetControl<Button>("MinimizeButton").BorderThickness = new Thickness(0);

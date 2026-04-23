@@ -4,11 +4,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Width="218" Height="210"
         x:Class="TöölauaMärkmed.MainWindow" ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
         Background="PaleGoldenrod"
         Foreground="Black"
         ExtendClientAreaTitleBarHeightHint="-1"
-        SystemDecorations="BorderOnly"
+        WindowDecorations="BorderOnly"
         IsHitTestVisible="True" BorderThickness="0"
         Title="TöölauaMärkmed" ShowInTaskbar="False">
   <StackPanel>

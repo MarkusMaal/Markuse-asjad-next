@@ -1,11 +1,10 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Markuse_arvuti_integratsioonitarkvara.App"
-             RequestedThemeVariant="Dark" Name="Markuse arvuti integratsioonitarkvara"
-             xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia">
+             RequestedThemeVariant="Dark" Name="Markuse arvuti integratsioonitarkvara">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>
-      <styling:FluentAvaloniaTheme PreferSystemTheme="False" PreferUserAccentColor="True" />
+      <FluentTheme></FluentTheme>
     </Application.Styles>
     <TrayIcon.Icons>
       <TrayIcons>

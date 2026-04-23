@@ -5,8 +5,6 @@
              xmlns:msBoxControls="clr-namespace:MsBox.Avalonia.Controls;assembly=MsBox.Avalonia"
              xmlns:markuseArvutiJuhtpaneel="clr-namespace:Markuse_arvuti_juhtpaneel"
              Name="Markuse arvuti juhtpaneel"
-             xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
-             xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
              x:DataType="markuseArvutiJuhtpaneel:Program">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
      <NativeMenu.Menu>
@@ -15,9 +13,7 @@
         </NativeMenu>
      </NativeMenu.Menu>
     <Application.Styles>
-        <styling:FluentAvaloniaTheme PreferSystemTheme="False" PreferUserAccentColor="True" />
-        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
-        
+        <FluentTheme></FluentTheme>
         <!-- Some overrides for MsBox.Avalonia styling (standard view only) -->
         <Style Selector="msBoxControls|MsBoxStandardView">
             <Setter Property="Background" Value="{Binding BgCol}"/>

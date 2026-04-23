@@ -30,7 +30,7 @@ public partial class VerifileFail : Window
         {
             //Console.WriteLine("Windows/Mac paranduste aktiveerimine...");
             this.ExtendClientAreaToDecorationsHint = false;
-            this.SystemDecorations = SystemDecorations.None;
+            this.WindowDecorations = WindowDecorations.None;
         }
     }
 }
